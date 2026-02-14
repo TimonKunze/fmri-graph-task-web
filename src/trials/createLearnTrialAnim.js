@@ -21,6 +21,12 @@ export function createLearnTrialAnim(
   const isSecondPhase = typeof type === "string" && type.startsWith("unconstrained");
   const phaseBgColor = isSecondPhase ? COLORS.bgBlue : COLORS.bgGreen;
   const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
+  const nodeSize = useSecondStimSet
+    ? SIZES.treetop
+    : SIZES.flower;
+  const movingObjSize = useSecondStimSet
+    ? SIZES.bat
+    : SIZES.bee;
   const movingObjPath = useSecondStimSet ? PATHS.movingObj2 : PATHS.movingObj1;
   const movingObjMirroredPath = useSecondStimSet
     ? PATHS.movingObj2Mirrored
@@ -98,12 +104,12 @@ export function createLearnTrialAnim(
               typeof this.aspect.width === "number" &&
               this.aspect.width > 0
             ) {
-              p.image(
+                p.image(
                 this.aspect,
-                this.x - SIZES.node / 2 + noise,
-                this.y - SIZES.node / 2 + noise,
-                SIZES.node,
-                SIZES.node
+                this.x - nodeSize / 2 + noise,
+                this.y - nodeSize / 2 + noise,
+                nodeSize,
+                nodeSize
               );
             } else {
               // fallback while loading/missing
@@ -129,7 +135,7 @@ export function createLearnTrialAnim(
       p.TLD.drawBee = (pos, angle) => {
         if (!p.TLD.bee || !p.TLD.bee_mirrored) return;
 
-        const size = SIZES.bee ?? 40;
+        const size = movingObjSize ?? 40;
         const iter = 4;
 
         p.TLD.bee.resize(size, 0);
@@ -239,10 +245,10 @@ export function createLearnTrialAnim(
 
       p.mousePressed = () => {
         for (let i = 0; i < nbNodes; i++) {
-          const tPLowX = nodePos[i][0] - SIZES.node / 2;
-          const tPHighX = nodePos[i][0] + SIZES.node / 2;
-          const tPLowY = nodePos[i][1] - SIZES.node / 2;
-          const tPHighY = nodePos[i][1] + SIZES.node / 2;
+          const tPLowX = nodePos[i][0] - nodeSize / 2;
+          const tPHighX = nodePos[i][0] + nodeSize / 2;
+          const tPLowY = nodePos[i][1] - nodeSize / 2;
+          const tPHighY = nodePos[i][1] + nodeSize / 2;
 
           if (
             p.mouseX < tPHighX &&
@@ -281,7 +287,7 @@ export function createLearnTrialAnim(
         const node = new p.TLD.Node(
           nodePos[i][0],
           nodePos[i][1],
-          SIZES.node,
+          nodeSize,
           null,
           showNum
         );
@@ -304,7 +310,7 @@ export function createLearnTrialAnim(
       if (trialEnded) return;
 
       p.cursor(p.ARROW);
-      p.TLD.changeCursorHand(nodePos, SIZES.node / 2);
+      p.TLD.changeCursorHand(nodePos, nodeSize / 2);
 
       p.background(phaseBgColor);
       p.textSize(38);

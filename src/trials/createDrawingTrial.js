@@ -13,6 +13,9 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
   const phaseBgColor = isSecondPhase ? COLORS.bgBlue : COLORS.bgGreen;
   const phaseGridColor = isSecondPhase ? COLORS.bgGridBlue : COLORS.bgGrid;
   const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
+  const nodeSize = useSecondStimSet
+    ? SIZES.treetop
+    : SIZES.flower;
   const nodeImageSmallPath = useSecondStimSet
     ? PATHS.nodeImages2Small
     : PATHS.nodeImages1Small;
@@ -57,7 +60,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
       display() {
           // safe draw while image loads
           if (this.aspect && typeof this.aspect.width === "number" && this.aspect.width > 0) {
-          p.image(this.aspect, this.x - SIZES.node / 2, this.y - SIZES.node / 2, SIZES.node, SIZES.node);
+          p.image(this.aspect, this.x - nodeSize / 2, this.y - nodeSize / 2, nodeSize, nodeSize);
           } else {
           p.noStroke();
           p.fill("#cccccc");
@@ -122,7 +125,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
         // create nodes first
         p.TLD.nodes = [];
         for (let i = 0; i < nodePos.length; i++) {
-            const node = new p.TLD.Node(nodePos[i][0], nodePos[i][1], SIZES.node, null);
+            const node = new p.TLD.Node(nodePos[i][0], nodePos[i][1], nodeSize, null);
             p.TLD.nodes.push(node);
 
             // p5 2.0: callbacks (avoid Promise)
@@ -142,7 +145,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
 
         // Set Cursor
         p.cursor(p.ARROW);
-        p.TLD.changeCursorCross(p.TLD.towPos, SIZES.node/2);
+        p.TLD.changeCursorCross(p.TLD.towPos, nodeSize / 2);
 
 
         // Run drawing over all nodes

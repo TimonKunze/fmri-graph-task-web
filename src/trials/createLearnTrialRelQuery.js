@@ -2,13 +2,16 @@ import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { PATHS } from "../config/paths";
 import { CONFIG } from "../config.js";
 import { jsPsych } from "../main.js";
+import { SIZES } from "../config/sizes.js";
 
 
 export function createLearnTrialRelQuery(rel, known, trialInd, type) {
-  const STIM_SIZE = 100; // px
-  let debugKeyboardListener = null;
   const useSecondStimSet =
     typeof type === "string" && type.startsWith("unconstrained");
+  const STIM_SIZE = useSecondStimSet
+    ? SIZES.treetop
+    : SIZES.flower;
+  let debugKeyboardListener = null;
   const nodeImagePath = useSecondStimSet ? PATHS.nodeImages2 : PATHS.nodeImages1;
   const agentLabel = useSecondStimSet ? "bat" : "bee";
   const nodeLabel = useSecondStimSet ? "treetop" : "flower";
