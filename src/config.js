@@ -2,7 +2,8 @@ import { decodeString } from "./utils/helper-tools";
 
 export const CONFIG = {
   // Flags
-  debug: false,
+  debug: true,
+  quick_run: true,
   randomize: false,
   part1: true,
   part2: true,
@@ -10,7 +11,6 @@ export const CONFIG = {
   feedback: true,
   staticMode: false,
   showNum: false,
-  quick_run: true,
 
   graphHex: "10248905",
   varType: "unconstrained", // or "rotational"
