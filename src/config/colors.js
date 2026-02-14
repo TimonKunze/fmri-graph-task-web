@@ -6,6 +6,7 @@ export const COLORS = {
     "envText" : "grey",
     "bgWhite": "#ffffff",
     "bgGreen": "#98BE64",
+    "bgBlue": "#14345C",
     "bgGrid": "#799850",
     "drawStroke": "#eeeeee",
 };

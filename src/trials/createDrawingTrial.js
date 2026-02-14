@@ -9,6 +9,8 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
     
   const jsPsychP5JS = makeP5JSPlugin(jsPsychModule);
   const attemptout = CONFIG.maxAttemptsDraw;
+  const isSecondPhase = typeof type === "string" && type.startsWith("unconstrained");
+  const phaseBgColor = isSecondPhase ? COLORS.bgBlue : COLORS.bgGreen;
   const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
   const nodeImageSmallPath = useSecondStimSet
     ? PATHS.nodeImages2Small
@@ -81,7 +83,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
        p.TLD.gridBackground = function(horLines=18, verLines=18) {
         for (let x = 0; x < p.width; x += p.width / verLines) {
           for (let y = 0; y < p.height; y += p.height / horLines) {
-            p.stroke(COLORS.bgGreen);
+            p.stroke(phaseBgColor);
             p.strokeWeight(0.5);
             p.line(x, 0, x, p.height);
             p.line(0, y, p.width, y);
@@ -148,7 +150,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
             // Handle state changes when mouse is released
             } else if (!p.mouseIsPressed) {
             // Set Background
-            p.background(COLORS.bgGreen);
+            p.background(phaseBgColor);
             p.TLD.gridBackground();
             p.textSize(38);
             p.textFont('Courier New');
@@ -195,7 +197,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
 
             // Set background
             p.cursor(p.ARROW);
-            p.background(COLORS.bgGreen);
+            p.background(phaseBgColor);
             p.TLD.gridBackground();
             p.textSize(38);
             p.textFont('Courier New');

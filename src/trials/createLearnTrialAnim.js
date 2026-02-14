@@ -18,6 +18,8 @@ export function createLearnTrialAnim(
 ) {
   const P5Plugin = makeP5JSPlugin(jsPsychModule);
   const nbNodes = nodePos.length;
+  const isSecondPhase = typeof type === "string" && type.startsWith("unconstrained");
+  const phaseBgColor = isSecondPhase ? COLORS.bgBlue : COLORS.bgGreen;
   const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
   const movingObjPath = useSecondStimSet ? PATHS.movingObj2 : PATHS.movingObj1;
   const movingObjMirroredPath = useSecondStimSet
@@ -304,7 +306,7 @@ export function createLearnTrialAnim(
       p.cursor(p.ARROW);
       p.TLD.changeCursorHand(nodePos, SIZES.node / 2);
 
-      p.background(COLORS.bgGreen);
+      p.background(phaseBgColor);
       p.textSize(38);
       p.textFont("Courier New");
       p.fill("grey");
