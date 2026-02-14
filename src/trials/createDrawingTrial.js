@@ -9,6 +9,10 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
     
   const jsPsychP5JS = makeP5JSPlugin(jsPsychModule);
   const attemptout = CONFIG.maxAttemptsDraw;
+  const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
+  const nodeImageSmallPath = useSecondStimSet
+    ? PATHS.nodeImages2Small
+    : PATHS.nodeImages1Small;
 
   let trialEnded = false;
 
@@ -110,7 +114,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
             p.TLD.nodes.push(node);
 
             // p5 2.0: callbacks (avoid Promise)
-            const url = PATHS.nodeImages1Small(i);
+            const url = nodeImageSmallPath(i);
             p.loadImage(url, (img) => { node.aspect = img; }, () => { node.aspect = null; });
         }
     },

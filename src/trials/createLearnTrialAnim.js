@@ -18,6 +18,14 @@ export function createLearnTrialAnim(
 ) {
   const P5Plugin = makeP5JSPlugin(jsPsychModule);
   const nbNodes = nodePos.length;
+  const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
+  const movingObjPath = useSecondStimSet ? PATHS.movingObj2 : PATHS.movingObj1;
+  const movingObjMirroredPath = useSecondStimSet
+    ? PATHS.movingObj2Mirrored
+    : PATHS.movingObj1Mirrored;
+  const nodeImageSmallPath = useSecondStimSet
+    ? PATHS.nodeImages2Small
+    : PATHS.nodeImages1Small;
 
   let saveNodesClicked = [];
   let trialEnded = false;
@@ -256,10 +264,10 @@ export function createLearnTrialAnim(
       p.TLD.bee = null;
       p.TLD.bee_mirrored = null;
 
-      p.loadImage(PATHS.movingObj1, (img) => {
+      p.loadImage(movingObjPath, (img) => {
         p.TLD.bee = img;
       });
-      p.loadImage(PATHS.movingObj1Mirrored, (img) => {
+      p.loadImage(movingObjMirroredPath, (img) => {
         p.TLD.bee_mirrored = img;
       });
 
@@ -277,7 +285,7 @@ export function createLearnTrialAnim(
         );
         p.TLD.nodes.push(node);
 
-        const url = PATHS.nodeImages1Small(i);
+        const url = nodeImageSmallPath(i);
         p.loadImage(
           url,
           (img) => {

@@ -12,8 +12,8 @@ export const PATHS = {
   nodeImages1: (i) => `/stimuli/flowers/node${i + 1}.png`,
 
   // Treetops
-  nodeImages2Small: (i) => `/stimuli/treetops/small_imgs/node${i + 1}.png`,
-  nodeImages2: (i) => `/stimuli/treetops/node${i + 1}.png`,
+  nodeImages2Small: (i) => `/stimuli/treetops/node_${i + 1}.png`,
+  nodeImages2: (i) => `/stimuli/treetops/node_${i + 1}.png`,
 
   dashPath: `/stimuli/other/dash.png`,
   dotPath: `/stimuli/other/dot.png`,

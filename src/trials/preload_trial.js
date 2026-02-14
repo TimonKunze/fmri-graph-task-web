@@ -11,6 +11,12 @@ export const preload_trial = {
     new Set([
         ...Array.from({ length: DESIGN.nbNodes }, (_, i) => PATHS.nodeImages1(i)),
         ...Array.from({ length: DESIGN.nbNodes }, (_, i) => PATHS.nodeImages1Small(i)),
+        ...Array.from({ length: DESIGN.nbNodes }, (_, i) => PATHS.nodeImages2(i)),
+        ...Array.from({ length: DESIGN.nbNodes }, (_, i) => PATHS.nodeImages2Small(i)),
+        PATHS.movingObj1,
+        PATHS.movingObj1Mirrored,
+        PATHS.movingObj2,
+        PATHS.movingObj2Mirrored,
         PATHS.dashPath,
         PATHS.dotPath,
         PATHS.undoPath,

@@ -49,7 +49,7 @@ export const INSTRUCTIONS = {
       Indicate your answer with a button click. The task looks like this:
     </p>
     <p>
-      <img src="./stimuli/other/reltest_example.png" style="max-width:${stim_width_ex};max-height:${stim_width_ex};">
+      <img src="/stimuli/other/reltest_example.png" style="max-width:${stim_width_ex};max-height:${stim_width_ex};">
     </p>
     <p>
       This time, you don't need a test trial. Go right ahead.
