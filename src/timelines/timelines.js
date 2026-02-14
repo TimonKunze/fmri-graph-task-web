@@ -1,4 +1,5 @@
 import { CONFIG } from "../config.js";
+import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { DESIGN } from "../build/derivedDesign.js";
 import { G_SAMPLE } from "../config/sample_graph.js";
 import { G } from "../config/graphs.js";
@@ -95,54 +96,66 @@ export function makeCoreTimeline() {
 export function makeLearnTimeline() {
   const tl = [];
 
-  const nbLB = CONFIG.nbLearnBlocks;
-  let nbLearnBlocks1;
-  let nbLearnBlocks2;
-  if (nbLB.length == 2) {
-      nbLearnBlocks1 = nbLB[0];
-      nbLearnBlocks2 = nbLB[1];
+  let rotationalBlocks = 0;
+  let unconstrainedBlocks = 0;
+  if (Array.isArray(CONFIG.nbLearnBlocks)) {
+    rotationalBlocks = Number(CONFIG.nbLearnBlocks[0] ?? 0);
+    unconstrainedBlocks = Number(CONFIG.nbLearnBlocks[1] ?? 0);
+  } else if (CONFIG.varType === "rotational") {
+    rotationalBlocks = Number(CONFIG.nbLearnBlocks ?? 0);
   } else {
-      nbLearnBlocks1 = nbLB;
+    unconstrainedBlocks = Number(CONFIG.nbLearnBlocks ?? 0);
   }
 
-  // Learning blocks
   const blockNames = ["first", "second", "third", "fourth", "fifth", "sixth"];
-  const blockType = ["random", "rotational"];  // select random or via config
+  let blockCounter = 0;
+  let relQueryInstrShown = false;
 
-  for (let blockI = 0; blockI < nbLearnBlocks1; blockI++) {
-    const block = blockNames[blockI] ?? `block_${blockI + 1}`;
+  const makePhaseTransitionTrial = (phaseName) => ({
+    type: jsPsychHtmlButtonResponse,
+    stimulus: `
+      <div class="instr-screen">
+        <p>You are now starting the <strong>${phaseName}</strong> learning phase.</p>
+      </div>
+    `,
+    choices: ["Continue"],
+    data: {
+      trial_name: "learn_phase_transition",
+      learn_phase: phaseName,
+    },
+  });
 
-    let varType = blockType[0];
-    tl.push(...createLearnTrials(DESIGN.randomPoss, block, varType));
+  const pushBlock = (layoutType, nodePositions) => {
+    blockCounter += 1;
+    const ordinalBlock = blockNames[blockCounter - 1] ?? `block_${blockCounter}`;
+    const block = `${layoutType}_${ordinalBlock}`;
 
-    if (block === "first") {
+    tl.push(...createLearnTrials(nodePositions, block, layoutType));
+
+    if (!relQueryInstrShown) {
       tl.push(learnTrialRelQueryInstr);
+      relQueryInstrShown = true;
     }
 
-    tl.push(...createRelQueryTrials(1, block,));
-
+    tl.push(...createRelQueryTrials(1, block));
     if (CONFIG.feedback) {
       tl.push(createRelQueryTrialFeedback(1));
     }
-  }
-  if (nbLB.length == 2) {
-    for (let blockI = 0; blockI < nbLearnBlocks2; blockI++) {
-        const block = blockNames[blockI] ?? `block_${blockI + 1}`;
+  };
 
-        let varType = blockType[1];
-        tl.push(...createLearnTrials(DESIGN.randomPoss, block, varType));
-
-        // if (block === "first") {
-        // tl.push(learnTrialRelQueryInstr);  // TODO: new intro
-        // }
-
-        tl.push(...createRelQueryTrials(1, block,));
-
-        if (CONFIG.feedback) {
-        tl.push(createRelQueryTrialFeedback(1));
-        }
-      }
+  for (let blockI = 0; blockI < rotationalBlocks; blockI++) {
+    if (blockI === 0) {
+      tl.push(makePhaseTransitionTrial("rotational"));
     }
+    pushBlock("rotational", DESIGN.rotationPos);
+  }
+
+  for (let blockI = 0; blockI < unconstrainedBlocks; blockI++) {
+    if (blockI === 0) {
+      tl.push(makePhaseTransitionTrial("unconstrained"));
+    }
+    pushBlock("unconstrained", DESIGN.randomPoss);
+  }
 
   
 

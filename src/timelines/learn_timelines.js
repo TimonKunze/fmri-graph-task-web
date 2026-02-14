@@ -5,74 +5,76 @@ import { createDrawingTrial } from "../trials/createDrawingTrial.js";
 import { createLearnTrialAnim } from "../trials/createLearnTrialAnim.js";
 import { createLearnTrialRelQuery } from "../trials/createLearnTrialRelQuery.js";
 import { jsPsych } from "../main.js";
+import { rotatePoint } from "../utils/geometry.js";
+import { SIZES } from "../config/sizes.js";
+import * as htools from "../utils/helper-tools.js";
 
 
-export function createLearnTrials(nodePoss, type,) {
+export function createLearnTrials(nodePoss, block, layoutType = CONFIG.varType) {
 
   let learnTrialsTL = [];
-  let randAngle = 0;
   let nodePosInd = 0;
-  
+  const isRotational = layoutType === "rotational";
+  const center = [SIZES.env[0] / 2, SIZES.env[1] / 2];
+
   let nbRelations = G.relations.length; 
   if (CONFIG.maxLearnRelations !== "max") {
       nbRelations = CONFIG.maxLearnRelations;
   }
 
   const learnTrialsBlock = CONFIG.nbLearnPasses*nbRelations;
-  // let learnTrialsCount = 0;
+  const baseNodePos = Array.isArray(nodePoss?.[0]) ? nodePoss[0] : [];
+  const unconstrainedPool = Array.isArray(nodePoss) ? nodePoss : [];
+
+  const makeRotatedNodePos = (angle) =>
+    baseNodePos.map((point) => rotatePoint(center, point, angle));
+
+  const getUnconstrainedNodePos = (index) => {
+    if (unconstrainedPool.length === 0) {
+      return [];
+    }
+    const wrappedIndex = index % unconstrainedPool.length;
+    return unconstrainedPool[wrappedIndex];
+  };
 
   let learnPassI;
   for (learnPassI=0; learnPassI<CONFIG.nbLearnPasses; learnPassI++) {
     for (let trialI = 0; trialI < nbRelations; trialI++) {
       nodePosInd = learnPassI*nbRelations + trialI*2;
-      let nodePos = Array(nodePoss[0].length);
-      // console.log("learnPassI", learnPassI)
+      let randAngle = 0;
+      let nodePos;
 
-      // Create random angle
-      if (CONFIG.varType=="rotational") {
-        randAngle = Math.random() * Math.PI * 2; // Get random float between 0 and 2pi
-        for (let i=0; i<nbAllNodes; i++) {
-          nodePos[i] = rotatePoint(
-            [sizes["env"][0]/2, sizes["env"][1]/2], nodePoss[0][i], randAngle,
-          );
-        }
+      if (isRotational) {
+        randAngle = Math.random() * Math.PI * 2;
+        nodePos = makeRotatedNodePos(randAngle);
       } else {
-        nodePos = nodePoss[nodePosInd];
+        nodePos = getUnconstrainedNodePos(nodePosInd);
       }
+
       // Create learning environment trial
       const learnTrialAnim = createLearnTrialAnim(
-        nodePos, G.relations, trialI, learnPassI, randAngle, type);
+        nodePos, G.relations, trialI, learnPassI, randAngle, block
+      );
       learnTrialsTL.push(learnTrialAnim);
 
-      // Create new random angle
-      if (CONFIG.varType=="rotational") {
-        randAngle = Math.random()* Math.PI*2; // Get random float between 0 and 2pi
-        nodePos = Array(nodePoss[0].length);
-        for (let i=0; i<nbAllNodes; i++) {
-          nodePos[i] = rotatePoint(
-            [sizes["env"][0]/2, sizes["env"][1]/2], nodePoss[0][i], randAngle,
-          );
-        }
+      if (isRotational) {
+        const drawAngle = Math.random() * Math.PI * 2;
+        nodePos = makeRotatedNodePos(drawAngle);
       } else {
-        nodePos = nodePoss[nodePosInd+1];
+        nodePos = getUnconstrainedNodePos(nodePosInd + 1);
       }
+
       // Create drawing environment trial
       const drawingTrial = createDrawingTrial(
-        nodePos, G.relations[trialI], trialI, learnPassI, type
+        nodePos, G.relations[trialI], trialI, learnPassI, block
       );
       learnTrialsTL.push(drawingTrial);
     }
   }
-  // console.log("CONFIG.nbLearnPasses", CONFIG.nbLearnPasses);
-  // console.log("nbRelations", nbRelations);
-  // console.log("learnTrialsBlock", learnTrialsBlock);
-  
 
   const drawingSummary = createDrawingTrialSummary(
-      jsPsych, learnTrialsBlock*2, type);
+      jsPsych, learnTrialsBlock*2, block);
   learnTrialsTL.push(drawingSummary);
-
-  // learnTrialsTL.push(createLearnTrialSummary(100, learnTrialsCount));
 
   return learnTrialsTL;
 }

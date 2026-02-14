@@ -16,6 +16,9 @@ p5.disableFriendlyErrors = true;
 
 console.table(CONFIG);
 export const jsPsych = makeJsPsych({ data_dir: PATHS.data_dir });
+const totalLearnBlocks = Array.isArray(CONFIG.nbLearnBlocks)
+  ? CONFIG.nbLearnBlocks.reduce((sum, n) => sum + Number(n || 0), 0)
+  : Number(CONFIG.nbLearnBlocks || 0);
 
   // already comptued in make JsPsych
   // // compute subject id here
@@ -49,7 +52,7 @@ jsPsych.data.addProperties({
   nb_learn_blocks: CONFIG.nbLearnBlocks,
   nb_relation: G.relations.length,
   nb_learn_trials_in_block: CONFIG.nbLearnPasses*G.relations.length,
-  nb_learn_trials: CONFIG.nbLearnPasses*G.relations.length*CONFIG.nbLearnBlocks,
+  nb_learn_trials: CONFIG.nbLearnPasses*G.relations.length*totalLearnBlocks,
   relations: G.relations,
   // Matrices
   adjacency_matrix: G.adjM,
