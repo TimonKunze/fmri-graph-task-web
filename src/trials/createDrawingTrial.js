@@ -11,6 +11,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
   const attemptout = CONFIG.maxAttemptsDraw;
   const isSecondPhase = typeof type === "string" && type.startsWith("unconstrained");
   const phaseBgColor = isSecondPhase ? COLORS.bgBlue : COLORS.bgGreen;
+  const phaseGridColor = isSecondPhase ? COLORS.bgGridBlue : COLORS.bgGrid;
   const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
   const nodeImageSmallPath = useSecondStimSet
     ? PATHS.nodeImages2Small
@@ -83,13 +84,22 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
        p.TLD.gridBackground = function(horLines=18, verLines=18) {
         for (let x = 0; x < p.width; x += p.width / verLines) {
           for (let y = 0; y < p.height; y += p.height / horLines) {
-            p.stroke(phaseBgColor);
+            p.stroke(phaseGridColor);
             p.strokeWeight(0.5);
             p.line(x, 0, x, p.height);
             p.line(0, y, p.width, y);
           }
         }
       }
+
+      p.TLD.renderBackground = function () {
+        p.background(phaseBgColor);
+        p.TLD.gridBackground();
+        p.textSize(38);
+        p.textFont("Courier New");
+        p.fill("grey");
+        p.text("Draw", 20, 40);
+      };
 
       p.TLD.changeCursorCross = function (positions, thresh) {
         let dists = []
@@ -119,6 +129,10 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
             const url = nodeImageSmallPath(i);
             p.loadImage(url, (img) => { node.aspect = img; }, () => { node.aspect = null; });
         }
+
+        p.TLD.renderBackground();
+        p.noStroke();
+        p.TLD.nodes.forEach((node) => node.display());
     },
     draw_func: function (p) {
       if (trialEnded) return;
@@ -149,17 +163,12 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
 
             // Handle state changes when mouse is released
             } else if (!p.mouseIsPressed) {
-            // Set Background
-            p.background(phaseBgColor);
-            p.TLD.gridBackground();
-            p.textSize(38);
-            p.textFont('Courier New');
-            p.fill('grey');
-            p.text('Draw', 20, 40);
+            // Set background
+            p.TLD.renderBackground();
 
-            // Delete drawing
+            // Draw nodes
             p.noStroke();
-            p.TLD.nodes.forEach(node => node.display());
+            p.TLD.nodes.forEach((node) => node.display());
 
             // Determine if mouse was released over a node
             if (p.TLD.nodes[i].msOverReleased) {
@@ -197,16 +206,12 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
 
             // Set background
             p.cursor(p.ARROW);
-            p.background(phaseBgColor);
-            p.TLD.gridBackground();
-            p.textSize(38);
-            p.textFont('Courier New');
-            p.fill('grey');
-            p.text('Draw', 20, 40);
+            p.TLD.renderBackground();
 
-            // Delete drawings
+            // Draw nodes
             p.noStroke();
-            p.TLD.nodes.forEach(node => node.display());
+            p.TLD.nodes.forEach((node) => node.display());
+
             nodeEnded = -1;
             lineColRed = false;
             }

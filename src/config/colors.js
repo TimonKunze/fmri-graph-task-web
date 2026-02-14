@@ -8,5 +8,6 @@ export const COLORS = {
     "bgGreen": "#98BE64",
     "bgBlue": "#14345C",
     "bgGrid": "#799850",
+    "bgGridBlue": "#2A4E7A",
     "drawStroke": "#eeeeee",
 };
