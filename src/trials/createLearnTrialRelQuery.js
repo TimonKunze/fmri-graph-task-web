@@ -3,18 +3,18 @@ import { PATHS } from "../config/paths";
 import { CONFIG } from "../config.js";
 import { jsPsych } from "../main.js";
 import { SIZES } from "../config/sizes.js";
+import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
 
 
 export function createLearnTrialRelQuery(rel, known, trialInd, type) {
-  const useSecondStimSet =
-    typeof type === "string" && type.startsWith("unconstrained");
-  const STIM_SIZE = useSecondStimSet
-    ? (SIZES.task2Treetop ?? SIZES.task14Treetop)
-    : (SIZES.task2Flower ?? SIZES.task14Flower);
+  const secondStimSet = useSecondStimSet(type);
+  const STIM_SIZE = secondStimSet
+    ? SIZES.task2Treetop
+    : SIZES.task2Flower;
   let debugKeyboardListener = null;
-  const nodeImagePath = useSecondStimSet ? PATHS.nodeImages2 : PATHS.nodeImages1;
-  const agentLabel = useSecondStimSet ? "bat" : "bee";
-  const nodeLabel = useSecondStimSet ? "treetop" : "flower";
+  const nodeImagePath = secondStimSet ? PATHS.nodeImages2 : PATHS.nodeImages1;
+  const agentLabel = secondStimSet ? "bat" : "bee";
+  const nodeLabel = secondStimSet ? "treetop" : "flower";
 
   if (!Array.isArray(rel) || rel.length < 2) {
     throw new Error("createLearnTrialRelQuery: rel must be a [startNode, endNode] array.");
@@ -59,6 +59,7 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
       stim_size_px: STIM_SIZE,
       stim_agent: agentLabel,
       stim_nodes: nodeLabel,
+      stim_set: getStimSet(type),
     },
 
     on_load: function () {

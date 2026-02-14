@@ -2,6 +2,7 @@ import { SIZES } from "../config/sizes.js";
 import { PATHS } from "../config/paths.js";
 import { COLORS } from "../config/colors.js";
 import { CONFIG } from "../config.js";
+import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
 import * as gtools from "../utils/graph-tools.js";
 import * as jsPsychModule from "jspsych";
 import makeP5JSPlugin from "../plugins/jspsych-p5js-plugin/plugin-p5js.js";
@@ -18,20 +19,19 @@ export function createLearnTrialAnim(
 ) {
   const P5Plugin = makeP5JSPlugin(jsPsychModule);
   const nbNodes = nodePos.length;
-  const isSecondPhase = typeof type === "string" && type.startsWith("unconstrained");
-  const phaseBgColor = isSecondPhase ? COLORS.bgBlue : COLORS.bgGreen;
-  const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
-  const nodeSize = useSecondStimSet
+  const secondStimSet = useSecondStimSet(type);
+  const phaseBgColor = secondStimSet ? COLORS.bgBlue : COLORS.bgGreen;
+  const nodeSize = secondStimSet
     ? SIZES.task14Treetop
     : SIZES.task14Flower;
-  const movingObjSize = useSecondStimSet
+  const movingObjSize = secondStimSet
     ? SIZES.task14Bat
     : SIZES.task14Bee;
-  const movingObjPath = useSecondStimSet ? PATHS.movingObj2 : PATHS.movingObj1;
-  const movingObjMirroredPath = useSecondStimSet
+  const movingObjPath = secondStimSet ? PATHS.movingObj2 : PATHS.movingObj1;
+  const movingObjMirroredPath = secondStimSet
     ? PATHS.movingObj2Mirrored
     : PATHS.movingObj1Mirrored;
-  const nodeImageSmallPath = useSecondStimSet
+  const nodeImageSmallPath = secondStimSet
     ? PATHS.nodeImages2Small
     : PATHS.nodeImages1Small;
 
@@ -49,6 +49,7 @@ export function createLearnTrialAnim(
       relation: relations[trialI],
       angle: rotAngle,
       type,
+      stim_set: getStimSet(type),
     },
 
     top_level_declarations(p) {

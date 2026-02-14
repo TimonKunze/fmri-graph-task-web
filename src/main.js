@@ -4,6 +4,7 @@ import { makeJsPsych } from "./build/makeJsPsych.js";
 import { CONFIG } from "./config.js";
 import { PATHS } from "./config/paths.js";
 import { SIZES } from "./config/sizes.js";
+import { STIMULUS_CONDITION_MAP } from "./config/stimulus_assignment.js";
 import { DESIGN } from "./build/derivedDesign.js";
 import { G } from "./config/graphs.js"
 
@@ -15,6 +16,9 @@ p5.disableFriendlyErrors = true;
 
 
 console.table(CONFIG);
+const EXPERIMENT_VERSION =
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_EXPERIMENT_VERSION) ||
+  "dev";
 export const jsPsych = makeJsPsych({ data_dir: PATHS.data_dir });
 const totalLearnBlocks = Array.isArray(CONFIG.nbLearnBlocks)
   ? CONFIG.nbLearnBlocks.reduce((sum, n) => sum + Number(n || 0), 0)
@@ -76,6 +80,8 @@ jsPsych.data.addProperties({
   part2_flag: CONFIG.part2,
   prolific_flag: CONFIG.prolific,
   feedback_flag: CONFIG.feedback,
+  stimulus_condition_map: STIMULUS_CONDITION_MAP,
+  experiment_version: EXPERIMENT_VERSION,
 });
 
 

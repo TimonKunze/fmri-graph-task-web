@@ -6,6 +6,7 @@ import { COLORS } from "../config/colors.js";
 import { SIZES } from "../config/sizes.js";
 import { G } from "../config/graphs.js";
 import { PATHS } from "../config/paths.js";
+import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
 
 import { jsPsych } from "../main.js";
 import { rotatePoint } from "../utils/geometry.js";
@@ -16,10 +17,10 @@ import { isConnected, transformToAdjacencyObject } from "../utils/graph-tools.js
 export function createSpatialPosTrial(layoutType = CONFIG.varType) {
   console.log("PATHS.nodeImages1Small exists?", typeof PATHS.nodeImages1Small);
   console.log("example path [0]:", PATHS.nodeImages1Small?.(0));
-  const useSecondStimSet = layoutType === "unconstrained";
-  const arenaNodeSize = useSecondStimSet ? SIZES.task14Treetop : SIZES.task14Flower;
-  const arenaNodeImageSmallPath = useSecondStimSet ? PATHS.nodeImages2Small : PATHS.nodeImages1Small;
-  const arenaBgColor = useSecondStimSet ? COLORS.bgBlue : COLORS.bgGreen;
+  const secondStimSet = useSecondStimSet(layoutType);
+  const arenaNodeSize = secondStimSet ? SIZES.task14Treetop : SIZES.task14Flower;
+  const arenaNodeImageSmallPath = secondStimSet ? PATHS.nodeImages2Small : PATHS.nodeImages1Small;
+  const arenaBgColor = secondStimSet ? COLORS.bgBlue : COLORS.bgGreen;
 
   let saveNodePos = new Array();
   let trialEnded = false;
@@ -324,6 +325,7 @@ export function createSpatialPosTrial(layoutType = CONFIG.varType) {
         nodepos_spatialpos_norel: saveNodePos,
         rt_spatialpos_norel: rt,
         layout_type: layoutType,
+        stim_set: getStimSet(layoutType),
       }
       jsPsych.data.addDataToLastTrial(data);
     },
@@ -343,11 +345,11 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
 
   let connectedPos = [];
   let towPosLastTrial = [];
-  const useSecondStimSet = layoutType === "unconstrained";
-  const arenaNodeSize = useSecondStimSet ? SIZES.task14Treetop : SIZES.task14Flower;
-  const arenaNodeImageSmallPath = useSecondStimSet ? PATHS.nodeImages2Small : PATHS.nodeImages1Small;
-  const arenaBgColor = useSecondStimSet ? COLORS.bgBlue : COLORS.bgGreen;
-  const arenaGridColor = useSecondStimSet ? COLORS.bgGridBlue : COLORS.bgGrid;
+  const secondStimSet = useSecondStimSet(layoutType);
+  const arenaNodeSize = secondStimSet ? SIZES.task14Treetop : SIZES.task14Flower;
+  const arenaNodeImageSmallPath = secondStimSet ? PATHS.nodeImages2Small : PATHS.nodeImages1Small;
+  const arenaBgColor = secondStimSet ? COLORS.bgBlue : COLORS.bgGreen;
+  const arenaGridColor = secondStimSet ? COLORS.bgGridBlue : COLORS.bgGrid;
 
   let startTimeRT = 0;
   const P5Plugin = makeP5JSPlugin(jsPsychModule);
@@ -640,13 +642,14 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
       data.connected_spatialpos_rel = graphConnected;
       data.c_type = c_type;
       data.layout_type = layoutType;
+      data.stim_set = getStimSet(layoutType);
     },
     button_choices: ["Continue"],
     key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
 
     prompt: function () {
-      const agentLabel = useSecondStimSet ? "bat" : "bee";
-      const nodeLabel = useSecondStimSet ? "treetop" : "flower";
+      const agentLabel = secondStimSet ? "bat" : "bee";
+      const nodeLabel = secondStimSet ? "treetop" : "flower";
       return c_type === "first"
         ? `Make sure the ${agentLabel} can reach each ${nodeLabel}, i.e. no ${nodeLabel} is disconnected.`
         : `Not all ${nodeLabel}s are reachable for the ${agentLabel}. Please add one or more connections.`;

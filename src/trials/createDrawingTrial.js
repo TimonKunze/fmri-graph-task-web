@@ -2,6 +2,7 @@ import { SIZES } from "../config/sizes.js";
 import { PATHS } from "../config/paths.js";
 import { COLORS } from "../config/colors.js";
 import { CONFIG } from "../config.js";
+import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
 import * as jsPsychModule from "jspsych";
 import makeP5JSPlugin from "../plugins/jspsych-p5js-plugin/plugin-p5js.js";
 
@@ -9,14 +10,13 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
     
   const jsPsychP5JS = makeP5JSPlugin(jsPsychModule);
   const attemptout = CONFIG.maxAttemptsDraw;
-  const isSecondPhase = typeof type === "string" && type.startsWith("unconstrained");
-  const phaseBgColor = isSecondPhase ? COLORS.bgBlue : COLORS.bgGreen;
-  const phaseGridColor = isSecondPhase ? COLORS.bgGridBlue : COLORS.bgGrid;
-  const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
-  const nodeSize = useSecondStimSet
+  const secondStimSet = useSecondStimSet(type);
+  const phaseBgColor = secondStimSet ? COLORS.bgBlue : COLORS.bgGreen;
+  const phaseGridColor = secondStimSet ? COLORS.bgGridBlue : COLORS.bgGrid;
+  const nodeSize = secondStimSet
     ? SIZES.task14Treetop
     : SIZES.task14Flower;
-  const nodeImageSmallPath = useSecondStimSet
+  const nodeImageSmallPath = secondStimSet
     ? PATHS.nodeImages2Small
     : PATHS.nodeImages1Small;
 
@@ -276,6 +276,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
       data.attempts_drawtest = attempts;
       data.attemptout_drawtest = attemptout;
       data.rt_drawtest = rt;
+      data.stim_set = getStimSet(type);
     },
 
     key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
