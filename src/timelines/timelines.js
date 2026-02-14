@@ -198,7 +198,10 @@ export function makeTestTimeline() {
           layout_type: layoutType,
         },
       });
-      for (let tTrialI=0; tTrialI<DESIGN.test3Pairs.length; tTrialI++) {
+      const task3TrialLimit = CONFIG.quick_run
+        ? Math.min(2, DESIGN.test3Pairs.length)
+        : DESIGN.test3Pairs.length;
+      for (let tTrialI=0; tTrialI<task3TrialLimit; tTrialI++) {
         let currentPair = DESIGN.test3Pairs[tTrialI];
         tl.push(createCongrTestTrial(tTrialI, currentPair, CONFIG.rand, layoutType));
       }

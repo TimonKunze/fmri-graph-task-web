@@ -10,6 +10,7 @@ export const CONFIG = {
   feedback: true,
   staticMode: false,
   showNum: false,
+  quick_run: true,
 
   graphHex: "10248905",
   varType: "unconstrained", // or "rotational"
@@ -34,4 +35,3 @@ CONFIG.nbLearnPasses = CONFIG.debug ? 1 : 3; // in earlier pilots: 3
 CONFIG.prolif_compl_link = decodeString(
   "68747470733A2F2F6170702E70726F6C696669632E636F6D2F7375626D697373696F6E732F636F6D706C6574653F63633D4331444354523059"
   );
-

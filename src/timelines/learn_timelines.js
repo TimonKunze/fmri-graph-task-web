@@ -13,6 +13,7 @@ import * as htools from "../utils/helper-tools.js";
 export function createLearnTrials(nodePoss, block, layoutType = CONFIG.varType) {
 
   let learnTrialsTL = [];
+  const task1TrialLimit = CONFIG.quick_run ? 2 : Number.POSITIVE_INFINITY;
   let nodePosInd = 0;
   const isRotational = layoutType === "rotational";
   const center = [SIZES.env[0] / 2, SIZES.env[1] / 2];
@@ -38,8 +39,10 @@ export function createLearnTrials(nodePoss, block, layoutType = CONFIG.varType) 
   };
 
   let learnPassI;
+  outerLoop:
   for (learnPassI=0; learnPassI<CONFIG.nbLearnPasses; learnPassI++) {
     for (let trialI = 0; trialI < nbRelations; trialI++) {
+      if (learnTrialsTL.length >= task1TrialLimit) break outerLoop;
       nodePosInd = learnPassI*nbRelations + trialI*2;
       let randAngle = 0;
       let nodePos;
@@ -56,6 +59,7 @@ export function createLearnTrials(nodePoss, block, layoutType = CONFIG.varType) 
         nodePos, G.relations, trialI, learnPassI, randAngle, block
       );
       learnTrialsTL.push(learnTrialAnim);
+      if (learnTrialsTL.length >= task1TrialLimit) break outerLoop;
 
       if (isRotational) {
         const drawAngle = Math.random() * Math.PI * 2;
@@ -72,8 +76,9 @@ export function createLearnTrials(nodePoss, block, layoutType = CONFIG.varType) 
     }
   }
 
+  const generatedTask1Trials = learnTrialsTL.length;
   const drawingSummary = createDrawingTrialSummary(
-      jsPsych, learnTrialsBlock*2, block);
+      jsPsych, generatedTask1Trials, block);
   learnTrialsTL.push(drawingSummary);
 
   return learnTrialsTL;
@@ -125,5 +130,5 @@ export function createRelQueryTrials(testPasses, type) {
     //   relQueryTL.push(createLearnTrialFeedback());
     // }
   }
-  return relQueryTL;
+  return CONFIG.quick_run ? relQueryTL.slice(0, 2) : relQueryTL;
 }
