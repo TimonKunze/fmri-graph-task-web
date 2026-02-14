@@ -19,6 +19,7 @@ import { learnTrialRelQueryInstr } from "../trials/learn_rel_query_instr_trial.j
 import { createRelQueryTrialFeedback } from "../trials/rel_query_feedback_trial.js";
 import { testOneInstrTrial1, testOneInstrTrial2 } from "../trials/test1_instr_trial.js";
 import { createCongrTestTrial } from "../trials/create_congr_test_trial.js";
+import { createConditionTransitionTrial } from "../trials/condition_transition_trial.js";
 import { createConfidenceTrial, createFreeEvalTrial } from "../trials/eval_trials.js"; 
 import { spatialPosInstrTrial1, spatialPosInstrTrial2 } from "../trials/spatialpos_instr_trial.js";
 import { 
@@ -173,7 +174,6 @@ export const testTimeline = [];
 export function makeTestTimeline() {
     let tl = [];
     const testLayouts = ["rotational", "unconstrained"];
-    const layoutTitle = (layout) => (layout === "unconstrained" ? "unconstrained" : "rotational");
     // Instructions 3 (Congr Test)
     // ---------------------------
     
@@ -189,15 +189,7 @@ export function makeTestTimeline() {
     // Task 3 (Congr Task) for both layout conditions
     // ----------------------------------------------
     for (const layoutType of testLayouts) {
-      tl.push({
-        type: jsPsychHtmlButtonResponse,
-        stimulus: `<p>Now continuing Task 3 in the <strong>${layoutTitle(layoutType)}</strong> condition.</p>`,
-        choices: ["Continue"],
-        data: {
-          trial_name: "test3_condition_transition",
-          layout_type: layoutType,
-        },
-      });
+      tl.push(createConditionTransitionTrial("test3_condition_transition"));
       const task3TrialLimit = CONFIG.quick_run
         ? Math.min(2, DESIGN.test3Pairs.length)
         : DESIGN.test3Pairs.length;
@@ -213,15 +205,7 @@ export function makeTestTimeline() {
     // ---------------------------------------------------------------
     tl.push(spatialPosInstrTrial1);
     for (const layoutType of testLayouts) {
-      tl.push({
-        type: jsPsychHtmlButtonResponse,
-        stimulus: `<p>Now continuing Task 4 in the <strong>${layoutTitle(layoutType)}</strong> condition.</p>`,
-        choices: ["Continue"],
-        data: {
-          trial_name: "test4_condition_transition",
-          layout_type: layoutType,
-        },
-      });
+      tl.push(createConditionTransitionTrial("test4_condition_transition"));
       tl.push(createSpatialPosTrial(layoutType));
       tl.push(spatialPosInstrTrial2);
       tl.push(createPosDrawTrial("first", layoutType));
