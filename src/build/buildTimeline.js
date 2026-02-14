@@ -9,7 +9,7 @@ import {
 export function buildTimeline() {
   const tl = [];
 
-  // tl.push(...makeCoreTimeline(),);
+  tl.push(...makeCoreTimeline());
 
   if (CONFIG.part1) {
     tl.push(

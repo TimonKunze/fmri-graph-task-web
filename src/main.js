@@ -1,8 +1,6 @@
 import "jspsych/css/jspsych.css";
 import { buildTimeline } from "./build/buildTimeline.js";
 import { makeJsPsych } from "./build/makeJsPsych.js";
-import { preloadImages } from "./trials/preloadImages.js"
-import { setImageCache } from "./utils/imageCache.js";
 import { CONFIG } from "./config.js";
 import { PATHS } from "./config/paths.js";
 import { SIZES } from "./config/sizes.js";
@@ -17,19 +15,7 @@ p5.disableFriendlyErrors = true;
 
 
 console.table(CONFIG);
-
-
-// Preload
-const nodeUrls = Array.from(
-  { length: G.nbNodes },
-  (_, i) => PATHS.nodeImages1Small(i)
-);
-const extraUrls = [PATHS.undoPath]; // add others if needed
-const IMG_CACHE = await preloadImages([...nodeUrls, ...extraUrls]);
-setImageCache(IMG_CACHE);
-
-
-export const jsPsych = makeJsPsych(PATHS.data_dir);
+export const jsPsych = makeJsPsych({ data_dir: PATHS.data_dir });
 
   // already comptued in make JsPsych
   // // compute subject id here
@@ -90,7 +76,7 @@ jsPsych.data.addProperties({
 });
 
 
-const timeline = buildTimeline(jsPsych);
+const timeline = buildTimeline();
 
 timeline.forEach((t, i) => {
   if (t?.type?.info?.name === "p5js") {
