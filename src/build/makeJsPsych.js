@@ -1,0 +1,39 @@
+import { initJsPsych } from "jspsych";
+import { save_data } from "../utils/save_data.js"; // or wherever your save lives
+import { CONFIG } from "../config.js";
+
+function computePart({ part1, part2 }) {
+  if (part1 && part2) return 0;
+  if (part1 && !part2) return 1;
+  if (!part1 && part2) return 2;
+  return 0; // or null, depending on your design
+}
+
+export function makeJsPsych({ data_dir }) {
+  const part = computePart(CONFIG);
+
+  const qs = new URLSearchParams(window.location.search);
+
+  const subject_id = CONFIG.prolific
+    ? (qs.get("PROLIFIC_PID") ?? "MISSING_PROLIFIC_PID")
+    : randomID8();
+
+  const jsPsych = initJsPsych({
+    show_progress_bar: true,
+
+    on_finish: () => {
+      jsPsych.data.displayData("json");
+    },
+
+    on_data_update: (data) => {
+      const dataJsonl = JSON.stringify(data) + "\n";
+      const file_name = `${CONFIG.varType}_${subject_id}_p${part}.jsonl`;
+      save_data(dataJsonl, data_dir, file_name);
+    },
+  });
+
+  // make subject_id globally available in data
+  jsPsych.data.addProperties({subject_id});
+
+  return jsPsych;
+}

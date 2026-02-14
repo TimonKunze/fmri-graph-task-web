@@ -1,0 +1,29 @@
+import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
+import { CONFIG } from "../config";
+
+function getPartString() {
+  if (CONFIG.part1 && !CONFIG.part2) return "part 1 of ";
+  if (!CONFIG.part1 && CONFIG.part2) return "part 2 of ";
+  return "";
+}
+
+export const welcome_trial = {
+  type: jsPsychHtmlButtonResponse,
+
+  stimulus: () => `
+    <div style="max-width: 700px; margin: 0 auto; font-size: 18px; line-height: 1.6;">
+      <p><strong>Welcome to ${getPartString()}our experiment!</strong></p>
+      <p>Please click the button below when you are ready to begin.</p>
+    </div>
+  `,
+
+  choices: ["Continue"],
+
+  data: {
+    trial_name: "welcome",
+  },
+
+  on_finish: (data) => {
+    data.timestamp = Date.now();
+  },
+};
