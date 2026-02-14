@@ -14,8 +14,8 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
   const phaseGridColor = isSecondPhase ? COLORS.bgGridBlue : COLORS.bgGrid;
   const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
   const nodeSize = useSecondStimSet
-    ? SIZES.treetop
-    : SIZES.flower;
+    ? SIZES.task14Treetop
+    : SIZES.task14Flower;
   const nodeImageSmallPath = useSecondStimSet
     ? PATHS.nodeImages2Small
     : PATHS.nodeImages1Small;

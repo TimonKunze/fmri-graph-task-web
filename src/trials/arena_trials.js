@@ -16,6 +16,9 @@ import { isConnected, transformToAdjacencyObject } from "../utils/graph-tools.js
 export function createSpatialPosTrial() {
   console.log("PATHS.nodeImages1Small exists?", typeof PATHS.nodeImages1Small);
   console.log("example path [0]:", PATHS.nodeImages1Small?.(0));
+  const useSecondStimSet = CONFIG.varType === "unconstrained";
+  const arenaNodeSize = useSecondStimSet ? SIZES.task14Treetop : SIZES.task14Flower;
+  const arenaNodeImageSmallPath = useSecondStimSet ? PATHS.nodeImages2Small : PATHS.nodeImages1Small;
 
   let saveNodePos = new Array();
   let trialEnded = false;
@@ -67,10 +70,10 @@ export function createSpatialPosTrial() {
         ) {
             p.image(
             this.aspect,
-            this.x - SIZES["node"] / 2,
-            this.y - SIZES["node"] / 2,
-            SIZES["node"],
-            SIZES["node"]
+            this.x - arenaNodeSize / 2,
+            this.y - arenaNodeSize / 2,
+            arenaNodeSize,
+            arenaNodeSize
             );
         } else {
             // fallback while loading / missing
@@ -241,14 +244,14 @@ export function createSpatialPosTrial() {
           const node = new p.TLD.Node(
               p.TLD.towPos[i][0],
               p.TLD.towPos[i][1],
-              SIZES.node,     // ✅ diam
+              arenaNodeSize,  // ✅ diam
               null,           // ✅ aspect (will be set when image loads)
               showNum         // ✅ num
           );
           
           p.TLD.nodes.push(node);
           
-          const url = PATHS.nodeImages1Small(i);
+          const url = arenaNodeImageSmallPath(i);
           p.loadImage(
               url,
               (img) => { node.aspect = img; },
@@ -262,7 +265,7 @@ export function createSpatialPosTrial() {
       // Drawing Function ==================================================== {{{
       // Set Cursor
       p.cursor(p.ARROW);
-      p.TLD.changeCursorHand(p.TLD.towPos, SIZES["node"]/2);
+      p.TLD.changeCursorHand(p.TLD.towPos, arenaNodeSize / 2);
 
       // Set Background
       p.background(COLORS["bgGreen"]);
@@ -338,6 +341,9 @@ export function createPosDrawTrial(c_type = "first") {
 
   let connectedPos = [];
   let towPosLastTrial = [];
+  const useSecondStimSet = CONFIG.varType === "unconstrained";
+  const arenaNodeSize = useSecondStimSet ? SIZES.task14Treetop : SIZES.task14Flower;
+  const arenaNodeImageSmallPath = useSecondStimSet ? PATHS.nodeImages2Small : PATHS.nodeImages1Small;
 
   let startTimeRT = 0;
   const P5Plugin = makeP5JSPlugin(jsPsychModule);
@@ -377,10 +383,10 @@ export function createPosDrawTrial(c_type = "first") {
         ) {
             p.image(
             this.aspect,
-            this.x - SIZES["node"] / 2,
-            this.y - SIZES["node"] / 2,
-            SIZES["node"],
-            SIZES["node"]
+            this.x - arenaNodeSize / 2,
+            this.y - arenaNodeSize / 2,
+            arenaNodeSize,
+            arenaNodeSize
             );
         } else {
             // fallback while loading / missing
@@ -517,14 +523,14 @@ export function createPosDrawTrial(c_type = "first") {
         const node = new p.TLD.Node(
           p.TLD.towPos[i][0],
           p.TLD.towPos[i][1],
-          SIZES.node,
+          arenaNodeSize,
           null,
           showNum
         );
       
         p.TLD.nodes.push(node);
       
-        const url = PATHS.nodeImages1Small(i);
+        const url = arenaNodeImageSmallPath(i);
         p.loadImage(
           url,
           (img) => { node.aspect = img; },
@@ -577,7 +583,7 @@ export function createPosDrawTrial(c_type = "first") {
 
           p.noStroke();
           p.TLD.nodes.forEach((node) => node.display());
-          p.TLD.changeCursorCross(p.TLD.towPos, SIZES["node"] / 2);
+          p.TLD.changeCursorCross(p.TLD.towPos, arenaNodeSize / 2);
 
           if (p.TLD.nodes[i].msOverReleased) nodeEnded = i;
 

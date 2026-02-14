@@ -9,8 +9,8 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
   const useSecondStimSet =
     typeof type === "string" && type.startsWith("unconstrained");
   const STIM_SIZE = useSecondStimSet
-    ? SIZES.treetop
-    : SIZES.flower;
+    ? (SIZES.task2Treetop ?? SIZES.task14Treetop)
+    : (SIZES.task2Flower ?? SIZES.task14Flower);
   let debugKeyboardListener = null;
   const nodeImagePath = useSecondStimSet ? PATHS.nodeImages2 : PATHS.nodeImages1;
   const agentLabel = useSecondStimSet ? "bat" : "bee";

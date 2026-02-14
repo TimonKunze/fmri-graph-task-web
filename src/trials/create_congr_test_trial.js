@@ -2,17 +2,26 @@ import { PATHS } from "../config/paths.js";
 import { G } from "../config/graphs.js";
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { jsPsych } from "../main.js";
+import { CONFIG } from "../config.js";
+import { SIZES } from "../config/sizes.js";
 
 export function createCongrTestTrial(tTrialI, currentPair, randFlag) {
 
   const path1SDPlongerPath2 = currentPair[0].length > currentPair[1].length;
+  const useSecondStimSet = CONFIG.varType === "unconstrained";
+  const nodeImagePath = useSecondStimSet ? PATHS.nodeImages2 : PATHS.nodeImages1;
+  const stimSize = useSecondStimSet
+    ? (SIZES.task3Treetop ?? SIZES.task14Treetop)
+    : (SIZES.task3Flower ?? SIZES.task14Flower);
+  const stimLabel = useSecondStimSet ? "treetop" : "flower";
+  const agentLabel = useSecondStimSet ? "bat" : "bee";
 
   // Get Stimuli
   // Define html strings for stimuli
-  let stim_width_ft = "100px";
+  let stim_width_ft = `${stimSize}px`;
   const stim_html_strings_ft = []; 
   for (let i=0; i<G.nbNodes; i++) {
-      stim_html_strings_ft.push(`<img src=${PATHS.nodeImages1(i)} style='max-width:${stim_width_ft};max-height:${stim_width_ft};'>`);
+      stim_html_strings_ft.push(`<img src=${nodeImagePath(i)} style='max-width:${stim_width_ft};max-height:${stim_width_ft};'>`);
   }
 
   // Get dash
@@ -37,8 +46,8 @@ export function createCongrTestTrial(tTrialI, currentPair, randFlag) {
         Please take your time and answer correctly: 
       </p>
       <p>
-         Which route from start flower to end flower requires 
-         <strong>less stopovers</strong> for the bee?
+         Which route from start ${stimLabel} to end ${stimLabel} requires 
+         <strong>less stopovers</strong> for the ${agentLabel}?
       </p>
     `,
     choices: function() {

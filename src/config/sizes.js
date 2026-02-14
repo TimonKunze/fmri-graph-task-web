@@ -3,8 +3,17 @@ export const SIZES = {
   "env" : [900, 900], // x and y in px
   "envExtra" : 100, // x and y in px
 
-  "bee": 48,
-  "bat": 80,
-  "flower": 60,
-  "treetop": 75,
+  
+  // Task 1 and 4 (Learning and Arena task): node stimulus sizes
+  "task14Bee": 48,
+  "task14Bat": 80,
+  "task14Flower": 60,
+  "task14Treetop": 75,
+
+  // Task 2 (relation query): node stimulus sizes
+  "task2Flower": 75,
+  "task2Treetop": 85,
+  // Task 3 (congruency test): node stimulus sizes
+  "task3Flower": 100,
+  "task3Treetop": 100,
 };

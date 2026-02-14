@@ -22,11 +22,11 @@ export function createLearnTrialAnim(
   const phaseBgColor = isSecondPhase ? COLORS.bgBlue : COLORS.bgGreen;
   const useSecondStimSet = typeof type === "string" && type.startsWith("unconstrained");
   const nodeSize = useSecondStimSet
-    ? SIZES.treetop
-    : SIZES.flower;
+    ? SIZES.task14Treetop
+    : SIZES.task14Flower;
   const movingObjSize = useSecondStimSet
-    ? SIZES.bat
-    : SIZES.bee;
+    ? SIZES.task14Bat
+    : SIZES.task14Bee;
   const movingObjPath = useSecondStimSet ? PATHS.movingObj2 : PATHS.movingObj1;
   const movingObjMirroredPath = useSecondStimSet
     ? PATHS.movingObj2Mirrored
