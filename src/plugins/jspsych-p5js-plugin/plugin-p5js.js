@@ -116,7 +116,7 @@ trial(display_element, trial) {
   let p5instance = null;
   let keyboardListener;
 
-  const response = { rt: null, button: null, key: null };
+  let response = { rt: null, button: null, key: null };
   const start_time = performance.now();
 
   const end_trial = () => {
