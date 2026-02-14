@@ -275,7 +275,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
       data.rt_drawtest = rt;
     },
 
-    key_choices: "NO_KEYS",
+    key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
   };
 
   return drawingTrial;

@@ -323,7 +323,7 @@ export function createSpatialPosTrial() {
       jsPsych.data.addDataToLastTrial(data);
     },
     button_choices: ['Continue'],
-    key_choices: "NO_KEYS",
+    key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
   };
   return spatialpos_trial;
 }
@@ -631,7 +631,7 @@ export function createPosDrawTrial(c_type = "first") {
       data.c_type = c_type;
     },
     button_choices: ["Continue"],
-    key_choices: "NO_KEYS",
+    key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
 
     prompt: function () {
       return c_type === "first"

@@ -1,9 +1,12 @@
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { PATHS } from "../config/paths";
+import { CONFIG } from "../config.js";
+import { jsPsych } from "../main.js";
 
 
 export function createLearnTrialRelQuery(rel, known, trialInd, type) {
   const STIM_SIZE = 100; // px
+  let debugKeyboardListener = null;
   const useSecondStimSet =
     typeof type === "string" && type.startsWith("unconstrained");
   const nodeImagePath = useSecondStimSet ? PATHS.nodeImages2 : PATHS.nodeImages1;
@@ -55,10 +58,40 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
       stim_nodes: nodeLabel,
     },
 
+    on_load: function () {
+      if (!CONFIG.debug) return;
+
+      debugKeyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
+        callback_function: () => {
+          if (debugKeyboardListener) {
+            jsPsych.pluginAPI.cancelKeyboardResponse(debugKeyboardListener);
+            debugKeyboardListener = null;
+          }
+          jsPsych.finishTrial({ response: null, debug_skip: true });
+        },
+        valid_responses: "ALL_KEYS",
+        rt_method: "performance",
+        persist: false,
+        allow_held_key: false,
+      });
+    },
+
     on_finish: function (data) {
+      if (debugKeyboardListener) {
+        jsPsych.pluginAPI.cancelKeyboardResponse(debugKeyboardListener);
+        debugKeyboardListener = null;
+      }
+
+      if (data.response === null || typeof data.response === "undefined") {
+        data.correct = null;
+        data.debug_skip = true;
+        return;
+      }
+
       // data.response is the button index (0 or 1)
       // correct if response matches knownness
       data.correct = Number((data.response === 0) === isKnown);
+      data.debug_skip = false;
     },
   };
 }
