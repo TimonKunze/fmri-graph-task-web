@@ -173,7 +173,9 @@ export function makeLearnTimeline() {
 export const testTimeline = [];
 export function makeTestTimeline() {
     let tl = [];
-    const testLayouts = ["rotational", "unconstrained"];
+    const testLayouts = CONFIG.condition_order === "unconstr_first"
+      ? ["unconstrained", "rotational"]
+      : ["rotational", "unconstrained"];
     // Instructions 3 (Congr Test)
     // ---------------------------
     

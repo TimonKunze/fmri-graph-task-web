@@ -16,7 +16,7 @@ const baseConfig = {
 
   graphHex: "10248905",
   varType: "unconstrained", // or "rotational"
-
+  condition_order: "rot_first", // "rot_first" | "unconstr_first"
 
   keyChoice: null, // placeholder
     
