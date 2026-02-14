@@ -1,9 +1,11 @@
 import { decodeString } from "./utils/helper-tools";
 
-export const CONFIG = {
+const baseConfig = {
+  mode: "dev", // "dev" | "prod"
+
   // Flags
-  debug: true,
-  quick_run: true,
+  debug: false,
+  quick_run: false,
   randomize: true,
   part1: true,
   part2: true,
@@ -25,8 +27,26 @@ export const CONFIG = {
   maxAttemptsDraw: 11,
   // maxLearnRelations: "max",
   maxLearnRelations: 2,
+};
 
+const configProfiles = {
+  dev: {
+    debug: true,
+    quick_run: true,
+    randomize: true,
+  },
+  prod: {
+    debug: false,
+    quick_run: false,
+    randomize: true,
+  },
+};
 
+const selectedProfile = configProfiles[baseConfig.mode] || {};
+
+export const CONFIG = {
+  ...baseConfig,
+  ...selectedProfile,
 };
 
 CONFIG.keyChoice = CONFIG.debug ? null : "NO_KEYS";
