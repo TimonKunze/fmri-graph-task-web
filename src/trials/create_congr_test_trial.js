@@ -5,10 +5,10 @@ import { jsPsych } from "../main.js";
 import { CONFIG } from "../config.js";
 import { SIZES } from "../config/sizes.js";
 
-export function createCongrTestTrial(tTrialI, currentPair, randFlag) {
+export function createCongrTestTrial(tTrialI, currentPair, randFlag, layoutType = CONFIG.varType) {
 
   const path1SDPlongerPath2 = currentPair[0].length > currentPair[1].length;
-  const useSecondStimSet = CONFIG.varType === "unconstrained";
+  const useSecondStimSet = layoutType === "unconstrained";
   const nodeImagePath = useSecondStimSet ? PATHS.nodeImages2 : PATHS.nodeImages1;
   const stimSize = useSecondStimSet
     ? (SIZES.task3Treetop ?? SIZES.task14Treetop)
@@ -89,6 +89,7 @@ export function createCongrTestTrial(tTrialI, currentPair, randFlag) {
         trial_name: "test_congr",
         trial_ind_congrtest: tTrialI,
         pathpair_congrtest: currentPair,
+        layout_type: layoutType,
       });
     },
   };

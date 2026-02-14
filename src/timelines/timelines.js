@@ -172,6 +172,8 @@ export function makeLearnTimeline() {
 export const testTimeline = [];
 export function makeTestTimeline() {
     let tl = [];
+    const testLayouts = ["rotational", "unconstrained"];
+    const layoutTitle = (layout) => (layout === "unconstrained" ? "unconstrained" : "rotational");
     // Instructions 3 (Congr Test)
     // ---------------------------
     
@@ -184,23 +186,45 @@ export function makeTestTimeline() {
     tl.push(testOneInstrTrial1);
     tl.push(testOneInstrTrial2);
 
-    // Task 3 (Congr Task)
-    // ------------------
-    for (let tTrialI=0; tTrialI<DESIGN.test3Pairs.length; tTrialI++) {
-    let currentPair = DESIGN.test3Pairs[tTrialI];
-        tl.push(createCongrTestTrial(tTrialI, currentPair, CONFIG.rand));
+    // Task 3 (Congr Task) for both layout conditions
+    // ----------------------------------------------
+    for (const layoutType of testLayouts) {
+      tl.push({
+        type: jsPsychHtmlButtonResponse,
+        stimulus: `<p>Now continuing Task 3 in the <strong>${layoutTitle(layoutType)}</strong> condition.</p>`,
+        choices: ["Continue"],
+        data: {
+          trial_name: "test3_condition_transition",
+          layout_type: layoutType,
+        },
+      });
+      for (let tTrialI=0; tTrialI<DESIGN.test3Pairs.length; tTrialI++) {
+        let currentPair = DESIGN.test3Pairs[tTrialI];
+        tl.push(createCongrTestTrial(tTrialI, currentPair, CONFIG.rand, layoutType));
+      }
     }
     tl.push(createConfidenceTrial("congrtest"));
     tl.push(createFreeEvalTrial("congrtest"));
 
-    // Instruction 4 & Task 4 (Spatialpos)
-    // -----------------------------------
+    // Instruction 4 & Task 4 (Spatialpos) for both layout conditions
+    // ---------------------------------------------------------------
     tl.push(spatialPosInstrTrial1);
-    tl.push(createSpatialPosTrial());
-    tl.push(spatialPosInstrTrial2);
-    tl.push(createPosDrawTrial("first"));
+    for (const layoutType of testLayouts) {
+      tl.push({
+        type: jsPsychHtmlButtonResponse,
+        stimulus: `<p>Now continuing Task 4 in the <strong>${layoutTitle(layoutType)}</strong> condition.</p>`,
+        choices: ["Continue"],
+        data: {
+          trial_name: "test4_condition_transition",
+          layout_type: layoutType,
+        },
+      });
+      tl.push(createSpatialPosTrial(layoutType));
+      tl.push(spatialPosInstrTrial2);
+      tl.push(createPosDrawTrial("first", layoutType));
         for (let i=0; i<5; i++) {
-            tl.push(createCondPosDrawTrial());
+            tl.push(createCondPosDrawTrial(layoutType));
+      }
     }
     tl.push(createConfidenceTrial("spatialpos"));
     tl.push(createFreeEvalTrial("spatialpos"));

@@ -13,12 +13,13 @@ import { shortenLine, addUniqueArray } from "../utils/helper-tools.js";
 import { isConnected, transformToAdjacencyObject } from "../utils/graph-tools.js";
 
 
-export function createSpatialPosTrial() {
+export function createSpatialPosTrial(layoutType = CONFIG.varType) {
   console.log("PATHS.nodeImages1Small exists?", typeof PATHS.nodeImages1Small);
   console.log("example path [0]:", PATHS.nodeImages1Small?.(0));
-  const useSecondStimSet = CONFIG.varType === "unconstrained";
+  const useSecondStimSet = layoutType === "unconstrained";
   const arenaNodeSize = useSecondStimSet ? SIZES.task14Treetop : SIZES.task14Flower;
   const arenaNodeImageSmallPath = useSecondStimSet ? PATHS.nodeImages2Small : PATHS.nodeImages1Small;
+  const arenaBgColor = useSecondStimSet ? COLORS.bgBlue : COLORS.bgGreen;
 
   let saveNodePos = new Array();
   let trialEnded = false;
@@ -268,7 +269,7 @@ export function createSpatialPosTrial() {
       p.TLD.changeCursorHand(p.TLD.towPos, arenaNodeSize / 2);
 
       // Set Background
-      p.background(COLORS["bgGreen"]);
+      p.background(arenaBgColor);
       p.textSize(38);
       p.textFont('Courier New');
       p.fill(COLORS["envText"]);
@@ -322,6 +323,7 @@ export function createSpatialPosTrial() {
         trial_name: "test_spatialpos_norel",
         nodepos_spatialpos_norel: saveNodePos,
         rt_spatialpos_norel: rt,
+        layout_type: layoutType,
       }
       jsPsych.data.addDataToLastTrial(data);
     },
@@ -332,7 +334,7 @@ export function createSpatialPosTrial() {
 }
 
 
-export function createPosDrawTrial(c_type = "first") {
+export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType) {
   // State that must persist across p5 callbacks for this trial instance
   let trialEnded = false;
 
@@ -341,9 +343,11 @@ export function createPosDrawTrial(c_type = "first") {
 
   let connectedPos = [];
   let towPosLastTrial = [];
-  const useSecondStimSet = CONFIG.varType === "unconstrained";
+  const useSecondStimSet = layoutType === "unconstrained";
   const arenaNodeSize = useSecondStimSet ? SIZES.task14Treetop : SIZES.task14Flower;
   const arenaNodeImageSmallPath = useSecondStimSet ? PATHS.nodeImages2Small : PATHS.nodeImages1Small;
+  const arenaBgColor = useSecondStimSet ? COLORS.bgBlue : COLORS.bgGreen;
+  const arenaGridColor = useSecondStimSet ? COLORS.bgGridBlue : COLORS.bgGrid;
 
   let startTimeRT = 0;
   const P5Plugin = makeP5JSPlugin(jsPsychModule);
@@ -413,7 +417,7 @@ export function createPosDrawTrial(c_type = "first") {
       p.TLD.gridBackground = function (horLines = 18, verLines = 18) {
         for (let x = 0; x < SIZES["env"][0]; x += SIZES["env"][0] / verLines) {
           for (let y = 0; y < SIZES["env"][0]; y += SIZES["env"][0] / horLines) {
-            p.stroke(COLORS.bgGrid);
+            p.stroke(arenaGridColor);
             p.strokeWeight(0.5);
             p.line(x, 0, x, p.height);
             p.line(0, y, p.width, y);
@@ -450,7 +454,7 @@ export function createPosDrawTrial(c_type = "first") {
 
       p.TLD.renderBackground = function () {
         p.createCanvas(SIZES["env"][0] + SIZES["envExtra"], SIZES["env"][1]);
-          p.background(COLORS.bgGreen);
+          p.background(arenaBgColor);
         p.TLD.gridBackground();
 
         p.textSize(38);
@@ -635,21 +639,24 @@ export function createPosDrawTrial(c_type = "first") {
       data.rt_spatialpos_rel = rt;
       data.connected_spatialpos_rel = graphConnected;
       data.c_type = c_type;
+      data.layout_type = layoutType;
     },
     button_choices: ["Continue"],
     key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
 
     prompt: function () {
+      const agentLabel = useSecondStimSet ? "bat" : "bee";
+      const nodeLabel = useSecondStimSet ? "treetop" : "flower";
       return c_type === "first"
-        ? "Make sure the bee can reach each flower, i.e. no flower is disconnected."
-        : "Not all flowers are reachable for the bee. Please add one or more connections.";
+        ? `Make sure the ${agentLabel} can reach each ${nodeLabel}, i.e. no ${nodeLabel} is disconnected.`
+        : `Not all ${nodeLabel}s are reachable for the ${agentLabel}. Please add one or more connections.`;
     },
   };
 }
 
-export function createCondPosDrawTrial() {
+export function createCondPosDrawTrial(layoutType = CONFIG.varType) {
   return {
-    timeline: [createPosDrawTrial("conditional")],
+    timeline: [createPosDrawTrial("conditional", layoutType)],
     conditional_function: function () {
       const graphConnected = jsPsych.data.get().last(1).values()[0]?.connected_spatialpos_rel;
       return !graphConnected; // show again if NOT connected
