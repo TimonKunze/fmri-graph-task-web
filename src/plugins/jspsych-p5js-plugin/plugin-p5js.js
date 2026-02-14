@@ -178,23 +178,35 @@ trial(display_element, trial) {
 
   // create DOM
   let html = '<div id="jspsych-p5js-stimulus"></div>';
-  //display buttons
+  // display buttons
+  var choices = Array.isArray(trial.button_choices) ? trial.button_choices : [];
   var buttons = [];
-  if (Array.isArray(trial.button_html)) {
-    if (trial.button_html.length == trial.button_choices.length) {
-      buttons = trial.button_html;
+  if (choices.length > 0) {
+    if (Array.isArray(trial.button_html)) {
+      if (trial.button_html.length === choices.length) {
+        buttons = trial.button_html;
+      } else if (trial.button_html.length === 1) {
+        for (var i = 0; i < choices.length; i++) {
+          buttons.push(trial.button_html[0]);
+        }
+      } else {
+        console.error(
+          "Error in p5js plugin. The length of the button_html array must be 1 or equal to the length of button_choices array"
+        );
+        for (var i = 0; i < choices.length; i++) {
+          buttons.push('<button class="jspsych-btn">%choice%</button>');
+        }
+      }
     } else {
-      console.error("Error in p5js plugin. The length of the button_html array does not equal the length of the button_choices array");
-    }
-  } else {
-    for (var i = 0; i < trial.button_choices.length; i++) {
-      buttons.push(trial.button_html);
+      for (var i = 0; i < choices.length; i++) {
+        buttons.push(trial.button_html);
+      }
     }
   }
   
   html += '<div id="jspsych-p5js-btngroup">';
-  for (var i = 0; i < trial.button_choices.length; i++) {
-    var str = buttons[i].replace(/%choice%/g, trial.button_choices[i]);
+  for (var i = 0; i < choices.length; i++) {
+    var str = buttons[i].replace(/%choice%/g, choices[i]);
     html +=
       '<div class="jspsych-p5js-button" style="display: inline-block; margin:' +
       trial.margin_vertical +
@@ -255,7 +267,7 @@ trial(display_element, trial) {
      }
   };
 
-    for (var i = 0; i < trial.button_choices.length; i++) {
+    for (var i = 0; i < choices.length; i++) {
     display_element
         .querySelector("#jspsych-p5js-button-" + i)
         .addEventListener("click", (e) => {
