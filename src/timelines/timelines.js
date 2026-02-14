@@ -112,6 +112,7 @@ export function makeLearnTimeline() {
   for (let blockI = 0; blockI < nbLearnBlocks1; blockI++) {
     const block = blockNames[blockI] ?? `block_${blockI + 1}`;
 
+    let varType = blockType[0];
     tl.push(...createLearnTrials(DESIGN.randomPoss, block, varType));
 
     if (block === "first") {
@@ -128,7 +129,8 @@ export function makeLearnTimeline() {
     for (let blockI = 0; blockI < nbLearnBlocks2; blockI++) {
         const block = blockNames[blockI] ?? `block_${blockI + 1}`;
 
-        tl.push(...createLearnTrials(DESIGN.randomPoss, block));
+        let varType = blockType[1];
+        tl.push(...createLearnTrials(DESIGN.randomPoss, block, varType));
 
         // if (block === "first") {
         // tl.push(learnTrialRelQueryInstr);  // TODO: new intro
