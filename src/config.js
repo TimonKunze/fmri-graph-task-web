@@ -2,7 +2,7 @@ import { decodeString } from "./utils/helper-tools";
 
 export const CONFIG = {
   // Flags
-  debug: true,
+  debug: false,
   randomize: false,
   part1: true,
   part2: true,

@@ -11,6 +11,7 @@ function computePart({ part1, part2 }) {
 
 export function makeJsPsych({ data_dir }) {
   const part = computePart(CONFIG);
+  let debugAdvanceHandler = null;
 
   const qs = new URLSearchParams(window.location.search);
 
@@ -20,8 +21,40 @@ export function makeJsPsych({ data_dir }) {
 
   const jsPsych = initJsPsych({
     show_progress_bar: true,
+    on_trial_start: () => {
+      if (!CONFIG.debug) return;
+
+      if (debugAdvanceHandler) {
+        document.removeEventListener("keydown", debugAdvanceHandler, true);
+      }
+
+      debugAdvanceHandler = () => {
+        const displayEl = jsPsych.getDisplayElement();
+        if (!displayEl) return;
+
+        // For button-based plugins, trigger the first enabled button.
+        // p5 trials are handled by their own debug key listener.
+        const btn = displayEl.querySelector(
+          "button.jspsych-btn:not([disabled]), .jspsych-btn:not([disabled])"
+        );
+        if (btn && typeof btn.click === "function") {
+          btn.click();
+        }
+      };
+
+      document.addEventListener("keydown", debugAdvanceHandler, true);
+    },
+    on_trial_finish: () => {
+      if (!debugAdvanceHandler) return;
+      document.removeEventListener("keydown", debugAdvanceHandler, true);
+      debugAdvanceHandler = null;
+    },
 
     on_finish: () => {
+      if (debugAdvanceHandler) {
+        document.removeEventListener("keydown", debugAdvanceHandler, true);
+        debugAdvanceHandler = null;
+      }
       jsPsych.data.displayData("json");
     },
 
