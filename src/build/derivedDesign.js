@@ -1,6 +1,7 @@
 import { CONFIG } from "../config";
 import { G } from "../config/graphs";
 import { shuffleArray } from "../utils/helper-tools";
+import { randomlyReverseLists } from "../utils/graph-tools";
 
 // Randomize congr/incongr pairs
 if (CONFIG.randomize) {

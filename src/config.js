@@ -4,7 +4,7 @@ export const CONFIG = {
   // Flags
   debug: true,
   quick_run: true,
-  randomize: false,
+  randomize: true,
   part1: true,
   part2: true,
   prolific: true,

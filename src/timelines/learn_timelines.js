@@ -23,7 +23,6 @@ export function createLearnTrials(nodePoss, block, layoutType = CONFIG.varType) 
       nbRelations = CONFIG.maxLearnRelations;
   }
 
-  const learnTrialsBlock = CONFIG.nbLearnPasses*nbRelations;
   const baseNodePos = Array.isArray(nodePoss?.[0]) ? nodePoss[0] : [];
   const unconstrainedPool = Array.isArray(nodePoss) ? nodePoss : [];
 
