@@ -11,9 +11,9 @@ export const SIZES = {
 
   // Task 2 (relation query): node stimulus sizes
   "task2Flower": 75,
-  "task2Treetop": 85,
+  "task2Treetop": 95,
 
   // Task 3 (congruency test): node stimulus sizes
   "task3Flower": 100,
-  "task3Treetop": 100,
+  "task3Treetop": 120,
 };
