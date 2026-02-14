@@ -4,6 +4,11 @@ import { PATHS } from "../config/paths";
 
 export function createLearnTrialRelQuery(rel, known, trialInd, type) {
   const STIM_SIZE = 100; // px
+  const useSecondStimSet =
+    typeof type === "string" && type.startsWith("unconstrained");
+  const nodeImagePath = useSecondStimSet ? PATHS.nodeImages2 : PATHS.nodeImages1;
+  const agentLabel = useSecondStimSet ? "bat" : "bee";
+  const nodeLabel = useSecondStimSet ? "treetop" : "flower";
 
   if (!Array.isArray(rel) || rel.length < 2) {
     throw new Error("createLearnTrialRelQuery: rel must be a [startNode, endNode] array.");
@@ -22,12 +27,12 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
 
     stimulus: `
       <div style="${wrapStyle}">
-        <p>Please indicate whether the bee knew, or did not know this pair of flowers.</p>
+        <p>Please indicate whether the ${agentLabel} knew, or did not know this pair of ${nodeLabel}s.</p>
 
         <div style="${rowStyle}">
-        <img alt="Flower A" src="${PATHS.nodeImages1(startNode)}" style="${imgStyle}">
+        <img alt="${nodeLabel} A" src="${nodeImagePath(startNode)}" style="${imgStyle}">
         <img alt="Dot" src="${PATHS.dotPath}" style="${imgStyle}">
-          <img alt="Flower B" src="${PATHS.nodeImages1(endNode)}" style="${imgStyle}">
+          <img alt="${nodeLabel} B" src="${nodeImagePath(endNode)}" style="${imgStyle}">
         </div>
       </div>
     `,
@@ -46,6 +51,8 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
       start_node: startNode,
       end_node: endNode,
       stim_size_px: STIM_SIZE,
+      stim_agent: agentLabel,
+      stim_nodes: nodeLabel,
     },
 
     on_finish: function (data) {
