@@ -5,8 +5,11 @@ export const COLORS = {
     "nice" : "#f51467",
     "envText" : "grey",
     "bgWhite": "#ffffff",
-    "bgGreen": "#98BE64",
-    "bgBlue": "#14345C",
+    // "bgGreen": "#98BE64",  // (green)
+    // "bgGreen": "#EEA663", // (orange)
+    "bgGreen": "#ECECEC", // (grey)
+    // "bgBlue": "#14345C",
+    "bgBlue": "#ECECEC", // (grey)
     "bgGrid": "#799850",
     "bgGridBlue": "#2A4E7A",
     "drawStroke": "#eeeeee",
