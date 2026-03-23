@@ -4,8 +4,8 @@ export const SIZES = {
   "envExtra" : 100, // x and y in px
 
   // Task 1 and 4 (Learning and Arena task): node stimulus sizes
-  "task14Bee": 48,
-  "task14Bat": 80,
+  "task14Bee": 105,
+  "task14Bat": 105,
   // "task14Flower": 60,
   // "task14Treetop": 75,
   "task14Flower": 80,

@@ -1,0 +1,8 @@
+#+title: Image Sources
+
+- Wasp:  Japanese yellow hornet by DataBase Center for Life Science (DBCLS) (https://doi.org/10.7875/togopic.2022.144) with  Creative Commons [[https://creativecommons.org/licenses/by/4.0/deed.en][Attribution 4.0]] International license.
+- Fly: Calliphora vicina (Calliphoridae) by B. Schoenmakers (https://commons.wikimedia.org/wiki/File:Calliphora_vicina_(Calliphoridae)_-_(female_imago),_Elst_(Gld),_the_Netherlands.jpg) with [[https://web.archive.org/web/20210512231235/https://world.observation.org/foto/view/35225467][Creative Commons Attribution 3.0 Unported license].
+- Objects:
+  - Duñabeitia, J.A., Crepaldi, D., Meyer, A.S., New, B., Pliatsikas, C., Smolka, E., and Brysbaert, M. (2018). MultiPic: A standardized set of 750 drawings with norms for six European languages. Quarterly Journal of Experimental Psychology 71, 808–816. https://doi.org/10.1080/17470218.2017.1310261.
+  - Rossion, B., and Pourtois, G. (2004). Revisiting Snodgrass and Vanderwart’s Object Pictorial Set: The Role of Surface Detail in Basic-Level Object Recognition. Perception 33, 217–236. https://doi.org/10.1068/p5117.
+

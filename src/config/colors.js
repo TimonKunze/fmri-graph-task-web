@@ -7,10 +7,12 @@ export const COLORS = {
     "bgWhite": "#ffffff",
     // "bgGreen": "#98BE64",  // (green)
     // "bgGreen": "#EEA663", // (orange)
-    "bgGreen": "#ECECEC", // (grey)
+    "bgGreen": "#E0E0E0", // (grey)
+    // "bgGreen": "#FCFCFC", // (white)
     // "bgBlue": "#14345C",
-    "bgBlue": "#ECECEC", // (grey)
-    "bgGrid": "#799850",
-    "bgGridBlue": "#2A4E7A",
+    "bgBlue": "#E0E0E0", // (grey)
+    // "bgBlue": "#FCFCFC", // (white)
+    "bgGrid": "#DADADA",
+    "bgGridBlue": "#DADADA",
     "drawStroke": "#eeeeee",
 };
