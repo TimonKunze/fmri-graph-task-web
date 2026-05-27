@@ -12,6 +12,11 @@ export const welcome_trial = {
 
   stimulus: () => `
     <div style="max-width: 700px; margin: 0 auto; font-size: 18px; line-height: 1.6;">
+    <img 
+        src="/stimuli/collected_pic/fruit_salad.png" 
+        alt="Welcome image fruit salad"
+        style="max-width: 250px; height: auto; display: block; margin: 0 auto 24px auto;"
+      >
       <p><strong>Welcome to ${getPartString()}our experiment!</strong></p>
       <p>Please click the button below when you are ready to begin.</p>
     </div>

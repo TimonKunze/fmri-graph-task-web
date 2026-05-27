@@ -8,13 +8,13 @@ const baseConfig = {
   quick_run: false,
   randomize: true,
   part1: true,
-  part2: true,
+  part2: false,
   prolific: true,
   feedback: true,
   staticMode: false,
   showNum: false,
 
-  graphHex: "10248905",
+  graphHex: "10248905",  // TODO: change to correct graph
   varType: "unconstrained", // or "rotational"
   condition_order: "rot_first", // "rot_first" | "unconstr_first"
 

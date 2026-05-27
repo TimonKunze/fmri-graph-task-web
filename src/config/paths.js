@@ -1,13 +1,13 @@
 export const PATHS = {
-  // Fly
+    // Layout 1 object: Fly
   movingObj1: "/stimuli/fly/moving_obj.png",
   movingObj1Mirrored: "/stimuli/fly/moving_obj_mirrored.png",
 
-  // Wasp
+    // Layout 2 object: Wasp
   movingObj2: "/stimuli/wasp/moving_obj.png",
   movingObj2Mirrored: "/stimuli/wasp/moving_obj_mirrored.png",
     
-  // Flowers
+  // Objects Layout 1
   // nodeImages1Small: (i) => `/stimuli/flowers/small_imgs/node${i + 1}.png`,
   // nodeImages1: (i) => `/stimuli/flowers/node${i + 1}.png`,
   // nodeImages1Small: (i) => `/stimuli/produce16/small_imgs/node${i + 1}.png`,
@@ -17,7 +17,7 @@ export const PATHS = {
   nodeImages1Small: (i) => `/stimuli/collected_pic/small_imgs/node${i + 1}.png`,
   nodeImages1: (i) => `/stimuli/collected_pic/node${i + 1}.png`,
 
-  // Treetops
+  // Objects Layout 2
   // nodeImages2Small: (i) => `/stimuli/treetops/node_${i + 1}.png`,
   // nodeImages2: (i) => `/stimuli/treetops/node_${i + 1}.png`,
   // nodeImages2Small: (i) => `/stimuli/produce16/node${i + 9}.png`,
