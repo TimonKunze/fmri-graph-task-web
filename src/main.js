@@ -1,12 +1,20 @@
 import "jspsych/css/jspsych.css";
 import { buildTimeline } from "./build/buildTimeline.js";
+import { refreshDesign, DESIGN } from "./build/derivedDesign.js";
 import { makeJsPsych } from "./build/makeJsPsych.js";
 import { CONFIG } from "./config.js";
+import { refreshGraphState, G } from "./config/graphs.js";
 import { PATHS } from "./config/paths.js";
 import { SIZES } from "./config/sizes.js";
 import { STIMULUS_CONDITION_MAP } from "./config/stimulus_assignment.js";
-import { DESIGN } from "./build/derivedDesign.js";
-import { G } from "./config/graphs.js"
+import { participant_setup_trial } from "./trials/participant_setup_trial.js";
+import { getParticipantSetup } from "./state/participant.js";
+import {
+  getRandomizationAssignment,
+  getSubjectAssignment,
+  loadRandomizationRows,
+  setSubjectAssignment,
+} from "./state/subjectAssignment.js";
 
 // Disable p5 Friendly Errors (recommended in Vite)
 import p5 from "p5";
@@ -19,10 +27,8 @@ console.table(CONFIG);
 const EXPERIMENT_VERSION =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_EXPERIMENT_VERSION) ||
   "dev";
+window.__JSPSYCH_DISPLAY_DATA_ON_FINISH__ = false;
 export const jsPsych = makeJsPsych({ data_dir: PATHS.data_dir });
-const totalLearnBlocks = Array.isArray(CONFIG.nbLearnBlocks)
-  ? CONFIG.nbLearnBlocks.reduce((sum, n) => sum + Number(n || 0), 0)
-  : Number(CONFIG.nbLearnBlocks || 0);
 
   // already comptued in make JsPsych
   // // compute subject id here
@@ -38,59 +44,86 @@ const totalLearnBlocks = Array.isArray(CONFIG.nbLearnBlocks)
   ? jsPsych.data.getURLVariable("SESSION_ID")
   : "custom_session";
 
-jsPsych.data.addProperties({
-  // Subject Specific Data
-  // subject_id: subject_id,
-  study_id: study_id,
-  session_id: session_id,
-  group_name: CONFIG.varType,
-  date: new Date().toDateString(),
-  time: new Date().toTimeString(),
-  // Animation environment
-  random_node_positions: DESIGN.randomPoss,
-  rotation_node_positions: DESIGN.rotationPos,
-  canvas_size: SIZES["env"],
-  node_size: SIZES["node"],
-  // Learning
-  nb_learn_passes: CONFIG.nbLearnPasses,
-  nb_learn_blocks: CONFIG.nbLearnBlocks,
-  nb_relation: G.relations.length,
-  nb_learn_trials_in_block: CONFIG.nbLearnPasses*G.relations.length,
-  nb_learn_trials: CONFIG.nbLearnPasses*G.relations.length*totalLearnBlocks,
-  relations: G.relations,
-  // Matrices
-  adjacency_matrix: G.adjM,
-  // pos_weighted_adj_mat: poswAdjMat,
-  // eucl_distance_mat: eucMat,
-  // short_path_dist_mat: spdMat,
-  // weighted_spd_mat: wSpdMat,
-  // Congruency
-  eucd_congr_pairs: G.eCongrPairs,
-  eucd_incongr_pairs: G.eIncongrPairs,
-  wspd_congr_pairs: G.wCongrPairs,
-  wspd_incongr_pairs: G.wIncongrPairs,
-  test3_pairs: DESIGN.test3Pairs,
-  // Paths
-  node_paths: PATHS.nodeImages1,
-  node_paths_small: PATHS.nodeImages1Small,
-  // Flags
-  debug_flag: CONFIG.debug,
-  rand_flag: CONFIG.randomize,
-  part1_flag: CONFIG.part1,
-  part2_flag: CONFIG.part2,
-  prolific_flag: CONFIG.prolific,
-  feedback_flag: CONFIG.feedback,
-  stimulus_condition_map: STIMULUS_CONDITION_MAP,
-  experiment_version: EXPERIMENT_VERSION,
-});
+function addExperimentProperties() {
+  const assignment = getSubjectAssignment();
+  const totalLearnBlocks = Array.isArray(assignment.learnBlockOrder)
+    ? assignment.learnBlockOrder.length
+    : Array.isArray(CONFIG.nbLearnBlocks)
+      ? CONFIG.nbLearnBlocks.reduce((sum, n) => sum + Number(n || 0), 0)
+      : Number(CONFIG.nbLearnBlocks || 0);
 
+  jsPsych.data.addProperties({
+    study_id,
+    session_id,
+    group_name: CONFIG.varType,
+    date: new Date().toDateString(),
+    time: new Date().toTimeString(),
+    subject_assignment: assignment,
+    random_node_positions: DESIGN.randomPoss,
+    rotation_node_positions: DESIGN.rotationPos,
+    canvas_size: SIZES.env,
+    node_size: SIZES.node,
+    nb_learn_passes: CONFIG.nbLearnPasses,
+    nb_learn_blocks: assignment.learnBlockOrder ?? CONFIG.nbLearnBlocks,
+    nb_relation: G.relations.length,
+    nb_learn_trials_in_block: CONFIG.nbLearnPasses * G.relations.length,
+    nb_learn_trials: CONFIG.nbLearnPasses * G.relations.length * totalLearnBlocks,
+    relations: G.relations,
+    adjacency_matrix: G.adjM,
+    eucd_congr_pairs: G.eCongrPairs,
+    eucd_incongr_pairs: G.eIncongrPairs,
+    wspd_congr_pairs: G.wCongrPairs,
+    wspd_incongr_pairs: G.wIncongrPairs,
+    test3_pairs: DESIGN.test3Pairs,
+    node_paths_set1: Array.from({ length: G.nbNodes }, (_, i) => PATHS.nodeImages1(i)),
+    node_paths_set2: Array.from({ length: G.nbNodes }, (_, i) => PATHS.nodeImages2(i)),
+    debug_flag: CONFIG.debug,
+    rand_flag: CONFIG.randomize,
+    part1_flag: CONFIG.part1,
+    part2_flag: CONFIG.part2,
+    prolific_flag: CONFIG.prolific,
+    feedback_flag: CONFIG.feedback,
+    stimulus_condition_map: STIMULUS_CONDITION_MAP,
+    experiment_version: EXPERIMENT_VERSION,
+  });
+}
 
-const timeline = buildTimeline();
+async function bootstrap() {
+  const response = await fetch("/config/randomization_table.csv");
+  const csvText = await response.text();
+  loadRandomizationRows(csvText);
 
-timeline.forEach((t, i) => {
-  if (t?.type?.info?.name === "p5js") {
-    if (typeof t.setup_func !== "function") console.error("BAD p5 trial", i, t);
+  jsPsych.options.show_progress_bar = false;
+  await jsPsych.run([participant_setup_trial]);
+
+  const setup = getParticipantSetup();
+  const assignment = getRandomizationAssignment(setup.subjectCode);
+
+  if (!assignment) {
+    throw new Error(`No randomization row found for subject code ${setup.subjectCode}.`);
   }
-});
 
-jsPsych.run(timeline);
+  setSubjectAssignment(assignment);
+  refreshGraphState();
+  refreshDesign();
+  addExperimentProperties();
+
+  const timeline = buildTimeline();
+  const displayContainer = jsPsych.getDisplayContainerElement();
+
+  if (displayContainer) {
+    displayContainer.innerHTML = "";
+  }
+
+  timeline.forEach((t, i) => {
+    if (t?.type?.info?.name === "p5js") {
+      if (typeof t.setup_func !== "function") console.error("BAD p5 trial", i, t);
+    }
+  });
+
+  jsPsych.options.show_progress_bar = true;
+  window.__JSPSYCH_DISPLAY_DATA_ON_FINISH__ = CONFIG.debug;
+  await jsPsych.run(timeline);
+}
+
+bootstrap();

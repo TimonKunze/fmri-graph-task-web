@@ -11,7 +11,6 @@ import { learnInstrEndTrial } from "../trials/learn_instr_end_trial.js";
 import { learnInstrTrial } from "../trials/learn_instr_trial.js";
 import { age_trial } from "../trials/age_trial.js";
 import { preload_trial } from "../trials/preload_trial.js";
-import { participant_setup_trial } from "../trials/participant_setup_trial.js";
 import { welcome_trial } from "../trials/welcome_trial.js";
 import { consent_trial } from "../trials/consent_trial.js";
 import { fullscreen_trial } from "../trials/fullscreen_trial.js";
@@ -31,6 +30,7 @@ import { cheater_trial } from "../trials/cheater_trial.js";
 import { finalTrialP1 } from "../trials/final_p1_trial.js";
 import { createFinalTrial } from "../trials/final_trial.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
+import { getLearnLayoutOrder, getTestLayoutOrder } from "../state/subjectAssignment.js";
 
 // ------------------------------------
 // Learn Intro Timeline
@@ -84,7 +84,6 @@ export function makeLearnIntroTimeline(config = CONFIG) {
 export function makeCoreTimeline() {
   const tl = [];
 
-  tl.push(participant_setup_trial);
   tl.push(preload_trial);
   tl.push(welcome_trial);
   tl.push(consent_trial);
@@ -99,17 +98,7 @@ export function makeCoreTimeline() {
  
 export function makeLearnTimeline() {
   const tl = [];
-
-  let rotationalBlocks = 0;
-  let unconstrainedBlocks = 0;
-  if (Array.isArray(CONFIG.nbLearnBlocks)) {
-    rotationalBlocks = Number(CONFIG.nbLearnBlocks[0] ?? 0);
-    unconstrainedBlocks = Number(CONFIG.nbLearnBlocks[1] ?? 0);
-  } else if (CONFIG.varType === "rotational") {
-    rotationalBlocks = Number(CONFIG.nbLearnBlocks ?? 0);
-  } else {
-    unconstrainedBlocks = Number(CONFIG.nbLearnBlocks ?? 0);
-  }
+  const orderedLayouts = getLearnLayoutOrder();
 
   const blockNames = ["first", "second", "third", "fourth", "fifth", "sixth"];
   let blockCounter = 0;
@@ -155,18 +144,23 @@ export function makeLearnTimeline() {
     }
   };
 
-  for (let blockI = 0; blockI < rotationalBlocks; blockI++) {
-    if (blockI === 0) {
-      tl.push(makePhaseTransitionTrial("rotational"));
-    }
-    pushBlock("rotational", DESIGN.rotationPos);
+  const fallbackLayouts = [];
+  if (Array.isArray(CONFIG.nbLearnBlocks)) {
+    for (let i = 0; i < Number(CONFIG.nbLearnBlocks[0] ?? 0); i++) fallbackLayouts.push("rotational");
+    for (let i = 0; i < Number(CONFIG.nbLearnBlocks[1] ?? 0); i++) fallbackLayouts.push("unconstrained");
+  } else {
+    fallbackLayouts.push(CONFIG.varType);
   }
 
-  for (let blockI = 0; blockI < unconstrainedBlocks; blockI++) {
-    if (blockI === 0) {
-      tl.push(makePhaseTransitionTrial("unconstrained"));
+  const learnLayouts = orderedLayouts ?? fallbackLayouts;
+  let previousLayout = null;
+
+  for (const layoutType of learnLayouts) {
+    if (layoutType !== previousLayout) {
+      tl.push(makePhaseTransitionTrial(layoutType));
+      previousLayout = layoutType;
     }
-    pushBlock("unconstrained", DESIGN.randomPoss);
+    pushBlock(layoutType, layoutType === "rotational" ? DESIGN.rotationPos : DESIGN.randomPoss);
   }
 
   
@@ -184,9 +178,10 @@ export function makeLearnTimeline() {
 export const testTimeline = [];
 export function makeTestTimeline() {
     let tl = [];
-    const testLayouts = CONFIG.condition_order === "unconstr_first"
-      ? ["unconstrained", "rotational"]
-      : ["rotational", "unconstrained"];
+    const testLayouts = getTestLayoutOrder()
+      ?? (CONFIG.condition_order === "unconstr_first"
+        ? ["unconstrained", "rotational"]
+        : ["rotational", "unconstrained"]);
     // Instructions 3 (Congr Test)
     // ---------------------------
     

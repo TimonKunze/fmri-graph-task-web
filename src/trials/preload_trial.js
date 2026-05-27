@@ -6,10 +6,11 @@ import { t } from "../state/participant.js";
 export const preload_trial = {
   type: jsPsychPreload,
   auto_preload: true,
+  images: [],
 
-  // flatten + dedupe
-  images: Array.from(
-    new Set([
+  on_start: (trial) => {
+    trial.images = Array.from(
+      new Set([
         ...Array.from({ length: DESIGN.nbNodes }, (_, i) => PATHS.nodeImages1(i)),
         ...Array.from({ length: DESIGN.nbNodes }, (_, i) => PATHS.nodeImages1Small(i)),
         ...Array.from({ length: DESIGN.nbNodes }, (_, i) => PATHS.nodeImages2(i)),
@@ -21,12 +22,8 @@ export const preload_trial = {
         PATHS.dashPath,
         PATHS.dotPath,
         PATHS.undoPath,
-    ])
-  ),
-
-  show_detailed_errors: true,
-  error_message: "",
-  on_start: (trial) => {
+      ])
+    );
     trial.error_message = t({
       it: "Impossibile caricare l'esperimento. Invia un'email a: tkunze@sissa.it.",
       en: "The experiment failed to load. Please email: tkunze@sissa.it.",

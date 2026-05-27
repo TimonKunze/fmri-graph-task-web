@@ -1,3 +1,5 @@
+import { getObjectNodeId } from "../state/subjectAssignment.js";
+
 export const PATHS = {
     // Layout 1 object: Fly
   movingObj1: "/stimuli/fly/moving_obj.png",
@@ -14,8 +16,8 @@ export const PATHS = {
   // nodeImages1: (i) => `/stimuli/produce16/node${i + 1}.png`,
   // nodeImages1Small: (i) => `/stimuli/flowers16/small_imgs/node${i + 1}.png`,
   // nodeImages1: (i) => `/stimuli/flowers16/node${i + 1}.png`,
-  nodeImages1Small: (i) => `/stimuli/collected_pic/small_imgs/node${i + 1}.png`,
-  nodeImages1: (i) => `/stimuli/collected_pic/node${i + 1}.png`,
+  nodeImages1Small: (i) => `/stimuli/collected_pic/small_imgs/node${getObjectNodeId("set1", i)}.png`,
+  nodeImages1: (i) => `/stimuli/collected_pic/node${getObjectNodeId("set1", i)}.png`,
 
   // Objects Layout 2
   // nodeImages2Small: (i) => `/stimuli/treetops/node_${i + 1}.png`,
@@ -24,8 +26,8 @@ export const PATHS = {
   // nodeImages2: (i) => `/stimuli/produce16/node${i + 9}.png`,
   // nodeImages2Small: (i) => `/stimuli/flowers16/node${i + 9}.png`,  // TODO: change 9
   // nodeImages2: (i) => `/stimuli/flowers16/node${i + 9}.png`,
-  nodeImages2Small: (i) => `/stimuli/collected_pic/node${i + 9}.png`,  // TODO: change 9
-  nodeImages2: (i) => `/stimuli/collected_pic/node${i + 9}.png`,
+  nodeImages2Small: (i) => `/stimuli/collected_pic/node${getObjectNodeId("set2", i)}.png`,
+  nodeImages2: (i) => `/stimuli/collected_pic/node${getObjectNodeId("set2", i)}.png`,
 
   dashPath: `/stimuli/other/dash.png`,
   dotPath: `/stimuli/other/dot.png`,

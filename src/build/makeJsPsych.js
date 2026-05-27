@@ -55,7 +55,9 @@ export function makeJsPsych({ data_dir }) {
         document.removeEventListener("keydown", debugAdvanceHandler, true);
         debugAdvanceHandler = null;
       }
-      jsPsych.data.displayData("json");
+      if (window.__JSPSYCH_DISPLAY_DATA_ON_FINISH__ === true) {
+        jsPsych.data.displayData("json");
+      }
     },
 
     on_data_update: (data) => {

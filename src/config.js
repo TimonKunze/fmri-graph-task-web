@@ -1,14 +1,14 @@
 import { decodeString } from "./utils/helper-tools";
 
 const baseConfig = {
-  mode: "dev", // "dev" | "prod"
+  mode: "prod", // "dev" | "prod"
 
   // Flags
   debug: false,
   quick_run: false,
   randomize: true,
-  part1: false,
-  part2: true,
+  part1: true,
+  part2: false,
   
   prolific: true,
   feedback: true,
