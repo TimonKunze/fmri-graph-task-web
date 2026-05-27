@@ -68,6 +68,7 @@ function addExperimentProperties() {
     rand_flag: CONFIG.randomize,
     part1_flag: CONFIG.part1,
     part2_flag: CONFIG.part2,
+    part3_flag: CONFIG.part3,
     feedback_flag: CONFIG.feedback,
     stimulus_condition_map: STIMULUS_CONDITION_MAP,
     experiment_version: EXPERIMENT_VERSION,

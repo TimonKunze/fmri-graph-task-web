@@ -6,11 +6,18 @@ function randomID8() {
   return Math.random().toString(36).slice(2, 10);
 }
 
-function computePart({ part1, part2 }) {
-  if (part1 && part2) return 0;
-  if (part1 && !part2) return 1;
-  if (!part1 && part2) return 2;
-  return 0; // or null, depending on your design
+function computePart({ part1, part2, part3 }) {
+  const activeParts = [
+    part1 ? 1 : null,
+    part2 ? 2 : null,
+    part3 ? 3 : null,
+  ].filter(Number.isFinite);
+
+  if (activeParts.length === 1) {
+    return activeParts[0];
+  }
+
+  return 0; // combined session or no active part
 }
 
 export function makeJsPsych({ data_dir }) {

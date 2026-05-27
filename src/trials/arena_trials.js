@@ -356,6 +356,26 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
   let startTimeRT = 0;
   const P5Plugin = makeP5JSPlugin(jsPsychModule);
 
+  function getLatestSpatialPositions() {
+    const lastSpatialTrial = jsPsych.data
+      .get()
+      .filter({ trial_name: "test_spatialpos_norel", layout_type: layoutType })
+      .last(1)
+      .values()[0];
+
+    return lastSpatialTrial?.nodepos_spatialpos_norel ?? [];
+  }
+
+  function getLatestConnectedEdges() {
+    const lastArenaTrial = jsPsych.data
+      .get()
+      .filter({ trial_name: "test_spatialpos_rel", layout_type: layoutType })
+      .last(1)
+      .values()[0];
+
+    return lastArenaTrial?.connected_pos_spatialpos_rel ?? [];
+  }
+
   return {
     type: P5Plugin,
 
@@ -500,22 +520,20 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
       };
     },
 
-    on_start: function () {
-      // const jsPsych = this.jsPsych;
-
-      // Pull node positions / prior edges safely
+    on_start: function (trial) {
       if (c_type === "first") {
-        towPosLastTrial = jsPsych.data.get().last(2).values()[0]?.nodepos_spatialpos_norel ?? [];
+        towPosLastTrial = getLatestSpatialPositions();
         connectedPos = [];
       } else {
-        towPosLastTrial = jsPsych.data.get().last(1).values()[0]?.nodepos_spatialpos_norel ?? [];
-        connectedPos = jsPsych.data.get().last(1).values()[0]?.connected_pos_spatialpos_rel ?? [];
+        towPosLastTrial = getLatestSpatialPositions();
+        connectedPos = getLatestConnectedEdges();
       }
 
       startTimeRT = performance.now();
       trialEnded = false;
       nodeStarted = -1;
       nodeEnded = -1;
+      trial.button_choices = [t({ it: "Continua", en: "Continue" })];
     },
 
     setup_func: function (p) {
@@ -648,9 +666,6 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
     },
     button_choices: [""],
     key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
-    on_start: function (trial) {
-      trial.button_choices = [t({ it: "Continua", en: "Continue" })];
-    },
 
     prompt: function () {
       const isItalian = getCurrentLanguage() === "it";

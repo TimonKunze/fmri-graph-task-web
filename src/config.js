@@ -6,7 +6,8 @@ const baseConfig = {
   quick_run: false,
   randomize: true,
   part1: false,
-  part2: true,
+  part2: false,
+  part3: true,
 
   feedback: true,
   staticMode: false,

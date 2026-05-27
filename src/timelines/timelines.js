@@ -12,6 +12,9 @@ import { learnInstrTrial } from "../trials/learn_instr_trial.js";
 import { age_trial } from "../trials/age_trial.js";
 import { preload_trial } from "../trials/preload_trial.js";
 import { welcome_trial } from "../trials/welcome_trial.js";
+import { part2_intro_trial } from "../trials/part2_intro_trial.js";
+import { createFmriPathChoiceTrial } from "../trials/fmri_path_choice_trial.js";
+import { createFmriPictureViewingTrial } from "../trials/fmri_picture_viewing_trial.js";
 import { consent_trial } from "../trials/consent_trial.js";
 import { fullscreen_trial } from "../trials/fullscreen_trial.js";
 import { createLearnTrials, createRelQueryTrials } from "./learn_timelines.js";
@@ -28,7 +31,9 @@ import {
     createCondPosDrawTrial } from "../trials/arena_trials.js";
 import { cheater_trial } from "../trials/cheater_trial.js";
 import { finalTrialP1 } from "../trials/final_p1_trial.js";
+import { finalTrialP2 } from "../trials/final_p2_trial.js";
 import { createFinalTrial } from "../trials/final_trial.js";
+import { PATHS } from "../config/paths.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
 import { getLearnLayoutOrder, getTestLayoutOrder } from "../state/subjectAssignment.js";
 
@@ -167,7 +172,35 @@ export function makeLearnTimeline() {
 
   // Part 1 final
   const isPart1AndPart2 = CONFIG.part1 === true && CONFIG.part2 === true;
-  tl.push(isPart1AndPart2 ? finalTrialP1 : createFinalTrial({ part: 1 }));
+  tl.push(isPart1AndPart2 ? finalTrialP1 : createFinalTrial(1));
+
+  return tl;
+}
+
+// ------------------------------------
+// Part 2 Time line
+// ------------------------------------
+export function makePart2Timeline() {
+  const tl = [];
+
+  tl.push(part2_intro_trial);
+  tl.push(
+    createFmriPictureViewingTrial({
+      imageSrc: PATHS.nodeImages1(0),
+      duration: 1500,
+      trialIndex: 0,
+    })
+  );
+  tl.push(
+    createFmriPathChoiceTrial({
+      leftImageSrc: PATHS.nodeImages1(1),
+      rightImageSrc: PATHS.nodeImages1(2),
+      trialIndex: 1,
+    })
+  );
+
+  const isPart2AndPart3 = CONFIG.part2 === true && CONFIG.part3 === true;
+  tl.push(isPart2AndPart3 ? finalTrialP2 : createFinalTrial(2));
 
   return tl;
 }
@@ -176,7 +209,7 @@ export function makeLearnTimeline() {
 // Test Time line
 // ------------------------------------
 export const testTimeline = [];
-export function makeTestTimeline() {
+export function makeTestTimeline({ part = 3, includePartIntro = false } = {}) {
     let tl = [];
     const testLayouts = getTestLayoutOrder()
       ?? (CONFIG.condition_order === "unconstr_first"
@@ -185,6 +218,10 @@ export function makeTestTimeline() {
     // Instructions 3 (Congr Test)
     // ---------------------------
     
+    if (includePartIntro) {
+      tl.push(part2_intro_trial);
+    }
+
     if (CONFIG.debug) {
         let learnPassI = 1;
         tl.push(createLearnTrialAnim(
@@ -227,7 +264,7 @@ export function makeTestTimeline() {
     // Cheater & Final
     // ---------------
     tl.push(cheater_trial);
-    tl.push(createFinalTrial(2));
+    tl.push(createFinalTrial(part));
 
     return tl;
 }

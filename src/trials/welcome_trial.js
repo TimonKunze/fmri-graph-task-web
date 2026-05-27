@@ -4,8 +4,18 @@ import { getCurrentLanguage } from "../state/participant.js";
 
 function getPartString() {
   const language = getCurrentLanguage();
-  if (CONFIG.part1 && !CONFIG.part2) return language === "it" ? "alla parte 1 del " : "part 1 of ";
-  if (!CONFIG.part1 && CONFIG.part2) return language === "it" ? "alla parte 2 del " : "part 2 of ";
+  const activeParts = [
+    CONFIG.part1 ? 1 : null,
+    CONFIG.part2 ? 2 : null,
+    CONFIG.part3 ? 3 : null,
+  ].filter(Number.isFinite);
+
+  if (activeParts.length === 1) {
+    return language === "it"
+      ? `alla parte ${activeParts[0]} del `
+      : `part ${activeParts[0]} of `;
+  }
+
   return "";
 }
 
