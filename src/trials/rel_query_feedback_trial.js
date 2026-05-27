@@ -1,13 +1,15 @@
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { G } from "../config/graphs.js";
 import { jsPsych } from "../main.js";
+import { getCurrentLanguage, t } from "../state/participant.js";
 
 function getCheerUpText(acc) {
-  if (acc > 0.97) return "Excellent job!";
-  if (acc > 0.85) return "Really good job!";
-  if (acc > 0.70) return "Quite good!";
-  if (acc > 0.60) return "Okay! But you can do better!";
-  return "I'm sure you can do better!";
+  const isItalian = getCurrentLanguage() === "it";
+  if (acc > 0.97) return isItalian ? "Ottimo lavoro!" : "Excellent job!";
+  if (acc > 0.85) return isItalian ? "Davvero un buon lavoro!" : "Really good job!";
+  if (acc > 0.70) return isItalian ? "Abbastanza bene!" : "Quite good!";
+  if (acc > 0.60) return isItalian ? "Va bene, ma puoi fare meglio!" : "Okay! But you can do better!";
+  return isItalian ? "Sono sicuro/a che puoi fare meglio!" : "I'm sure you can do better!";
 }
 
 export function createRelQueryTrialFeedback(testPasses) {
@@ -17,6 +19,7 @@ export function createRelQueryTrialFeedback(testPasses) {
 
   return {
     type: jsPsychHtmlButtonResponse,
+    choices: [""],
 
     stimulus: function() {
 
@@ -34,14 +37,16 @@ export function createRelQueryTrialFeedback(testPasses) {
       return `
         <div class="instr-screen">
           <p>
-            You answered <strong>${pct}%</strong> of questions correctly.
+            ${getCurrentLanguage() === "it" ? `Hai risposto correttamente al <strong>${pct}%</strong> delle domande.` : `You answered <strong>${pct}%</strong> of questions correctly.`}
           </p>
           <p>${cheerUp}</p>
         </div>
       `;
     },
 
-    choices: ["Continue"],
+    on_start: function(trial) {
+      trial.choices = [t({ it: "Continua", en: "Continue" })];
+    },
 
     data: function() {
 

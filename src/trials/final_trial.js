@@ -2,25 +2,32 @@ import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { CONFIG } from "../config";
 import { sendMessage } from "../utils/telegram";
 import { jsPsych } from "../main";
+import { getCurrentLanguage } from "../state/participant.js";
 
 
 export function createFinalTrial(part) {
   const isNumber = Number.isFinite(part);
-  const partInsert = isNumber ? ` of part ${part}` : "";
-  const seeYou = part === 1 ? "That's enough for today, see you tomorrow. " : "";
-
   const showDataButton = CONFIG.debug ? ["Show data."] : "NO_KEYS";
 
   return {
     type: jsPsychHtmlButtonResponse,
 
-    stimulus: () => `
-      <div style="max-width: 800px; margin: 0 auto; line-height: 1.6; text-align: left;">
-        <p>You've finished the last task${partInsert}.</p>
-        <h3>${seeYou}Thank you for participating!</h3>
-        <p>After 5 seconds, you will be redirected automatically to Prolific's completion URL.</p>
-      </div>
-    `,
+    stimulus: () => {
+      const isItalian = getCurrentLanguage() === "it";
+      const partInsert = isNumber
+        ? isItalian ? ` della parte ${part}` : ` of part ${part}`
+        : "";
+      const seeYou = part === 1
+        ? isItalian ? "Per oggi e tutto, ci vediamo domani. " : "That's enough for today, see you tomorrow. "
+        : "";
+      return `
+        <div style="max-width: 800px; margin: 0 auto; line-height: 1.6; text-align: left;">
+          <p>${isItalian ? "Hai completato l'ultimo compito" : "You've finished the last task"}${partInsert}.</p>
+          <h3>${seeYou}${isItalian ? "Grazie per la partecipazione!" : "Thank you for participating!"}</h3>
+          <p>${isItalian ? "Tra 5 secondi verrai reindirizzato/a automaticamente all'URL di completamento di Prolific." : "After 5 seconds, you will be redirected automatically to Prolific's completion URL."}</p>
+        </div>
+      `;
+    },
 
     trial_duration: 5000,
 
@@ -31,7 +38,10 @@ export function createFinalTrial(part) {
       part,
     },
 
-    on_start: () => {
+    on_start: (trial) => {
+      if (CONFIG.debug) {
+        trial.choices = [getCurrentLanguage() === "it" ? "Mostra dati." : "Show data."];
+      }
       const partLabel = isNumber ? part : "n/a";
         sendMessage(`${jsPsych.data.subject_id} part **${partLabel}** finish.`);
     },

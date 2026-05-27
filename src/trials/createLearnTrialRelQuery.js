@@ -4,6 +4,7 @@ import { CONFIG } from "../config.js";
 import { jsPsych } from "../main.js";
 import { SIZES } from "../config/sizes.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
+import { getCurrentLanguage } from "../state/participant.js";
 
 
 export function createLearnTrialRelQuery(rel, known, trialInd, type) {
@@ -30,20 +31,8 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
   return {
     type: jsPsychHtmlButtonResponse,
     required: true,
-
-    stimulus: `
-      <div style="${wrapStyle}">
-        <p>Please indicate whether the ${agentLabel} knew, or did not know this pair of ${nodeLabel}s.</p>
-
-        <div style="${rowStyle}">
-        <img alt="${nodeLabel} A" src="${nodeImagePath(startNode)}" style="${imgStyle}">
-        <img alt="Dot" src="${PATHS.dotPath}" style="${imgStyle}">
-          <img alt="${nodeLabel} B" src="${nodeImagePath(endNode)}" style="${imgStyle}">
-        </div>
-      </div>
-    `,
-
-    choices: ["Known", "Not known"],
+    stimulus: "",
+    choices: [],
 
     // jsPsych's html-button-response doesn't have a standard "save_trial_parameters"
     // If you need to save stimulus/choices, just store them in data below.
@@ -60,6 +49,29 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
       stim_agent: agentLabel,
       stim_nodes: nodeLabel,
       stim_set: getStimSet(type),
+    },
+    on_start: function (trial) {
+      const isItalian = getCurrentLanguage() === "it";
+      const knownLabel = isItalian ? "Conosciuta" : "Known";
+      const unknownLabel = isItalian ? "Non conosciuta" : "Not known";
+      const prompt = isItalian
+        ? `Indica se la ${agentLabel === "bee" ? "ape" : "pipistrello"} conosceva oppure no questa coppia di ${nodeLabel === "flower" ? "fiori" : "chiome"}.`
+        : `Please indicate whether the ${agentLabel} knew, or did not know this pair of ${nodeLabel}s.`;
+      const nodeAlt = isItalian
+        ? nodeLabel === "flower" ? "fiore" : "chioma"
+        : nodeLabel;
+      trial.stimulus = `
+        <div style="${wrapStyle}">
+          <p>${prompt}</p>
+
+          <div style="${rowStyle}">
+          <img alt="${nodeAlt} A" src="${nodeImagePath(startNode)}" style="${imgStyle}">
+          <img alt="${isItalian ? "Punto" : "Dot"}" src="${PATHS.dotPath}" style="${imgStyle}">
+            <img alt="${nodeAlt} B" src="${nodeImagePath(endNode)}" style="${imgStyle}">
+          </div>
+        </div>
+      `;
+      trial.choices = [knownLabel, unknownLabel];
     },
 
     on_load: function () {

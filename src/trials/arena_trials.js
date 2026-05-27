@@ -7,6 +7,7 @@ import { SIZES } from "../config/sizes.js";
 import { G } from "../config/graphs.js";
 import { PATHS } from "../config/paths.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
+import { getCurrentLanguage, t } from "../state/participant.js";
 
 import { jsPsych } from "../main.js";
 import { rotatePoint } from "../utils/geometry.js";
@@ -315,6 +316,7 @@ export function createSpatialPosTrial(layoutType = CONFIG.varType) {
     },
     on_start: function(data) {
       startTimeRT = performance.now();
+      data.button_choices = [t({ it: "Continua", en: "Continue" })];
     },
     on_finish: function(data) {
       trialEnded = true;
@@ -329,7 +331,7 @@ export function createSpatialPosTrial(layoutType = CONFIG.varType) {
       }
       jsPsych.data.addDataToLastTrial(data);
     },
-    button_choices: ['Continue'],
+    button_choices: [""],
     key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
   };
   return spatialpos_trial;
@@ -644,15 +646,23 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
       data.layout_type = layoutType;
       data.stim_set = getStimSet(layoutType);
     },
-    button_choices: ["Continue"],
+    button_choices: [""],
     key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
+    on_start: function (trial) {
+      trial.button_choices = [t({ it: "Continua", en: "Continue" })];
+    },
 
     prompt: function () {
-      const agentLabel = secondStimSet ? "bat" : "bee";
-      const nodeLabel = secondStimSet ? "treetop" : "flower";
+      const isItalian = getCurrentLanguage() === "it";
+      const agentLabel = secondStimSet ? (isItalian ? "pipistrello" : "bat") : (isItalian ? "ape" : "bee");
+      const nodeLabel = secondStimSet ? (isItalian ? "chioma" : "treetop") : (isItalian ? "fiore" : "flower");
       return c_type === "first"
-        ? `Make sure the ${agentLabel} can reach each ${nodeLabel}, i.e. no ${nodeLabel} is disconnected.`
-        : `Not all ${nodeLabel}s are reachable for the ${agentLabel}. Please add one or more connections.`;
+        ? isItalian
+          ? `Assicurati che ${agentLabel === "ape" ? "l'ape" : "il pipistrello"} possa raggiungere ogni ${nodeLabel}, cioe che nessun ${nodeLabel} sia scollegato.`
+          : `Make sure the ${agentLabel} can reach each ${nodeLabel}, i.e. no ${nodeLabel} is disconnected.`
+        : isItalian
+          ? `Non tutti i ${nodeLabel === "chioma" ? "punti della chioma" : "fiori"} sono raggiungibili per ${agentLabel === "ape" ? "l'ape" : "il pipistrello"}. Aggiungi una o piu connessioni.`
+          : `Not all ${nodeLabel}s are reachable for the ${agentLabel}. Please add one or more connections.`;
     },
   };
 }

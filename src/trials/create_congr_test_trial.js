@@ -5,6 +5,7 @@ import { jsPsych } from "../main.js";
 import { CONFIG } from "../config.js";
 import { SIZES } from "../config/sizes.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
+import { getCurrentLanguage } from "../state/participant.js";
 
 export function createCongrTestTrial(tTrialI, currentPair, randFlag, layoutType = CONFIG.varType) {
 
@@ -43,15 +44,7 @@ export function createCongrTestTrial(tTrialI, currentPair, randFlag, layoutType 
   const testingTrial = {
     type: jsPsychHtmlButtonResponse,
     required: true,
-    stimulus: `
-      <p>
-        Please take your time and answer correctly: 
-      </p>
-      <p>
-         Which route from start ${stimLabel} to end ${stimLabel} requires 
-         <strong>less stopovers</strong> for the ${agentLabel}?
-      </p>
-    `,
+    stimulus: "",
     choices: function() {
       const choices = [choice1, choice2];
       const randChoices = randFlag ? jsPsych.randomization.shuffle(choices) : choices;
@@ -61,6 +54,18 @@ export function createCongrTestTrial(tTrialI, currentPair, randFlag, layoutType 
     save_trial_parameters: {
       choices: true, // Save randomly-selected button order and post trial gap duration to trial data
       stimulus: true, // Save stimulus
+    },
+    on_start: function (trial) {
+      const isItalian = getCurrentLanguage() === "it";
+      const startEndLabel = isItalian
+        ? `Quale percorso dal ${stimLabel === "flower" ? "fiore" : "punto"} iniziale al ${stimLabel === "flower" ? "fiore" : "punto"} finale richiede <strong>meno soste</strong> per ${agentLabel === "bee" ? "l'ape" : "il pipistrello"}?`
+        : `Which route from start ${stimLabel} to end ${stimLabel} requires <strong>less stopovers</strong> for the ${agentLabel}?`;
+      trial.stimulus = `
+        <p>
+          ${isItalian ? "Prenditi il tempo necessario e rispondi correttamente:" : "Please take your time and answer correctly:"}
+        </p>
+        <p>${startEndLabel}</p>
+      `;
     },
     on_finish: function(data) {
       // Score response as correct or incorrect and save

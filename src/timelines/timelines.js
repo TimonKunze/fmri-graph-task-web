@@ -30,6 +30,7 @@ import {
 import { cheater_trial } from "../trials/cheater_trial.js";
 import { finalTrialP1 } from "../trials/final_p1_trial.js";
 import { createFinalTrial } from "../trials/final_trial.js";
+import { getCurrentLanguage, t } from "../state/participant.js";
 
 // ------------------------------------
 // Learn Intro Timeline
@@ -116,12 +117,20 @@ export function makeLearnTimeline() {
 
   const makePhaseTransitionTrial = (phaseName) => ({
     type: jsPsychHtmlButtonResponse,
-    stimulus: `
-      <div class="instr-screen">
-        <p>You are now starting the <strong>${phaseName}</strong> learning phase.</p>
-      </div>
-    `,
-    choices: ["Continue"],
+    stimulus: "",
+    choices: [""],
+    on_start: (trial) => {
+      const isItalian = getCurrentLanguage() === "it";
+      const phaseLabel = phaseName === "rotational"
+        ? isItalian ? "rotazionale" : "rotational"
+        : isItalian ? "non vincolata" : "unconstrained";
+      trial.stimulus = `
+        <div class="instr-screen">
+          <p>${isItalian ? `Stai per iniziare la fase di apprendimento <strong>${phaseLabel}</strong>.` : `You are now starting the <strong>${phaseLabel}</strong> learning phase.`}</p>
+        </div>
+      `;
+      trial.choices = [t({ it: "Continua", en: "Continue" })];
+    },
     data: {
       trial_name: "learn_phase_transition",
       learn_phase: phaseName,

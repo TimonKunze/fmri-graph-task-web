@@ -4,6 +4,7 @@ import {
   getCurrentLanguage,
   LANGUAGE_OPTIONS,
   setParticipantSetup,
+  t,
 } from "../state/participant.js";
 
 const COPY = {
@@ -12,8 +13,8 @@ const COPY = {
     intro: "Please complete the following fields before starting the experiment.",
     subjectLabel: "Subject identity code",
     subjectHint: "Enter an integer number",
-    extraNodeLabel: "Extra node",
-    extraNodeHint: "Enter the extra node text",
+    extraNodeLabel: "Optional note to the experimenter",
+    extraNodeHint: "Enter an optional note",
     languageLabel: "Language",
     languagePlaceholder: "Select a language",
     continueLabel: "Continue",
@@ -25,8 +26,8 @@ const COPY = {
     intro: "Compila i campi seguenti prima di iniziare l'esperimento.",
     subjectLabel: "Codice identificativo del soggetto",
     subjectHint: "Inserisci un numero intero",
-    extraNodeLabel: "Nodo extra",
-    extraNodeHint: "Inserisci il testo del nodo extra",
+    extraNodeLabel: "Nota facoltativa per lo sperimentatore",
+    extraNodeHint: "Inserisci una nota facoltativa",
     languageLabel: "Lingua",
     languagePlaceholder: "Seleziona una lingua",
     continueLabel: "Continua",
@@ -36,12 +37,12 @@ const COPY = {
 };
 
 function getCopy() {
-  return COPY[getCurrentLanguage()] ?? COPY.en;
+  return t(COPY);
 }
 
 let latestParticipantSetup = {
   subjectCode: null,
-  extraNode: "",
+  experimenterNote: "",
   language: getCurrentLanguage(),
 };
 
@@ -50,7 +51,8 @@ export const participant_setup_trial = {
   stimulus: () => {
     const copy = getCopy();
     const languageOptions = LANGUAGE_OPTIONS.map(
-      ({ value, label }) => `<option value="${value}">${label}</option>`
+      ({ value, label }) =>
+        `<option value="${value}" ${value === getCurrentLanguage() ? "selected" : ""}>${label}</option>`
     ).join("");
 
     return `
@@ -81,7 +83,6 @@ export const participant_setup_trial = {
           <label>
             <div style="margin-bottom: 6px; font-weight: 600;">${copy.languageLabel}</div>
             <select id="language-select" style="width: 100%; padding: 10px;">
-              <option value="">${copy.languagePlaceholder}</option>
               ${languageOptions}
             </select>
           </label>
@@ -101,11 +102,11 @@ export const participant_setup_trial = {
     const display = jsPsych.getDisplayElement();
     const button = display?.querySelector("button.jspsych-btn");
     const subjectInput = document.getElementById("subject-code-input");
-    const extraNodeInput = document.getElementById("extra-node-input");
+    const experimenterNoteInput = document.getElementById("extra-node-input");
     const languageSelect = document.getElementById("language-select");
     const errorEl = document.getElementById("participant-setup-error");
 
-    if (!button || !subjectInput || !extraNodeInput || !languageSelect || !errorEl) {
+    if (!button || !subjectInput || !experimenterNoteInput || !languageSelect || !errorEl) {
       return;
     }
 
@@ -118,7 +119,7 @@ export const participant_setup_trial = {
         const subjectCodeRaw = subjectInput.value.trim();
         const subjectCode = Number(subjectCodeRaw);
         const language = languageSelect.value;
-        const extraNode = extraNodeInput.value.trim();
+        const experimenterNote = experimenterNoteInput.value.trim();
         const copy = COPY[language] ?? getCopy();
 
         if (!/^-?\d+$/.test(subjectCodeRaw) || !Number.isInteger(subjectCode)) {
@@ -138,17 +139,17 @@ export const participant_setup_trial = {
         errorEl.textContent = "";
         latestParticipantSetup = {
           subjectCode,
-          extraNode,
+          experimenterNote,
           language,
         };
         setParticipantSetup({
           subjectCode,
-          extraNode,
+          experimenterNote,
           language,
         });
         jsPsych.data.addProperties({
           subject_identity_code: subjectCode,
-          extra_node: extraNode,
+          experimenter_note: experimenterNote,
           language,
         });
       },
@@ -157,7 +158,7 @@ export const participant_setup_trial = {
   },
   on_finish: (data) => {
     data.subject_identity_code = latestParticipantSetup.subjectCode;
-    data.extra_node = latestParticipantSetup.extraNode;
+    data.experimenter_note = latestParticipantSetup.experimenterNote;
     data.language = latestParticipantSetup.language;
   },
 };

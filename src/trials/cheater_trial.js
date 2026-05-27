@@ -1,19 +1,28 @@
 import jsPsychSurveyMultiChoice from "@jspsych/plugin-survey-multi-choice";
 import { CONFIG } from "../config.js";
-import { INSTRUCTIONS } from "../config/instructions.js"; // or itools equivalent
+import { getInstructions } from "../config/instructions.js";
+import { t } from "../state/participant.js";
 
 export const cheater_trial = {
   type: jsPsychSurveyMultiChoice,
   questions: [
     {
-      prompt: INSTRUCTIONS.cheater,
+      prompt: "",
       name: "cheater",
-      options: ["Yes", "No", "Sometimes"],
+      options: [],
       required: !CONFIG.debug,
       horizontal: true,
     },
   ],
-  button_label: "Continue",
+  button_label: "",
+  on_start: (trial) => {
+    trial.questions[0].prompt = getInstructions().cheater;
+    trial.questions[0].options = t({
+      it: ["Si", "No", "A volte"],
+      en: ["Yes", "No", "Sometimes"],
+    });
+    trial.button_label = t({ it: "Continua", en: "Continue" });
+  },
   data: {
     trial_name: "cheater",
   },

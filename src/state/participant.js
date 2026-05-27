@@ -1,8 +1,8 @@
-const DEFAULT_LANGUAGE = "en";
+const DEFAULT_LANGUAGE = "it";
 
 const participantSetup = {
   subjectCode: null,
-  extraNode: "",
+  experimenterNote: "",
   language: DEFAULT_LANGUAGE,
 };
 
@@ -20,8 +20,8 @@ export function setParticipantSetup(nextSetup = {}) {
     participantSetup.subjectCode = nextSetup.subjectCode;
   }
 
-  if (nextSetup.extraNode !== undefined) {
-    participantSetup.extraNode = nextSetup.extraNode;
+  if (nextSetup.experimenterNote !== undefined) {
+    participantSetup.experimenterNote = nextSetup.experimenterNote;
   }
 
   if (nextSetup.language) {
@@ -31,4 +31,9 @@ export function setParticipantSetup(nextSetup = {}) {
 
 export function getCurrentLanguage() {
   return participantSetup.language || DEFAULT_LANGUAGE;
+}
+
+export function t(copy) {
+  const language = getCurrentLanguage();
+  return copy?.[language] ?? copy?.it ?? copy?.en;
 }

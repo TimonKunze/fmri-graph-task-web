@@ -1,10 +1,15 @@
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
-import { INSTRUCTIONS } from "../config/instructions.js"; // adjust path if needed
+import { getInstructions } from "../config/instructions.js";
+import { t } from "../state/participant.js";
 
 export const learnInstrEndTrial = {
   type: jsPsychHtmlButtonResponse,
-  stimulus: INSTRUCTIONS.task1Part1End,
-  choices: ["Continue"],
+  stimulus: "",
+  choices: [""],
+  on_start: (trial) => {
+    trial.stimulus = getInstructions().task1Part1End;
+    trial.choices = [t({ it: "Continua", en: "Continue" })];
+  },
   data: {
     trial_name: "learn_instr_end",
   },

@@ -1,6 +1,7 @@
 import jsPsychPreload from "@jspsych/plugin-preload";
 import { PATHS } from "../config/paths";
 import { DESIGN } from "../build/derivedDesign";
+import { t } from "../state/participant.js";
 
 export const preload_trial = {
   type: jsPsychPreload,
@@ -24,8 +25,13 @@ export const preload_trial = {
   ),
 
   show_detailed_errors: true,
-  error_message:
-    "The experiment failed to load. Please email: tkunze@sissa.it.",
+  error_message: "",
+  on_start: (trial) => {
+    trial.error_message = t({
+      it: "Impossibile caricare l'esperimento. Invia un'email a: tkunze@sissa.it.",
+      en: "The experiment failed to load. Please email: tkunze@sissa.it.",
+    });
+  },
 
   data: {
     trial_name: "preload",

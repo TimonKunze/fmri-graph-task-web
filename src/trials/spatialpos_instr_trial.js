@@ -1,6 +1,7 @@
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { jsPsych } from "../main";
-import { INSTRUCTIONS } from "../config/instructions";
+import { getInstructions } from "../config/instructions";
+import { t } from "../state/participant.js";
 
 /**
  * Spatial position instruction – part 1
@@ -8,9 +9,13 @@ import { INSTRUCTIONS } from "../config/instructions";
 export const spatialPosInstrTrial1 = {
   type: jsPsychHtmlButtonResponse,
 
-  stimulus: INSTRUCTIONS.task2Part2First,
+  stimulus: "",
 
-  choices: ["Continue"],
+  choices: [""],
+  on_start: (trial) => {
+    trial.stimulus = getInstructions().task2Part2First;
+    trial.choices = [t({ it: "Continua", en: "Continue" })];
+  },
 
   data: {
     trial_name: "test_spatialpos_instr",
@@ -25,8 +30,12 @@ export const spatialPosInstrTrial1 = {
  */
 export const spatialPosInstrTrial2 = {
   type: jsPsychHtmlButtonResponse,
-  stimulus: INSTRUCTIONS.task2Part2Sec,
-  choices: ["Continue"],
+  stimulus: "",
+  choices: [""],
+  on_start: (trial) => {
+    trial.stimulus = getInstructions().task2Part2Sec;
+    trial.choices = [t({ it: "Continua", en: "Continue" })];
+  },
   data: {
     trial_name: "test_spatialpos_instr",
     instr_part: 2,
