@@ -7,8 +7,9 @@ const baseConfig = {
   debug: false,
   quick_run: false,
   randomize: true,
-  part1: true,
-  part2: false,
+  part1: false,
+  part2: true,
+  
   prolific: true,
   feedback: true,
   staticMode: false,

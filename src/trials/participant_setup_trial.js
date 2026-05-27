@@ -13,8 +13,8 @@ const COPY = {
     intro: "Please complete the following fields before starting the experiment.",
     subjectLabel: "Subject identity code",
     subjectHint: "Enter an integer number",
-    extraNodeLabel: "Optional note to the experimenter",
-    extraNodeHint: "Enter an optional note",
+    experimenterNoteLabel: "Optional note to the experimenter",
+    experimenterNoteHint: "Enter an optional note",
     languageLabel: "Language",
     languagePlaceholder: "Select a language",
     continueLabel: "Continue",
@@ -26,8 +26,8 @@ const COPY = {
     intro: "Compila i campi seguenti prima di iniziare l'esperimento.",
     subjectLabel: "Codice identificativo del soggetto",
     subjectHint: "Inserisci un numero intero",
-    extraNodeLabel: "Nota facoltativa per lo sperimentatore",
-    extraNodeHint: "Inserisci una nota facoltativa",
+    experimenterNoteLabel: "Nota facoltativa per lo sperimentatore",
+    experimenterNoteHint: "Inserisci una nota facoltativa",
     languageLabel: "Lingua",
     languagePlaceholder: "Seleziona una lingua",
     continueLabel: "Continua",
@@ -72,11 +72,11 @@ export const participant_setup_trial = {
             >
           </label>
           <label>
-            <div style="margin-bottom: 6px; font-weight: 600;">${copy.extraNodeLabel}</div>
+            <div style="margin-bottom: 6px; font-weight: 600;">${copy.experimenterNoteLabel}</div>
             <input
               id="extra-node-input"
               type="text"
-              placeholder="${copy.extraNodeHint}"
+              placeholder="${copy.experimenterNoteHint}"
               style="width: 100%; padding: 10px;"
             >
           </label>
