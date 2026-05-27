@@ -16,12 +16,6 @@ import {
   setSubjectAssignment,
 } from "./state/subjectAssignment.js";
 
-// Disable p5 Friendly Errors (recommended in Vite)
-import p5 from "p5";
-p5.disableFriendlyErrors = true;
-// window.p5 = window.p5 || {};
-// window.p5.disableFriendlyErrors = true;
-
 
 console.table(CONFIG);
 const EXPERIMENT_VERSION =
@@ -29,20 +23,8 @@ const EXPERIMENT_VERSION =
   "dev";
 window.__JSPSYCH_DISPLAY_DATA_ON_FINISH__ = false;
 export const jsPsych = makeJsPsych({ data_dir: PATHS.data_dir });
-
-  // already comptued in make JsPsych
-  // // compute subject id here
-  // const subject_id = CONFIG.prolific
-  // ? jsPsych.data.getURLVariable("PROLIFIC_PID")
-  // : jsPsych.randomization.randomID(8);
-
-  const study_id = CONFIG.prolific
-  ? jsPsych.data.getURLVariable("STUDY_ID")
-  : "custom_study";
-
-  const session_id = CONFIG.prolific
-  ? jsPsych.data.getURLVariable("SESSION_ID")
-  : "custom_session";
+const study_id = "custom_study";
+const session_id = "custom_session";
 
 function addExperimentProperties() {
   const assignment = getSubjectAssignment();
@@ -59,6 +41,11 @@ function addExperimentProperties() {
     date: new Date().toDateString(),
     time: new Date().toTimeString(),
     subject_assignment: assignment,
+    subj_nb: assignment.subjNb,
+    node_to_graph: assignment.nodeToGraph,
+    object_to_nodes: assignment.objectToNodes,
+    learn_block_order: assignment.learnBlockOrder,
+    test_block_order: assignment.testBlockOrder,
     random_node_positions: DESIGN.randomPoss,
     rotation_node_positions: DESIGN.rotationPos,
     canvas_size: SIZES.env,
@@ -81,7 +68,6 @@ function addExperimentProperties() {
     rand_flag: CONFIG.randomize,
     part1_flag: CONFIG.part1,
     part2_flag: CONFIG.part2,
-    prolific_flag: CONFIG.prolific,
     feedback_flag: CONFIG.feedback,
     stimulus_condition_map: STIMULUS_CONDITION_MAP,
     experiment_version: EXPERIMENT_VERSION,
@@ -107,6 +93,20 @@ async function bootstrap() {
   refreshGraphState();
   refreshDesign();
   addExperimentProperties();
+
+  console.log("CSV mapping check: stimulus paths", {
+    subject: assignment.subjNb,
+    set1Paths: Array.from({ length: G.nbNodes }, (_, i) => PATHS.nodeImages1(i)),
+    set2Paths: Array.from({ length: G.nbNodes }, (_, i) => PATHS.nodeImages2(i)),
+  });
+
+  console.log("CSV mapping check: graph remapping", {
+    subject: assignment.subjNb,
+    nodeToGraph: assignment.nodeToGraph,
+    adjacencyMatrix: G.adjM,
+    relations: G.relations,
+    sampleTest3Pairs: DESIGN.test3Pairs.slice(0, 3),
+  });
 
   const timeline = buildTimeline();
   const displayContainer = jsPsych.getDisplayContainerElement();

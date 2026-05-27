@@ -24,7 +24,7 @@ export function createFinalTrial(part) {
         <div style="max-width: 800px; margin: 0 auto; line-height: 1.6; text-align: left;">
           <p>${isItalian ? "Hai completato l'ultimo compito" : "You've finished the last task"}${partInsert}.</p>
           <h3>${seeYou}${isItalian ? "Grazie per la partecipazione!" : "Thank you for participating!"}</h3>
-          <p>${isItalian ? "Tra 5 secondi verrai reindirizzato/a automaticamente all'URL di completamento di Prolific." : "After 5 seconds, you will be redirected automatically to Prolific's completion URL."}</p>
+          <p>${isItalian ? "Questa schermata si chiudera automaticamente tra 5 secondi." : "This screen will close automatically after 5 seconds."}</p>
         </div>
       `;
     },
@@ -44,15 +44,6 @@ export function createFinalTrial(part) {
       }
       const partLabel = isNumber ? part : "n/a";
         sendMessage(`${jsPsych.data.subject_id} part **${partLabel}** finish.`);
-    },
-
-    on_load: () => {
-      // Redirect after 5s (matches trial_duration)
-        if (CONFIG.prolific) {
-        setTimeout(() => {
-           window.location.assign(CONFIG.prolif_compl_link);
-        }, 5000);
-      }
     },
 
     on_finish: (data) => {

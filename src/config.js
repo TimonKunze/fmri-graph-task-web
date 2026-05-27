@@ -1,5 +1,3 @@
-import { decodeString } from "./utils/helper-tools";
-
 const baseConfig = {
   mode: "prod", // "dev" | "prod"
 
@@ -7,10 +5,9 @@ const baseConfig = {
   debug: false,
   quick_run: false,
   randomize: true,
-  part1: true,
-  part2: false,
-  
-  prolific: true,
+  part1: false,
+  part2: true,
+
   feedback: true,
   staticMode: false,
   showNum: false,
@@ -21,7 +18,6 @@ const baseConfig = {
 
   keyChoice: null, // placeholder
     
-  // [rotationalBlocks, unconstrainedBlocks]
   // nbLearnBlocks: [3, 3],
   nbLearnBlocks: [1, 1],
 
@@ -52,7 +48,3 @@ export const CONFIG = {
 
 CONFIG.keyChoice = CONFIG.debug ? null : "NO_KEYS";
 CONFIG.nbLearnPasses = CONFIG.debug ? 1 : 3; // in earlier pilots: 3
-
-CONFIG.prolif_compl_link = decodeString(
-  "68747470733A2F2F6170702E70726F6C696669632E636F6D2F7375626D697373696F6E732F636F6D706C6574653F63633D4331444354523059"
-  );

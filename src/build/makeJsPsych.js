@@ -2,6 +2,10 @@ import { initJsPsych } from "jspsych";
 import { save_data } from "../utils/save_data.js"; // or wherever your save lives
 import { CONFIG } from "../config.js";
 
+function randomID8() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
 function computePart({ part1, part2 }) {
   if (part1 && part2) return 0;
   if (part1 && !part2) return 1;
@@ -12,12 +16,7 @@ function computePart({ part1, part2 }) {
 export function makeJsPsych({ data_dir }) {
   const part = computePart(CONFIG);
   let debugAdvanceHandler = null;
-
-  const qs = new URLSearchParams(window.location.search);
-
-  const subject_id = CONFIG.prolific
-    ? (qs.get("PROLIFIC_PID") ?? "MISSING_PROLIFIC_PID")
-    : randomID8();
+  const subject_id = randomID8();
 
   const jsPsych = initJsPsych({
     show_progress_bar: true,
