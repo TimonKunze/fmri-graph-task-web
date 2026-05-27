@@ -11,6 +11,7 @@ import { learnInstrEndTrial } from "../trials/learn_instr_end_trial.js";
 import { learnInstrTrial } from "../trials/learn_instr_trial.js";
 import { age_trial } from "../trials/age_trial.js";
 import { preload_trial } from "../trials/preload_trial.js";
+import { participant_setup_trial } from "../trials/participant_setup_trial.js";
 import { welcome_trial } from "../trials/welcome_trial.js";
 import { consent_trial } from "../trials/consent_trial.js";
 import { fullscreen_trial } from "../trials/fullscreen_trial.js";
@@ -82,6 +83,7 @@ export function makeLearnIntroTimeline(config = CONFIG) {
 export function makeCoreTimeline() {
   const tl = [];
 
+  tl.push(participant_setup_trial);
   tl.push(preload_trial);
   tl.push(welcome_trial);
   tl.push(consent_trial);
