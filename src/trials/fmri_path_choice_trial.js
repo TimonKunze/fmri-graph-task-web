@@ -28,6 +28,9 @@ function createImageChoice(imageSrc, imageWidth, imageHeight, alt) {
 export function createFmriPathChoiceTrial({
   leftImageSrc,
   rightImageSrc,
+  leftNodeIndex = null,
+  rightNodeIndex = null,
+  blockIndex = null,
   imageWidth = 220,
   imageHeight = imageWidth,
   leftAlt = "Left stimulus",
@@ -45,7 +48,9 @@ export function createFmriPathChoiceTrial({
       createImageChoice(leftImageSrc, imageWidth, imageHeight, leftAlt),
       createImageChoice(rightImageSrc, imageWidth, imageHeight, rightAlt),
     ],
-    button_html: '<button class="jspsych-btn" style="background:none;border:none;padding:0;margin:0 16px;box-shadow:none;">%choice%</button>',
+    button_layout: "flex",
+    button_html: (choice) =>
+      `<button class="jspsych-btn" style="background:none;border:none;padding:0;margin:0 16px;box-shadow:none;">${choice}</button>`,
     save_trial_parameters: {
       choices: true,
       stimulus: true,
@@ -53,7 +58,10 @@ export function createFmriPathChoiceTrial({
     data: {
       trial_name: "part2_dual_stimulus_choice",
       part: 2,
+      block_index: blockIndex,
       trial_index: trialIndex,
+      left_node_index: leftNodeIndex,
+      right_node_index: rightNodeIndex,
       left_image_src: leftImageSrc,
       right_image_src: rightImageSrc,
     },

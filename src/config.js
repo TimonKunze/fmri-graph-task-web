@@ -6,11 +6,10 @@ const baseConfig = {
   quick_run: false,
   randomize: true,
   part1: false,
-  part2: false,
-  part3: true,
+  part2: true,
+  part3: false,
 
   feedback: true,
-  staticMode: false,
   showNum: false,
 
   graphHex: "10248905",  // TODO: change to correct graph

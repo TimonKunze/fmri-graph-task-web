@@ -7,6 +7,7 @@ const currentAssignment = {
   objectToNodes: [...IDENTITY_OBJECT_TO_NODES],
   learnBlockOrder: null,
   testBlockOrder: null,
+  fmriTrials: null,
 };
 
 let randomizationRows = [];
@@ -53,6 +54,17 @@ function parseNumberArray(value) {
   }
 }
 
+function parseNestedArray(value) {
+  if (!value) return null;
+
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 export function loadRandomizationRows(csvText) {
   const lines = csvText.trim().split(/\r?\n/);
   const [headerLine, ...dataLines] = lines;
@@ -74,6 +86,7 @@ export function loadRandomizationRows(csvText) {
         objectToNodes: parseNumberArray(row.ObjectToNodes) ?? [...IDENTITY_OBJECT_TO_NODES],
         learnBlockOrder: parseNumberArray(row.learnBlockOrder),
         testBlockOrder: parseNumberArray(row.testBlockOrder),
+        fmriTrials: parseNestedArray(row.fMRI_trials),
       };
     })
     .filter(Boolean);
@@ -95,6 +108,9 @@ export function setSubjectAssignment(assignment) {
   currentAssignment.testBlockOrder = assignment?.testBlockOrder
     ? [...assignment.testBlockOrder]
     : null;
+  currentAssignment.fmriTrials = assignment?.fmriTrials
+    ? assignment.fmriTrials.map((block) => Array.isArray(block) ? [...block] : block)
+    : null;
 }
 
 export function getSubjectAssignment() {
@@ -107,6 +123,9 @@ export function getSubjectAssignment() {
       : null,
     testBlockOrder: currentAssignment.testBlockOrder
       ? [...currentAssignment.testBlockOrder]
+      : null,
+    fmriTrials: currentAssignment.fmriTrials
+      ? currentAssignment.fmriTrials.map((block) => Array.isArray(block) ? [...block] : block)
       : null,
   };
 }
@@ -133,5 +152,15 @@ export function getTestLayoutOrder() {
 
   return currentAssignment.testBlockOrder.map((item) =>
     Number(item) === 1 ? "rotational" : "unconstrained"
+  );
+}
+
+export function getFmriTrialBlocks() {
+  if (!Array.isArray(currentAssignment.fmriTrials)) {
+    return null;
+  }
+
+  return currentAssignment.fmriTrials.map((block) =>
+    Array.isArray(block) ? [...block] : []
   );
 }

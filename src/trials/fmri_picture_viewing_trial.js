@@ -2,6 +2,8 @@ import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response"
 
 export function createFmriPictureViewingTrial({
   imageSrc,
+  nodeIndex = null,
+  blockIndex = null,
   duration = 1000,
   imageWidth = 320,
   imageHeight = imageWidth,
@@ -27,7 +29,9 @@ export function createFmriPictureViewingTrial({
     data: {
       trial_name: "part2_single_stimulus",
       part: 2,
+      block_index: blockIndex,
       trial_index: trialIndex,
+      node_index: nodeIndex,
       image_src: imageSrc,
       duration,
     },

@@ -46,6 +46,7 @@ function addExperimentProperties() {
     object_to_nodes: assignment.objectToNodes,
     learn_block_order: assignment.learnBlockOrder,
     test_block_order: assignment.testBlockOrder,
+    fmri_trial_blocks: assignment.fmriTrials,
     random_node_positions: DESIGN.randomPoss,
     rotation_node_positions: DESIGN.rotationPos,
     canvas_size: SIZES.env,
