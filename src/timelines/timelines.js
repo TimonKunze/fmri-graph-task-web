@@ -21,8 +21,6 @@ import { fullscreen_trial } from "../trials/fullscreen_trial.js";
 import { createLearnTrials, createRelQueryTrials } from "./learn_timelines.js";
 import { learnTrialRelQueryInstr } from "../trials/learn_rel_query_instr_trial.js";
 import { createRelQueryTrialFeedback } from "../trials/rel_query_feedback_trial.js";
-import { testOneInstrTrial1, testOneInstrTrial2 } from "../trials/test1_instr_trial.js";
-import { createCongrTestTrial } from "../trials/create_congr_test_trial.js";
 import { createConditionTransitionTrial } from "../trials/condition_transition_trial.js";
 import { createConfidenceTrial, createFreeEvalTrial } from "../trials/eval_trials.js"; 
 import { spatialPosInstrTrial1, spatialPosInstrTrial2 } from "../trials/spatialpos_instr_trial.js";
@@ -333,8 +331,6 @@ export function makeTestTimeline({ part = 3, includePartIntro = false } = {}) {
       ?? (CONFIG.condition_order === "unconstr_first"
         ? ["unconstrained", "rotational"]
         : ["rotational", "unconstrained"]);
-    // Instructions 3 (Congr Test)
-    // ---------------------------
     
     if (includePartIntro) {
       tl.push(part2_intro_trial);
@@ -346,23 +342,6 @@ export function makeTestTimeline({ part = 3, includePartIntro = false } = {}) {
             DESIGN.randomPoss, G.relations, 0, learnPassI, 0)
         );
     }
-    tl.push(testOneInstrTrial1);
-    tl.push(testOneInstrTrial2);
-
-    // Task 3 (Congr Task) for both layout conditions
-    // ----------------------------------------------
-    for (const layoutType of testLayouts) {
-      tl.push(createConditionTransitionTrial("test3_condition_transition"));
-      const task3TrialLimit = CONFIG.quick_run
-        ? Math.min(2, DESIGN.test3Pairs.length)
-        : DESIGN.test3Pairs.length;
-      for (let tTrialI=0; tTrialI<task3TrialLimit; tTrialI++) {
-        let currentPair = DESIGN.test3Pairs[tTrialI];
-        tl.push(createCongrTestTrial(tTrialI, currentPair, layoutType));
-      }
-    }
-    tl.push(createConfidenceTrial("congrtest"));
-    tl.push(createFreeEvalTrial("congrtest"));
 
     // Instruction 4 & Task 4 (Spatialpos) for both layout conditions
     // ---------------------------------------------------------------

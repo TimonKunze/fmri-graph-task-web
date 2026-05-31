@@ -229,5 +229,14 @@ const INSTRUCTION_COPY = {
 };
 
 export function getInstructions() {
-  return t(INSTRUCTION_COPY);
+  const copy = t(INSTRUCTION_COPY);
+
+  return Object.fromEntries(
+    Object.entries(copy).map(([key, value]) => [
+      key,
+      typeof value === "string" && !value.includes('class="instr-screen"')
+        ? `<div class="instr-screen">${value}</div>`
+        : value,
+    ])
+  );
 }

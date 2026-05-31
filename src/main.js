@@ -1,4 +1,5 @@
 import "jspsych/css/jspsych.css";
+import "./style.css";
 import { buildTimeline } from "./build/buildTimeline.js";
 import { refreshDesign, DESIGN } from "./build/derivedDesign.js";
 import { makeJsPsych } from "./build/makeJsPsych.js";
