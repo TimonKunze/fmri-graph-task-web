@@ -4,16 +4,16 @@ const baseConfig = {
   // Flags
   debug: false,
   quick_run: false,
-  part1: false,
+  randomize: false,
+  part1: true,
   part2: false,
-  part3: true,
+  part3: false,
 
   feedback: true,
   showNum: false,
 
   graphHex: "10248905",  // TODO: change to correct graph
   varType: "unconstrained", // or "rotational"
-  condition_order: "rot_first", // "rot_first" | "unconstr_first"
 
   keyChoice: null, // placeholder
     
@@ -29,10 +29,12 @@ const configProfiles = {
   dev: {
     debug: true,
     quick_run: true,
+    randomize: false,
   },
   prod: {
     debug: false,
     quick_run: false,
+    randomize: false,
   },
 };
 

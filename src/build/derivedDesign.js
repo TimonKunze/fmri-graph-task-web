@@ -1,5 +1,6 @@
 import { CONFIG } from "../config";
 import { G } from "../config/graphs";
+import { shuffleArray } from "../utils/helper-tools";
 
 export const DESIGN = {};
 
@@ -9,7 +10,7 @@ export function refreshDesign() {
 
     const allPathPairs = congrPairs.concat(incongrPairs);
     const test3Pairs = allPathPairs;
-    const randomPoss = G.unconstrPos;
+    const randomPoss = CONFIG.randomize ? shuffleArray([...G.unconstrPos]) : G.unconstrPos;
 
     Object.assign(DESIGN, {
         nbNodes: G.adjM.length,

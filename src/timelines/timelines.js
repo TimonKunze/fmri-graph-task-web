@@ -327,10 +327,7 @@ export function makePart2Timeline() {
 export const testTimeline = [];
 export function makeTestTimeline({ part = 3, includePartIntro = false } = {}) {
     let tl = [];
-    const testLayouts = getTestLayoutOrder()
-      ?? (CONFIG.condition_order === "unconstr_first"
-        ? ["unconstrained", "rotational"]
-        : ["rotational", "unconstrained"]);
+    const testLayouts = getTestLayoutOrder();
     
     if (includePartIntro) {
       tl.push(part2_intro_trial);

@@ -40,7 +40,11 @@ export function createLearnTrials(nodePoss, block, layoutType = CONFIG.varType) 
   let learnPassI;
   outerLoop:
   for (learnPassI=0; learnPassI<CONFIG.nbLearnPasses; learnPassI++) {
-    for (let trialI = 0; trialI < nbRelations; trialI++) {
+    const trialOrder = CONFIG.randomize
+      ? htools.shuffleArray(Array.from({ length: nbRelations }, (_, i) => i))
+      : Array.from({ length: nbRelations }, (_, i) => i);
+
+    for (const trialI of trialOrder) {
       if (learnTrialsTL.length >= task1TrialLimit) break outerLoop;
       nodePosInd = learnPassI*nbRelations + trialI*2;
       let randAngle = 0;
@@ -96,11 +100,18 @@ export function createRelQueryTrials(testPasses, type) {
     // console.log(nbRelations)
     console.log(testPasses)
     console.log(nbQueryTrials)
-  const ones = Array.from({ length: nbRelations }, () => 1);
-  const zeros = Array.from({ length: nbRelations }, () => 0);
-  const randBinListQuery = ones.concat(zeros);
-  relations = G.relations;
-  nonRelations = G.nonRelations;
+  let randBinListQuery;
+  if (CONFIG.randomize) {
+    relations = htools.shuffleArray(G.relations);
+    nonRelations = htools.shuffleArray(G.nonRelations);
+    randBinListQuery = htools.generateRandomBinaryList(nbRelations);
+  } else {
+    const ones = Array.from({ length: nbRelations }, () => 1);
+    const zeros = Array.from({ length: nbRelations }, () => 0);
+    randBinListQuery = ones.concat(zeros);
+    relations = G.relations;
+    nonRelations = G.nonRelations;
+  }
   // console.log("testPasses", testPasses)
   // console.log("nbRelations", nbRelations);
   // console.log("nbQueryTrials", nbQueryTrials);
