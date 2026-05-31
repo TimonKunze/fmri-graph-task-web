@@ -1,4 +1,4 @@
-import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
+import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
 import { getCurrentLanguage } from "../state/participant.js";
 
 function getPrompt() {
@@ -38,23 +38,23 @@ export function createFmriPathChoiceTrial({
   trialIndex = null,
 } = {}) {
   return {
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsychHtmlKeyboardResponse,
     stimulus: `
       <div style="max-width: 900px; margin: 0 auto; text-align: center;">
         ${getPrompt()}
+        <div style="display:flex;align-items:center;justify-content:center;gap:32px;margin-top:20px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            ${createImageChoice(leftImageSrc, imageWidth, imageHeight, leftAlt)}
+            <div style="font-size:20px;font-weight:700;">&#8592;</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            ${createImageChoice(rightImageSrc, imageWidth, imageHeight, rightAlt)}
+            <div style="font-size:20px;font-weight:700;">&#8594;</div>
+          </div>
+        </div>
       </div>
     `,
-    choices: [
-      createImageChoice(leftImageSrc, imageWidth, imageHeight, leftAlt),
-      createImageChoice(rightImageSrc, imageWidth, imageHeight, rightAlt),
-    ],
-    button_layout: "flex",
-    button_html: (choice) =>
-      `<button class="jspsych-btn" style="background:none;border:none;padding:0;margin:0 16px;box-shadow:none;">${choice}</button>`,
-    save_trial_parameters: {
-      choices: true,
-      stimulus: true,
-    },
+    choices: ["arrowleft", "arrowright"],
     data: {
       trial_name: "part2_dual_stimulus_choice",
       part: 2,
@@ -64,6 +64,17 @@ export function createFmriPathChoiceTrial({
       right_node_index: rightNodeIndex,
       left_image_src: leftImageSrc,
       right_image_src: rightImageSrc,
+    },
+    on_finish: (data) => {
+      if (data.response === "arrowleft") {
+        data.response = 0;
+        data.response_side = "left";
+      } else if (data.response === "arrowright") {
+        data.response = 1;
+        data.response_side = "right";
+      } else {
+        data.response_side = null;
+      }
     },
   };
 }
