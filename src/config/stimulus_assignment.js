@@ -1,18 +1,9 @@
 import { CONFIG } from "../config.js";
 
-const flipStimulusConditionMap = CONFIG.randomize
-  ? Math.random() < 0.5
-  : false;
-
-export const STIMULUS_CONDITION_MAP = flipStimulusConditionMap
-  ? {
-      rotational: "set2",
-      unconstrained: "set1",
-    }
-  : {
-      rotational: "set1",
-      unconstrained: "set2",
-    };
+export const STIMULUS_CONDITION_MAP = {
+  rotational: "set1",
+  unconstrained: "set2",
+};
 
 export function getLayoutType(typeOrLayout) {
   if (typeof typeOrLayout !== "string") return CONFIG.varType;

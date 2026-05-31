@@ -96,18 +96,11 @@ export function createRelQueryTrials(testPasses, type) {
     // console.log(nbRelations)
     console.log(testPasses)
     console.log(nbQueryTrials)
-  let randBinListQuery;
-  if (CONFIG.randomize) {
-    relations = htools.shuffleArray(G.relations);
-    nonRelations = htools.shuffleArray(G.nonRelations);
-    randBinListQuery = htools.generateRandomBinaryList(nbRelations);
-  } else {
-    const ones = Array.from({ length: nbRelations }, () => 1);
-    const zeros = Array.from({ length: nbRelations }, () => 0);
-    randBinListQuery = ones.concat(zeros);
-    relations = G.relations;
-    nonRelations = G.nonRelations;
-  }
+  const ones = Array.from({ length: nbRelations }, () => 1);
+  const zeros = Array.from({ length: nbRelations }, () => 0);
+  const randBinListQuery = ones.concat(zeros);
+  relations = G.relations;
+  nonRelations = G.nonRelations;
   // console.log("testPasses", testPasses)
   // console.log("nbRelations", nbRelations);
   // console.log("nbQueryTrials", nbQueryTrials);

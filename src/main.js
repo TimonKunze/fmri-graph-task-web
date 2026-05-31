@@ -66,7 +66,6 @@ function addExperimentProperties() {
     node_paths_set1: Array.from({ length: G.nbNodes }, (_, i) => PATHS.nodeImages1(i)),
     node_paths_set2: Array.from({ length: G.nbNodes }, (_, i) => PATHS.nodeImages2(i)),
     debug_flag: CONFIG.debug,
-    rand_flag: CONFIG.randomize,
     part1_flag: CONFIG.part1,
     part2_flag: CONFIG.part2,
     part3_flag: CONFIG.part3,

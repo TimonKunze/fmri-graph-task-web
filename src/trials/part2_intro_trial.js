@@ -8,6 +8,7 @@ export const part2_intro_trial = {
   data: {
     trial_name: "part2_intro",
     part: 2,
+    stim_set: "set1",
   },
   on_start: (trial) => {
     const isItalian = getCurrentLanguage() === "it";

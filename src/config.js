@@ -4,10 +4,9 @@ const baseConfig = {
   // Flags
   debug: false,
   quick_run: false,
-  randomize: true,
   part1: false,
-  part2: true,
-  part3: false,
+  part2: false,
+  part3: true,
 
   feedback: true,
   showNum: false,
@@ -30,12 +29,10 @@ const configProfiles = {
   dev: {
     debug: true,
     quick_run: true,
-    randomize: true,
   },
   prod: {
     debug: false,
     quick_run: false,
-    randomize: true,
   },
 };
 

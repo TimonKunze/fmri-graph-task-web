@@ -100,3 +100,40 @@ export function isConnected(graph) {
   dfs(startNode);
   return visited.size === nodes.length;
 }
+
+export function createShortestPathDistanceMatrix(adjM) {
+  if (!Array.isArray(adjM)) return [];
+
+  const nbNodes = adjM.length;
+  const distanceMatrix = Array.from(
+    { length: nbNodes },
+    () => new Array(nbNodes).fill(null)
+  );
+
+  for (let startNode = 0; startNode < nbNodes; startNode++) {
+    const queue = [[startNode, 0]];
+    const visited = new Set([startNode]);
+    distanceMatrix[startNode][startNode] = 0;
+
+    while (queue.length > 0) {
+      const [node, distance] = queue.shift();
+
+      for (let nextNode = 0; nextNode < nbNodes; nextNode++) {
+        const isNeighbor = adjM[node]?.[nextNode] === 1 || adjM[nextNode]?.[node] === 1;
+        if (!isNeighbor || visited.has(nextNode)) continue;
+
+        visited.add(nextNode);
+        distanceMatrix[startNode][nextNode] = distance + 1;
+        queue.push([nextNode, distance + 1]);
+      }
+    }
+  }
+
+  return distanceMatrix;
+}
+
+export function getShortestPathDistance(adjM, startNode, endNode) {
+  if (!Number.isInteger(startNode) || !Number.isInteger(endNode)) return null;
+  const distanceMatrix = createShortestPathDistanceMatrix(adjM);
+  return distanceMatrix[startNode]?.[endNode] ?? null;
+}

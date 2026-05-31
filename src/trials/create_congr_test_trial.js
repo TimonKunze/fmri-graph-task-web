@@ -7,7 +7,7 @@ import { SIZES } from "../config/sizes.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
 import { getCurrentLanguage } from "../state/participant.js";
 
-export function createCongrTestTrial(tTrialI, currentPair, randFlag, layoutType = CONFIG.varType) {
+export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.varType) {
 
   const path1SDPlongerPath2 = currentPair[0].length > currentPair[1].length;
   const secondStimSet = useSecondStimSet(layoutType);
@@ -47,9 +47,8 @@ export function createCongrTestTrial(tTrialI, currentPair, randFlag, layoutType 
     stimulus: "",
     choices: function() {
       const choices = [choice1, choice2];
-      const randChoices = randFlag ? jsPsych.randomization.shuffle(choices) : choices;
-      choiceSwitched = randChoices[0]===choice1 ? false : true;
-      return randChoices;
+      choiceSwitched = false;
+      return choices;
     },
     save_trial_parameters: {
       choices: true, // Save randomly-selected button order and post trial gap duration to trial data

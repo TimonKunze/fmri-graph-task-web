@@ -37,6 +37,7 @@ import { createFinalTrial } from "../trials/final_trial.js";
 import { PATHS } from "../config/paths.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
 import { getFmriTrialBlocks, getLearnLayoutOrder, getTestLayoutOrder } from "../state/subjectAssignment.js";
+import { createShortestPathDistanceMatrix } from "../utils/graph-tools.js";
 
 // ------------------------------------
 // Learn Intro Timeline
@@ -185,7 +186,9 @@ export function makeLearnTimeline() {
 // ------------------------------------
 export function makePart2Timeline() {
   const tl = [];
-  const fmriBlocks = getFmriTrialBlocks() ?? [];
+  const fmriBlocks = (getFmriTrialBlocks() ?? []).filter(Array.isArray);
+  const totalFmriBlocks = fmriBlocks.length;
+  const shortestPathDistanceMatrix = createShortestPathDistanceMatrix(G.adjM);
   const sampleFmriItiSeconds = () => {
     while (true) {
       const sample = -3 * Math.log(1 - Math.random());
@@ -206,13 +209,13 @@ export function makePart2Timeline() {
       trial.stimulus = isItalian
         ? `
           <div class="instr-screen">
-            <p>Hai completato il blocco ${blockIndex} di 6.</p>
+            <p>Hai completato il blocco ${blockIndex} di ${totalFmriBlocks}.</p>
             <p>Quando sei pronto/a, fai clic qui sotto per iniziare il blocco successivo.</p>
           </div>
         `
         : `
           <div class="instr-screen">
-            <p>You have completed block ${blockIndex} of 6.</p>
+            <p>You have completed block ${blockIndex} of ${totalFmriBlocks}.</p>
             <p>When you are ready, click below to start the next block.</p>
           </div>
         `;
@@ -225,8 +228,7 @@ export function makePart2Timeline() {
     },
   });
 
-  const createPictureViewingItiTrial = (blockIndex, trialIndex) => {
-    const itiSeconds = sampleFmriItiSeconds();
+  const createPictureViewingItiTrial = (blockIndex, trialIndex, itiSeconds) => {
     return {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
@@ -247,10 +249,9 @@ export function makePart2Timeline() {
     };
   };
 
-  fmriBlocks.slice(0, 6).forEach((block, blockIndex) => {
-    if (!Array.isArray(block)) {
-      return;
-    }
+  fmriBlocks.forEach((block, blockIndex) => {
+    let previousNodeIndex = null;
+    let previousItiSeconds = null;
 
     block.forEach((item, trialIndex) => {
       if (Number.isInteger(item)) {
@@ -263,31 +264,55 @@ export function makePart2Timeline() {
             trialIndex,
           })
         );
+        previousNodeIndex = item;
         if (trialIndex < block.length - 1) {
-          tl.push(createPictureViewingItiTrial(blockIndex, trialIndex));
+          const itiSeconds = sampleFmriItiSeconds();
+          tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
+          previousItiSeconds = itiSeconds;
         }
         return;
       }
 
       if (Array.isArray(item) && item.length === 2) {
         const [leftNodeIndex, rightNodeIndex] = item;
+        const leftPathLength = Number.isInteger(previousNodeIndex)
+          ? shortestPathDistanceMatrix[previousNodeIndex]?.[leftNodeIndex] ?? null
+          : null;
+        const rightPathLength = Number.isInteger(previousNodeIndex)
+          ? shortestPathDistanceMatrix[previousNodeIndex]?.[rightNodeIndex] ?? null
+          : null;
+        const correctChoice = leftPathLength === null || rightPathLength === null
+          ? null
+          : leftPathLength === rightPathLength
+            ? null
+            : leftPathLength < rightPathLength ? 0 : 1;
+
         tl.push(
           createFmriPathChoiceTrial({
             leftImageSrc: PATHS.nodeImages1(leftNodeIndex),
             rightImageSrc: PATHS.nodeImages1(rightNodeIndex),
             leftNodeIndex,
             rightNodeIndex,
+            referenceNodeIndex: previousNodeIndex,
+            itiSecondsPrevious: previousItiSeconds,
+            leftPathLength,
+            rightPathLength,
+            correctChoice,
+            stimSet: "set1",
             blockIndex,
             trialIndex,
           })
         );
+        previousNodeIndex = null;
         if (trialIndex < block.length - 1) {
-          tl.push(createPictureViewingItiTrial(blockIndex, trialIndex));
+          const itiSeconds = sampleFmriItiSeconds();
+          tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
+          previousItiSeconds = itiSeconds;
         }
       }
     });
 
-    if (blockIndex < Math.min(fmriBlocks.length, 6) - 1) {
+    if (blockIndex < totalFmriBlocks - 1) {
       tl.push(createPart2BlockBreakTrial(blockIndex + 1));
     }
   });
@@ -333,7 +358,7 @@ export function makeTestTimeline({ part = 3, includePartIntro = false } = {}) {
         : DESIGN.test3Pairs.length;
       for (let tTrialI=0; tTrialI<task3TrialLimit; tTrialI++) {
         let currentPair = DESIGN.test3Pairs[tTrialI];
-        tl.push(createCongrTestTrial(tTrialI, currentPair, CONFIG.rand, layoutType));
+        tl.push(createCongrTestTrial(tTrialI, currentPair, layoutType));
       }
     }
     tl.push(createConfidenceTrial("congrtest"));
