@@ -121,48 +121,53 @@ const INSTRUCTION_COPY = {
     <h2>Task 1</h2>
     <h3>Instructions</h3>
     <p>
-      In this task, you will see several flowers on a meadow. Your task is to <strong>find a hidden bee</strong> by clicking on the flowers. When you have found the bee, observe from which flower the bee flies to which other flower and remember this.
+      In this task, you will see several fruits and vegetables arranged in an environment. Your task is to <strong>find a hidden flying creature</strong> by clicking on them. Once you find it, observe where it moves from and where it moves to, and remember this connection.
     </p>
     <p>
-      Next, we ask you to <strong>draw the bee's flight path</strong> by clicking on one flower and dragging the cursor to another flower. This creates a connection between the two flowers, and a green or red line indicates whether the connection is correct. Only if your drawing was correct, or if you have drawn more than 10 incorrect connections, can you move on to the next trial. Please be aware that during this task the position of the flowers on the meadow may change from time to time, but this should not hinder you in drawing the correct connection.
+      Next, we ask you to <strong>draw the path of the flying creature</strong> by clicking on one fruit or vegetable and dragging the cursor to another. This creates a connection between the two, and a green or red line indicates whether the connection is correct. You can continue to the next trial only after drawing the correct connection or after making more than 10 incorrect attempts. Please note that the positions of the fruits and vegetables may change from time to time, but this should not affect your ability to draw the correct connection.
     </p>
     <p>
-      Note that, firstly, the direction in which you see the bee flying does not matter, because for every direction in which you see a bee flying, we will also present you with the opposite direction. Similarly, it doesn't matter in which direction you draw the connection.
+      Note that the direction in which you see the flying creature move is not important, because whenever it moves from one item to another, you will also see the same movement in the opposite direction. Likewise, it does not matter in which direction you draw the connection.
     </p>
     <p>
-      Periodically give you a performance score based on your first-attempt accuracy over multiple trials.
+      From time to time, you will receive a performance score based on your first-attempt accuracy across several trials.
     </p>
     <p>
-      Before starting, you can try <strong>two example trials</strong> by clicking 'Continue.'
+      Before starting, you will have the chance to complete <strong>two example trials</strong> by clicking 'Continue.'
     </p>
   `,
     task1Part1End: `
     <h3>Are you ready?</h3>
     <br>
     <p>
-      The testing phase is over. As said before, the task is to remember start and end position of the bee in each trial.
+    The practice phase is now over. As explained earlier, your task is to remember where the flying creature started and
+    where it ended in each trial.
     </p>
     <p>
-      If you are ready you can click on the 'Continue' button, and the experiment begins.
+      If you are ready, click the “Continue” button to begin the experiment.
     </p>
   `,
     task2Part1: `
     <h2>Task 2</h2>
     <h3>Instructions</h3>
     <p>
-      Did you notice that the bee only flew between certain pairs of flowers and not between others? We call the former <strong>&ldquo;known pairs&rdquo;</strong> and the latter <strong>&ldquo;unknown pairs&rdquo;</strong>. You may also have noticed that if the bee knew a connection, it flew equally in both directions, as such the directionality is not important..
+    Did you notice that the flying creature moved only between certain pairs of fruits and vegetables, but not between others?
+    We call the former <strong>&ldquo;known pairs&rdquo;</strong> and the latter <strong>&ldquo;unknown pairs&rdquo;</strong>.
+    You may also have noticed that whenever the flying creature knew a connection, it moved equally in both directions, so the
+    direction is not important.
     </p>
     <p>
-      In the following, we show you several pairs of flowers, and please try to remember from the previous task <strong>whether the bee knows or does not know the shown flower pair</strong>.
+    In the following, you will see several pairs of fruits and vegetables. Please try to remember from the previous task
+    <strong>whether the flying creature knew or did not know the connection between the two shown items</strong>.
     </p>
     <p>
-      Indicate your answer with a button click. The task looks like this:
+    Please indicate your answer by clicking one of the buttons. The task looks like this:
     </p>
     <p>
       <img src="/stimuli/other/reltest_example.png" style="max-width:${stim_width_ex};max-height:${stim_width_ex};">
     </p>
     <p>
-      This time, you don't need a test trial. Go right ahead.
+    This time, there is no practice trial, so you can begin right away.
     </p>
   `,
     task1Part2: `
@@ -189,29 +194,35 @@ const INSTRUCTION_COPY = {
     <h3>Instructions</h3>
     <br>
     <p>
-      In the next part of the experiment we ask you to <strong>position the flowers on the meadow</strong> in a way that seems reasonable to you.
+    In the next part of the experiment, we ask you to <strong>arrange the fruits and vegetables in the
+    environment</strong> in a way that seems reasonable to you.
     </p>
     <p>
-      To begin with, the flowers are placed on the right-hand side. To place a flower on the meadow, click on the flower and drag it to a place you think fits best. Note that you can adjust the positions by dragging and droping flowers multiple times.
+    At the beginning, the fruits and vegetables will appear on the right-hand side. To place one in the
+    environment, click on it and drag it to the position you think fits best. You can adjust the arrangement
+    as often as you like by dragging the items again.
     </p>
     <p>
-      There is no test attempt since you will figure it out easily. Take as much time as you like.
+    There is no practice trial for this part. Take as much time as you need.
     </p>
     <br>
   `,
     task2Part2Sec: `
     <h3>Instructions</h3>
     <p>
-      Next, we show you the meadow with the flowers as you positioned them before. But this time we ask you to <strong>draw in the known connections</strong> as you remember them.
+    Next, we will show you the environment with the fruits and vegetables arranged as you placed them before.
+    This time, we ask you to <strong>draw the known connections</strong> as you remember them.
     </p>
     <p>
-      You can draw connections as before by <strong>dragging and dropping</strong> the cursor from one flower to another. If you want to delete an already drawn connection you can <strong>double-click</strong> on it, or you click on the <strong>reset button</strong> that deletes all previosly drawn connection in one go.
+    As in yesterday's task, you can draw connections by <strong>dragging the cursor</strong> from one fruit or vegetable
+    to another. If you want to remove a connection you have already drawn, you can <strong>double-click</strong> on it
+    or use the <strong>reset button</strong>, which deletes all previously drawn connections at once.
     </p>
     <p>
-      Please make sure that the bee can reach all flowers by at least one connection.
+    Please make sure that the flying creature can reach every fruit and vegetable through at least one connection.
     </p>
     <p>
-      There's no time limit. Take your time and click on 'Continue' once you are done.
+    Again, there is no time limit. Take as much time as you need, and click 'Continue' once you are done.
     </p>
     <br>
   `,
@@ -219,10 +230,11 @@ const INSTRUCTION_COPY = {
     <h3>Congratulations, you are nearly done. One last question:</h3>
     <br>
     <p>
-      Did you use any means of documentation for learning the bee's connections in part 1, or for solving the task in part 2 (e.g. by writing down the connections)?
+    Did you use any form of external aid to learn the flying creature’s connections in Part 1, or to
+    solve the task in Part 2 (for example, by writing the connections down or taking screenshots)?
     </p>
     <p>
-      (Please be honest and note that your answer to this question will not affect your payment in any way.)
+    (Please answer honestly. Your response to this question will not affect your compensation in any way.)
     </p>
   `,
   },
