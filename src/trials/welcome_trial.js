@@ -12,8 +12,8 @@ function getPartString() {
 
   if (activeParts.length === 1) {
     return language === "it"
-      ? `alla parte ${activeParts[0]} del `
-      : `part ${activeParts[0]} of `;
+      ? `alla PARTE ${activeParts[0]} del `
+      : `PART ${activeParts[0]} of `;
   }
 
   return "";

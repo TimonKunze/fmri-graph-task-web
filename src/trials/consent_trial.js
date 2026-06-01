@@ -73,6 +73,7 @@ export const consent_trial = {
   },
   on_start: (trial) => {
     const copy = getCopy();
+    const participantInfoPath = PATHS.participantInfo(getCurrentLanguage());
     const items = copy.items.map((item) => `<li>${item}</li>`).join("");
 
     trial.preamble = `
@@ -89,7 +90,7 @@ export const consent_trial = {
           </p>
           <p>
           ${copy.downloadLead}
-          <a href="${PATHS.participantInfo}" target="_blank" rel="noopener noreferrer">
+          <a href="${participantInfoPath}" target="_blank" rel="noopener noreferrer">
               ${copy.infoSheet}
           </a>.
           ${copy.infoTail}

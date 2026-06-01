@@ -32,7 +32,8 @@ export const PATHS = {
   dashPath: `/stimuli/other/dash.png`,
   dotPath: `/stimuli/other/dot.png`,
   undoPath: `/stimuli/other/undo_arrow.png`,
-  participantInfo: "/participant_info.pdf",
+  participantInfo: (language = "en") =>
+    language === "it" ? "/participant_info_ital.pdf" : "/participant_info_engl.pdf",
 
   testExample: "./stimuli/other/test_example.png",
 
