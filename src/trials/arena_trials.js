@@ -332,7 +332,7 @@ export function createSpatialPosTrial(layoutType = CONFIG.varType) {
       jsPsych.data.addDataToLastTrial(data);
     },
     button_choices: [""],
-    key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
+    key_choices: CONFIG.keyChoice,
   };
   return spatialpos_trial;
 }
@@ -665,7 +665,7 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
       data.stim_set = getStimSet(layoutType);
     },
     button_choices: [""],
-    key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
+    key_choices: CONFIG.keyChoice,
 
     prompt: function () {
       const isItalian = getCurrentLanguage() === "it";

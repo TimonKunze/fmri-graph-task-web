@@ -279,7 +279,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
       data.stim_set = getStimSet(type);
     },
 
-    key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
+    key_choices: CONFIG.keyChoice,
   };
 
   return drawingTrial;

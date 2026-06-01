@@ -75,7 +75,7 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
     },
 
     on_load: function () {
-      if (!CONFIG.debug) return;
+      if (CONFIG.keyChoice === "NO_KEYS") return;
 
       debugKeyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
         callback_function: () => {
@@ -85,7 +85,7 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
           }
           jsPsych.finishTrial({ response: null, debug_skip: true });
         },
-        valid_responses: "ALL_KEYS",
+        valid_responses: CONFIG.keyChoice,
         rt_method: "performance",
         persist: false,
         allow_held_key: false,

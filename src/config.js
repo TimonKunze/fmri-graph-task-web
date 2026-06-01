@@ -13,7 +13,7 @@ const baseConfig = {
 
   feedback: true,
 
-  keyChoice: null, // placeholder
+  keyChoice: null,
 };
 
 const configProfiles = {
@@ -42,5 +42,5 @@ export const CONFIG = {
   ...selectedProfile,
 };
 
-CONFIG.keyChoice = CONFIG.debug ? null : "NO_KEYS";
+CONFIG.keyChoice = CONFIG.debug ? "ALL_KEYS" : "NO_KEYS";
 CONFIG.nbLearnPasses = CONFIG.debug ? 1 : 3; // in earlier pilots: 3

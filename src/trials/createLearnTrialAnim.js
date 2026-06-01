@@ -393,7 +393,7 @@ export function createLearnTrialAnim(
       data.nodes_clicked = [...new Set(saveNodesClicked)];
     },
 
-    key_choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
+    key_choices: CONFIG.keyChoice,
   };
 
   return learnTrialAnim;
