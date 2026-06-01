@@ -2,27 +2,18 @@ const baseConfig = {
   mode: "prod", // "dev" | "prod"
 
   // Flags
-  debug: false,
-  quick_run: false,
-  randomize: false,
   part1: true,
   part2: false,
   part3: false,
 
-  feedback: true,
   showNum: false,
 
   graphHex: "10248905",  // TODO: change to correct graph
   varType: "unconstrained", // or "rotational"
 
-  keyChoice: null, // placeholder
-    
-  // nbLearnBlocks: [3, 3],
-  nbLearnBlocks: [1, 1],
+  feedback: true,
 
-  maxAttemptsDraw: 11,
-  // maxLearnRelations: "max",
-  maxLearnRelations: 2,
+  keyChoice: null, // placeholder
 };
 
 const configProfiles = {
@@ -30,11 +21,17 @@ const configProfiles = {
     debug: true,
     quick_run: true,
     randomize: false,
+    nbLearnBlocks: [1, 1],
+    maxAttemptsDraw: 2,
+    maxLearnRelations: 2,
   },
   prod: {
     debug: false,
     quick_run: false,
-    randomize: false,
+    randomize: true,
+    nbLearnBlocks: [3, 3],
+    maxAttemptsDraw: 11,
+    maxLearnRelations: "max",
   },
 };
 

@@ -181,7 +181,7 @@ export function createLearnTrialAnim(
       };
 
       p.TLD.runBee = (p1, p2, pt1, stopFlag) => {
-        const speed = 3;
+        const speed = 2.4;
 
         const angle = getHorAngleFromLineSeg(p1, p2) + p.PI;
         const dirFlags = [p1[0] < p2[0], p1[1] < p2[1]].toString();

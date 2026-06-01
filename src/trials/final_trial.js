@@ -7,10 +7,11 @@ import { getCurrentLanguage } from "../state/participant.js";
 
 export function createFinalTrial(part) {
   const isNumber = Number.isFinite(part);
-  const showDataButton = CONFIG.debug ? ["Show data."] : "NO_KEYS";
+  const showDataButton = CONFIG.debug ? ["Show data."] : [];
 
   return {
     type: jsPsychHtmlButtonResponse,
+    button_layout: "flex",
 
     stimulus: () => {
       const isItalian = getCurrentLanguage() === "it";

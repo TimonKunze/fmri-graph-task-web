@@ -14,5 +14,6 @@ export const COLORS = {
     // "bgBlue": "#FCFCFC", // (white)
     "bgGrid": "#DADADA",
     "bgGridBlue": "#DADADA",
-    "drawStroke": "#eeeeee",
+    "drawStroke": "#6f6f6f",
+    // "drawStroke": "#5a5a5a",
 };
