@@ -10,7 +10,7 @@ import { getHorAngleFromLineSeg } from "../utils/geometry.js";
 
 export function createLearnTrialAnim(
   nodePos,
-  relations,
+  relation,
   trialI,
   learnPassI,
   rotAngle,
@@ -46,7 +46,7 @@ export function createLearnTrialAnim(
       trial_name: "learn_anim",
       trialI,
       learnPassI,
-      relation: relations[trialI],
+      relation,
       angle: rotAngle,
       type,
       stim_set: getStimSet(type),
@@ -60,8 +60,9 @@ export function createLearnTrialAnim(
       p.TLD.movObjAlterFlag ??= true;
       p.TLD.movObjCounter ??= 0;
 
-      p.TLD.stopFlagM ??= gtools.createMatrix(nbNodes, nbNodes, false);
-      p.TLD.runM ??= gtools.createMatrix(nbNodes, nbNodes, 0);
+      // Reset per trial so previous relation state cannot leak into the next
+      p.TLD.stopFlagM = gtools.createMatrix(nbNodes, nbNodes, false);
+      p.TLD.runM = gtools.createMatrix(nbNodes, nbNodes, 0);
 
       // reset per trial (safe)
       p.TLD.nodeClicked = Array(nbNodes).fill(false);
@@ -319,8 +320,8 @@ export function createLearnTrialAnim(
       p.fill("grey");
       p.text("Search", 20, 40);
 
-      const startN = relations[trialI][0];
-      const endN = relations[trialI][1];
+      const startN = relation[0];
+      const endN = relation[1];
 
       if (CONFIG.debug && adjMat) {
         p.TLD.drawRelations(adjMat, nodePos);

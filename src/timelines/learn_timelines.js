@@ -59,7 +59,7 @@ export function createLearnTrials(nodePoss, block, layoutType = CONFIG.varType) 
 
       // Create learning environment trial
       const learnTrialAnim = createLearnTrialAnim(
-        nodePos, G.relations, trialI, learnPassI, randAngle, block
+        nodePos, G.relations[trialI], trialI, learnPassI, randAngle, block
       );
       learnTrialsTL.push(learnTrialAnim);
       if (learnTrialsTL.length >= task1TrialLimit) break outerLoop;
@@ -102,8 +102,8 @@ export function createRelQueryTrials(testPasses, type) {
     console.log(nbQueryTrials)
   let randBinListQuery;
   if (CONFIG.randomize) {
-    relations = htools.shuffleArray(G.relations);
-    nonRelations = htools.shuffleArray(G.nonRelations);
+    relations = htools.shuffleArray([...G.relations]);
+    nonRelations = htools.shuffleArray([...G.nonRelations]);
     randBinListQuery = htools.generateRandomBinaryList(nbRelations);
   } else {
     const ones = Array.from({ length: nbRelations }, () => 1);

@@ -55,7 +55,7 @@ export function makeLearnIntroTimeline(config = CONFIG) {
     tl.push(
       createLearnTrialAnim(
         G_SAMPLE.nodepos,
-        G_SAMPLE.relations,
+        G_SAMPLE.relations[trialI],
         trialI,
         learnPassI,
         0,
@@ -336,7 +336,7 @@ export function makeTestTimeline({ part = 3, includePartIntro = false } = {}) {
     if (CONFIG.debug) {
         let learnPassI = 1;
         tl.push(createLearnTrialAnim(
-            DESIGN.randomPoss, G.relations, 0, learnPassI, 0)
+            DESIGN.randomPoss, G.relations[0], 0, learnPassI, 0)
         );
     }
 
