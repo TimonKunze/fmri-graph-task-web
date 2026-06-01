@@ -1,6 +1,7 @@
 import { CONFIG } from "../config.js";
 import { 
     makeCoreTimeline, 
+    makeLearnIntroTimeline,
     makeLearnTimeline,
     makePart2Timeline,
     makeTestTimeline,  
@@ -13,7 +14,7 @@ export function buildTimeline() {
 
   if (CONFIG.part1) {
     tl.push(
-        // ...makeLearnIntroTimeline(jsPsych, CONFIG),
+        ...makeLearnIntroTimeline(CONFIG),
         ...makeLearnTimeline()
     );
   }

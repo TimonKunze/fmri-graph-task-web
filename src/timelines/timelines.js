@@ -33,6 +33,7 @@ import { finalTrialP1 } from "../trials/final_p1_trial.js";
 import { finalTrialP2 } from "../trials/final_p2_trial.js";
 import { createFinalTrial } from "../trials/final_trial.js";
 import { PATHS } from "../config/paths.js";
+import { jsPsych } from "../main.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
 import { getFmriTrialBlocks, getLearnLayoutOrder, getTestLayoutOrder } from "../state/subjectAssignment.js";
 import { createShortestPathDistanceMatrix } from "../utils/graph-tools.js";
@@ -67,7 +68,7 @@ export function makeLearnIntroTimeline(config = CONFIG) {
     tl.push(
       createDrawingTrial(
         G_SAMPLE.nodepos,
-        G_SAMPLE[trialI],
+        G_SAMPLE.relations[trialI],
         trialI,
         null,
         "sample"
@@ -75,7 +76,7 @@ export function makeLearnIntroTimeline(config = CONFIG) {
     );
   }
 
-  tl.push(createDrawingTrialSummary(sampleRels.length * 2, "sample"));
+  tl.push(createDrawingTrialSummary(jsPsych, sampleRels.length * 2, "sample"));
   tl.push(learnInstrEndTrial);
 
   return tl;

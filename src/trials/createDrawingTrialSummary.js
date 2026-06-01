@@ -1,5 +1,4 @@
 import htmlButtonResponse from "@jspsych/plugin-html-button-response";
-import { jsPsych } from "../main";
 import { getCurrentLanguage, t } from "../state/participant.js";
 
 function cheerUpFromFraction(fraction) {
