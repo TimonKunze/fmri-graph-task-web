@@ -9,48 +9,48 @@ const INSTRUCTION_COPY = {
     <h2>Compito 1</h2>
     <h3>Istruzioni</h3>
     <p>
-      In questo compito vedrai diversi fiori in un prato. Il tuo compito e <strong>trovare un'ape nascosta</strong> cliccando sui fiori. Quando hai trovato l'ape, osserva da quale fiore vola verso quale altro fiore e ricordalo.
+      In questo compito vedrai diversi frutti e ortaggi disposti in un ambiente. Il tuo compito è <strong>trovare una creatura volante nascosta</strong> cliccando su di essi. Una volta trovata, osserva da dove parte e dove arriva, e cerca di ricordare questa connessione.
     </p>
     <p>
-      Poi ti chiederemo di <strong>disegnare il percorso di volo dell'ape</strong> cliccando su un fiore e trascinando il cursore verso un altro fiore. Questo crea una connessione tra i due fiori e una linea verde o rossa indica se la connessione e corretta. Potrai passare alla prova successiva solo se il tuo disegno e corretto oppure se hai disegnato piu di 10 connessioni sbagliate. Tieni presente che durante questo compito la posizione dei fiori nel prato puo cambiare di tanto in tanto, ma questo non dovrebbe impedirti di disegnare la connessione corretta.
+      Successivamente, ti chiediamo di <strong>disegnare il percorso della creatura volante</strong> cliccando su un frutto o ortaggio e trascinando il cursore fino a un altro. Questo crea una connessione tra i due elementi, e una linea verde o rossa indicherà se la connessione è corretta. Potrai passare alla prova successiva solo dopo aver disegnato la connessione corretta oppure dopo aver fatto più di 10 tentativi sbagliati. Tieni presente che la posizione di frutti e ortaggi può cambiare di tanto in tanto, ma questo non dovrebbe impedirti di disegnare la connessione giusta.
     </p>
     <p>
-      Nota che la direzione in cui vedi volare l'ape non e importante, perche per ogni direzione in cui vedi volare un'ape presenteremo anche la direzione opposta. Allo stesso modo, non importa in quale direzione disegni la connessione.
+      Nota che la direzione in cui vedi muoversi la creatura volante non è importante, perché ogni volta che si sposta da un elemento a un altro, vedrai anche lo stesso movimento nella direzione opposta. Allo stesso modo, non importa in quale direzione disegni la connessione.
     </p>
     <p>
-      Periodicamente ti verra mostrato un punteggio di prestazione basato sull'accuratezza del primo tentativo in piu prove.
+      Di tanto in tanto, riceverai un punteggio di prestazione basato sulla frequenza con cui la tua prima risposta è stata corretta in una serie di prove.
     </p>
     <p>
-      Prima di iniziare puoi provare <strong>due prove di esempio</strong> cliccando su "Continua".
+      Prima di iniziare, avrai la possibilità di completare <strong>due prove di esempio</strong> cliccando su "Continua".
     </p>
   `,
     task1Part1End: `
     <h3>Sei pronto/a?</h3>
     <br>
     <p>
-      La fase di prova e terminata. Come detto prima, il compito consiste nel ricordare la posizione iniziale e finale dell'ape in ogni prova.
+      La fase di pratica è ora terminata. Come spiegato in precedenza, il tuo compito è ricordare da dove è partita e dove è arrivata la creatura volante in ogni prova.
     </p>
     <p>
-      Se sei pronto/a puoi fare clic sul pulsante "Continua" e l'esperimento iniziera.
+      Se sei pronto/a, fai clic sul pulsante "Continua" per iniziare l'esperimento.
     </p>
   `,
     task2Part1: `
     <h2>Compito 2</h2>
     <h3>Istruzioni</h3>
     <p>
-      Hai notato che l'ape volava solo tra alcune coppie di fiori e non tra altre? Chiamiamo le prime <strong>&ldquo;coppie note&rdquo;</strong> e le seconde <strong>&ldquo;coppie sconosciute&rdquo;</strong>. Potresti anche aver notato che se l'ape conosceva una connessione, volava in entrambe le direzioni con la stessa facilita, quindi la direzione non e importante.
+      Hai notato che la creatura volante si spostava solo tra alcune coppie di frutti e ortaggi, ma non tra altre? Chiamiamo le prime <strong>&ldquo;coppie note&rdquo;</strong> e le seconde <strong>&ldquo;coppie sconosciute&rdquo;</strong>. Potresti anche aver notato che, ogni volta che la creatura volante conosceva una connessione, si muoveva con la stessa facilità in entrambe le direzioni, quindi la direzione non è importante.
     </p>
     <p>
-      Di seguito ti mostreremo diverse coppie di fiori e ti chiediamo di ricordare dal compito precedente <strong>se l'ape conosceva o non conosceva la coppia mostrata</strong>.
+      Nella parte seguente vedrai diverse coppie di frutti e ortaggi. Cerca di ricordare, dal compito precedente, <strong>se la creatura volante conosceva o non conosceva la connessione tra i due elementi mostrati</strong>.
     </p>
     <p>
-      Indica la tua risposta con un clic sul pulsante. Il compito si presenta cosi:
+      Indica la tua risposta cliccando uno dei pulsanti. Il compito si presenta così:
     </p>
     <p>
       <img src="/stimuli/other/reltest_example.png" style="max-width:${stim_width_ex};max-height:${stim_width_ex};">
     </p>
     <p>
-      Questa volta non hai bisogno di una prova di allenamento. Puoi iniziare subito.
+      Questa volta non c'è una prova di pratica, quindi puoi iniziare subito.
     </p>
   `,
     task1Part2: `
@@ -59,16 +59,16 @@ const INSTRUCTION_COPY = {
     <h2>Compito 1</h2>
     <h3>Istruzioni</h3>
     <p>
-      Nella parte di ieri dell'esperimento hai imparato che l'ape vola solo tra alcune coppie note di fiori e non vola tra altre coppie sconosciute.
+      Nella parte di ieri dell'esperimento, hai imparato che la creatura volante si sposta solo tra alcune coppie di frutti e ortaggi. Queste sono le <strong>connessioni note</strong>.
     </p>
     <p>
-      Oggi ti chiediamo di aiutare l'ape a volare tra fiori le cui connessioni non sono note. Per farlo, l'ape dovra andare da un fiore all'altro <strong>indirettamente</strong> tramite le <strong>connessioni note di ieri</strong>.
+      Oggi, la creatura volante deve spostarsi tra frutti e ortaggi che <strong>non sono direttamente collegati</strong>. Per raggiungerli, deve viaggiare <strong>indirettamente</strong>, passando attraverso altri elementi e usando le <strong>connessioni note di ieri</strong>.
     </p>
     <p>
-      Nota pero che l'ape deve fare una sosta quando passa da un fiore all'altro tramite connessioni note, e ogni sosta richiede tempo. E quindi importante che l'ape trovi il percorso con <strong>meno soste</strong>.
+      Ogni volta che la creatura volante si ferma su un elemento intermedio, questo conta come una sosta e richiede tempo. Il tuo compito è quindi aiutarla a trovare il percorso con il <strong>minor numero di soste</strong>.
     </p>
     <p>
-      Nella parte seguente ti chiediamo di svolgere questo compito per l'ape...
+      Nella parte seguente, svolgerai questo compito per la creatura volante.
     </p>
     <br>
   `,
@@ -77,29 +77,29 @@ const INSTRUCTION_COPY = {
     <h3>Istruzioni</h3>
     <br>
     <p>
-      Nella prossima parte dell'esperimento ti chiediamo di <strong>posizionare i fiori nel prato</strong> in un modo che ti sembri ragionevole.
+      Nella prossima parte dell'esperimento, ti chiediamo di <strong>disporre i frutti e gli ortaggi nell'ambiente</strong> in un modo che ti sembri ragionevole.
     </p>
     <p>
-      All'inizio i fiori sono posizionati sul lato destro. Per collocare un fiore nel prato, clicca sul fiore e trascinalo nel punto che ritieni piu adatto. Nota che puoi modificare le posizioni trascinando i fiori piu volte.
+      All'inizio, i frutti e gli ortaggi appariranno sul lato destro. Per collocarne uno nell'ambiente, cliccaci sopra e trascinalo nella posizione che ti sembra più adatta. Puoi modificare la disposizione tutte le volte che vuoi trascinando di nuovo gli elementi.
     </p>
     <p>
-      Non c'e una prova di test perche il compito e intuitivo. Prenditi tutto il tempo che vuoi.
+      Per questa parte non è prevista una prova di pratica. Prenditi tutto il tempo di cui hai bisogno.
     </p>
     <br>
   `,
     task2Part2Sec: `
     <h3>Istruzioni</h3>
     <p>
-      Ora ti mostreremo il prato con i fiori nelle posizioni che hai scelto prima. Questa volta ti chiediamo di <strong>disegnare le connessioni note</strong> cosi come le ricordi.
+      Successivamente, ti mostreremo l'ambiente con i frutti e gli ortaggi disposti come li hai collocati in precedenza. Questa volta, ti chiediamo di <strong>disegnare le connessioni note</strong> così come le ricordi.
     </p>
     <p>
-      Puoi disegnare le connessioni come prima <strong>trascinando</strong> il cursore da un fiore all'altro. Se vuoi eliminare una connessione gia disegnata puoi fare <strong>doppio clic</strong> su di essa, oppure cliccare sul <strong>pulsante di reset</strong> che elimina tutte le connessioni gia disegnate in un colpo solo.
+      Come nel compito precedente, puoi disegnare le connessioni <strong>trascinando il cursore</strong> da un frutto o ortaggio a un altro. Se vuoi rimuovere una connessione che hai già disegnato, puoi <strong>fare doppio clic</strong> su di essa oppure usare il <strong>pulsante di reset</strong>, che elimina tutte le connessioni disegnate in una sola volta.
     </p>
     <p>
-      Assicurati che l'ape possa raggiungere tutti i fiori con almeno una connessione.
+      Assicurati che la creatura volante possa raggiungere ogni frutto e ortaggio attraverso almeno una connessione.
     </p>
     <p>
-      Non c'e limite di tempo. Prenditi il tempo necessario e fai clic su "Continua" quando hai finito.
+      Non c'è alcun limite di tempo. Prenditi tutto il tempo di cui hai bisogno e fai clic su "Continua" quando hai finito.
     </p>
     <br>
   `,
@@ -107,10 +107,10 @@ const INSTRUCTION_COPY = {
     <h3>Congratulazioni, hai quasi finito. Un'ultima domanda:</h3>
     <br>
     <p>
-      Hai usato qualche forma di documentazione per imparare le connessioni dell'ape nella parte 1, o per risolvere il compito nella parte 2 (per esempio scrivendo le connessioni)?
+      Hai utilizzato qualche forma di aiuto esterno per imparare le connessioni della creatura volante nella Parte 1 o per risolvere il compito nella Parte 2 (per esempio scrivendo le connessioni)?
     </p>
     <p>
-      (Per favore rispondi onestamente e nota che la tua risposta a questa domanda non influenzera in alcun modo il tuo compenso.)
+      (Per favore, rispondi onestamente. La tua risposta a questa domanda non influenzerà in alcun modo il tuo compenso.)
     </p>
   `,
   },
@@ -133,7 +133,7 @@ const INSTRUCTION_COPY = {
       From time to time, you will receive a performance score based on your first-attempt accuracy across several trials.
     </p>
     <p>
-      Before starting, you will have the chance to complete <strong>two example trials</strong> by clicking 'Continue.'
+      Before starting, you will have the chance to complete <strong>two example trials</strong> by clicking "Continue."
     </p>
   `,
     task1Part1End: `
@@ -170,25 +170,29 @@ const INSTRUCTION_COPY = {
     This time, there is no practice trial, so you can begin right away.
     </p>
   `,
+
     task1Part2: `
-    <h1>Part II</h1>
-    <br>
-    <h2>Task 1</h2>
-    <h3>Instructions</h3>
-    <p>
-      In yesterday's part of the experiment, you have learned that the bee only flies between certain known pairs of flowers and does not fly between other, unknown pairs of flowers.
-    </p>
-    <p>
-      Today we ask you to help the bee fly between flowers whose connections are not known. In order to do so, the bee will need to go from one flower to the next <strong>indirectly</strong> via the <strong>known connections from yesterday</strong>.
-    </p>
-    <p>
-      Note, however, that the bee must make a stopover when passing flowers via known connections, and each of these stopovers takes time. It is therefore important that the bee finds out which route has the <strong>fewest stopovers</strong>.
-    </p>
-    <p>
-      In the following, we like to ask you to take over this task for the bee...
-    </p>
-    <br>
-  `,
+      <h1>Part II</h1>
+      <br>
+      <h2>Task 1</h2>
+      <h3>Instructions</h3>
+      <p>
+      In yesterday's part of the experiment, you learned that the flying creature moves only between certain pairs of fruits and vegetables. These are the <strong>known connections</strong>.
+      </p>
+      <p>
+      Today, the flying creature needs to move between fruits and vegetables that are <strong>not directly
+      connected</strong>. To reach them, it must travel <strong>indirectly</strong> by
+      passing through other fruits and vegetables using the <strong>known connections from yesterday</strong>.
+      </p>
+      <p>
+      Each time the flying creature stops at an intermediate item, this counts as a stopover and takes time.
+      Your task is therefore to help it find the route with the <strong>fewest stopovers</strong>.
+      </p>
+      <p>
+      In the following, you will carry out this task for the flying creature.
+      </p>
+      <br>
+    `,
     task2Part2First: `
     <h2>Task 2</h2>
     <h3>Instructions</h3>
@@ -214,7 +218,7 @@ const INSTRUCTION_COPY = {
     This time, we ask you to <strong>draw the known connections</strong> as you remember them.
     </p>
     <p>
-    As in yesterday's task, you can draw connections by <strong>dragging the cursor</strong> from one fruit or vegetable
+    As in the earlier task, you can draw connections by <strong>dragging the cursor</strong> from one fruit or vegetable
     to another. If you want to remove a connection you have already drawn, you can <strong>double-click</strong> on it
     or use the <strong>reset button</strong>, which deletes all previously drawn connections at once.
     </p>
@@ -222,7 +226,7 @@ const INSTRUCTION_COPY = {
     Please make sure that the flying creature can reach every fruit and vegetable through at least one connection.
     </p>
     <p>
-    Again, there is no time limit. Take as much time as you need, and click 'Continue' once you are done.
+    There is no time limit. Take as much time as you need, and click "Continue" once you are done.
     </p>
     <br>
   `,
@@ -230,11 +234,11 @@ const INSTRUCTION_COPY = {
     <h3>Congratulations, you are nearly done. One last question:</h3>
     <br>
     <p>
-    Did you use any form of external aid to learn the flying creature’s connections in Part 1, or to
-    solve the task in Part 2 (for example, by writing the connections down or taking screenshots)?
+    Did you use any form of external aid to learn the flying creature's connections in Part 1, or to
+    solve the task in Part 2 (for example, by writing the connections down)?
     </p>
     <p>
-    (Please answer honestly. Your response to this question will not affect your compensation in any way.)
+    (Please answer honestly. Your response to this question will not affect your payment in any way.)
     </p>
   `,
   },
