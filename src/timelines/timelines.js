@@ -32,7 +32,9 @@ import {
     createPosDrawTrial, 
     createCondPosDrawTrial } from "../trials/arena_trials.js";
 import { cheater_trial } from "../trials/cheater_trial.js";
-import { createFinalTrial } from "../trials/final_trial.js";
+import { finalPart1Trial } from "../trials/final_part1_trial.js";
+import { finalPart2Trial } from "../trials/final_part2_trial.js";
+import { finalPart3Trial } from "../trials/final_part3_trial.js";
 import { PATHS } from "../config/paths.js";
 import { jsPsych } from "../main.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
@@ -170,7 +172,7 @@ export function makeLearnTimeline() {
 
   
 
-  tl.push(createFinalTrial(1));
+  tl.push(finalPart1Trial);
 
   return tl;
 }
@@ -318,7 +320,7 @@ export function makePart2Timeline() {
     }
   });
 
-  tl.push(createFinalTrial(2));
+  tl.push(finalPart2Trial);
 
   return tl;
 }
@@ -360,7 +362,7 @@ export function makeTestTimeline({ part = 3, includePartIntro = false } = {}) {
     // Cheater & Final
     // ---------------
     tl.push(cheater_trial);
-    tl.push(createFinalTrial(part));
+    tl.push(part === 3 ? finalPart3Trial : part === 2 ? finalPart2Trial : finalPart1Trial);
 
     return tl;
 }

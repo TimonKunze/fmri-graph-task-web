@@ -15,32 +15,7 @@ const baseConfig = {
   feedback: true,
   keyChoice: null,
 
-  singleTrialExport: {
-    enabled: false,
-    outputBaseName: "single-trial-export",
-    zipFileName: "single-trial-export.zip",
-    fps: 30,
-    speed: 2.4,
-    holdFrames: 30,
-    showSearchLabel: false,
-    backgroundColor: COLORS.bgGreen,
-    canvasSize: [300, 200],
-    nodeSize: SIZES.task14Flower,
-    movingFigureSize: SIZES.task14Bee,
-    startPos: [80, 100],
-    endPos: [220, 100],
-    // Link 1_2
-    startStimulusPath: PATHS.nodeExport(2),
-    endStimulusPath: PATHS.nodeExport(1),
-    // Link 3_4
-    // startStimulusPath: PATHS.nodeExport(3),
-    // endStimulusPath: PATHS.nodeExport(4),
-    // Link 1_3
-    // startStimulusPath: PATHS.nodeExport(1),
-    // endStimulusPath: PATHS.nodeExport(3),
-    movingFigurePath: PATHS.movingObjExport,
-    movingFigureMirroredPath: PATHS.movingObjExport,
-  },
+  showSingleTrialExport: false,
 };
 
 const configProfiles = {
@@ -66,11 +41,39 @@ const configProfiles = {
   },
 };
 
+const singleTrialExport = {
+    enabled: baseConfig.showSingleTrialExport,
+    outputBaseName: "single-trial-export",
+    zipFileName: "single-trial-export.zip",
+    fps: 30,
+    speed: 2.4,
+    holdFrames: 30,
+    showSearchLabel: false,
+    backgroundColor: COLORS.bgGreen,
+    canvasSize: [300, 200],
+    nodeSize: SIZES.task14Flower,
+    movingFigureSize: SIZES.task14Bee,
+    startPos: [80, 100],
+    endPos: [220, 100],
+    // Link 1_2
+    startStimulusPath: PATHS.nodeExport(2),
+    endStimulusPath: PATHS.nodeExport(1),
+    // Link 3_4
+    // startStimulusPath: PATHS.nodeExport(3),
+    // endStimulusPath: PATHS.nodeExport(4),
+    // Link 1_3
+    // startStimulusPath: PATHS.nodeExport(1),
+    // endStimulusPath: PATHS.nodeExport(3),
+    movingFigurePath: PATHS.movingObjExport,
+    movingFigureMirroredPath: PATHS.movingObjExport,
+};
+
 const selectedProfile = configProfiles[baseConfig.mode] || {};
 
 export const CONFIG = {
   ...baseConfig,
   ...selectedProfile,
+  singleTrialExport,
 };
 
 if (![1, 2, 3].includes(CONFIG.activePart)) {
