@@ -5,10 +5,7 @@ import { SIZES } from "./config/sizes.js";
 const baseConfig = {
   mode: "dev", // "dev" | "prod"
 
-  // Flags
-  part1: false,
-  part2: true,
-  part3: false,
+  activePart: 2, // 1 | 2 | 3
 
   defaultLanguage: "en", // "en" | "it"
 
@@ -75,6 +72,14 @@ export const CONFIG = {
   ...baseConfig,
   ...selectedProfile,
 };
+
+if (![1, 2, 3].includes(CONFIG.activePart)) {
+  throw new Error(`CONFIG.activePart must be 1, 2, or 3. Received: ${CONFIG.activePart}`);
+}
+
+CONFIG.part1 = CONFIG.activePart === 1;
+CONFIG.part2 = CONFIG.activePart === 2;
+CONFIG.part3 = CONFIG.activePart === 3;
 
 CONFIG.keyChoice = CONFIG.debug ? "ALL_KEYS" : "NO_KEYS";
 CONFIG.nbLearnPasses = CONFIG.debug ? 1 : 3; // in earlier pilots: 3

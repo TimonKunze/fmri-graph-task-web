@@ -17,13 +17,9 @@ export function buildTimeline() {
         ...makeLearnIntroTimeline(CONFIG),
         ...makeLearnTimeline()
     );
-  }
-
-  if (CONFIG.part2) {
+  } else if (CONFIG.part2) {
       tl.push(...makePart2Timeline());
-  }
-
-  if (CONFIG.part3) {
+  } else if (CONFIG.part3) {
       tl.push(...makeTestTimeline({ part: 3, includePartIntro: false }));
   }
 
