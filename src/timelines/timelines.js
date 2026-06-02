@@ -196,16 +196,14 @@ export function makePart2Timeline() {
   expToCanonical.forEach((canonicalIndex, experimentIndex) => {
     canonicalToExp[canonicalIndex] = experimentIndex;
   });
-  const learnLayoutOrder = getLearnLayoutOrder();
-  const firstStimSet = learnLayoutOrder?.[0] === "unconstrained" ? "set2" : "set1";
-  const secondStimSet = firstStimSet === "set1" ? "set2" : "set1";
   const decodeFmriNode = (rawNode) => {
     if (!Number.isInteger(rawNode) || rawNode < 0 || rawNode >= G.nbNodes * 2) {
       throw new Error(`[makePart2Timeline] Invalid fMRI node index: ${rawNode}`);
     }
 
     const graphNodeIndex = rawNode % G.nbNodes;
-    const stimSet = rawNode < G.nbNodes ? firstStimSet : secondStimSet;
+    const stimSet = rawNode < G.nbNodes ? "set1" : "set2";
+    const layoutType = stimSet === "set1" ? "rotational" : "unconstrained";
     const experimentNodeIndex = canonicalToExp[graphNodeIndex];
 
     if (!Number.isInteger(experimentNodeIndex)) {
@@ -217,6 +215,7 @@ export function makePart2Timeline() {
     return {
       rawNode,
       stimSet,
+      layoutType,
       graphNodeIndex,
       experimentNodeIndex,
       imageSrc: stimSet === "set2"
@@ -310,6 +309,7 @@ export function makePart2Timeline() {
               raw_node_index: decodedNode.rawNode,
               graph_node_index: decodedNode.graphNodeIndex,
               stim_set: decodedNode.stimSet,
+              layout_type: decodedNode.layoutType,
             },
           })
         );
@@ -367,6 +367,7 @@ export function makePart2Timeline() {
               right_raw_node_index: rightNode.rawNode,
               left_graph_node_index: leftNode.graphNodeIndex,
               right_graph_node_index: rightNode.graphNodeIndex,
+              layout_type: leftNode.layoutType,
             },
           })
         );
