@@ -1,8 +1,10 @@
 import jsPsychFullscreen from "@jspsych/plugin-fullscreen";
 import { CONFIG } from "../config.js";
+import { jsPsych } from "../main.js";
 import { getCurrentLanguage } from "../state/participant.js";
 
 const isDebug = CONFIG.debug === true;
+const isPart2Only = CONFIG.part2 && !CONFIG.part1 && !CONFIG.part3;
 
 function getCopy() {
   const isItalian = getCurrentLanguage() === "it";
@@ -22,10 +24,10 @@ function getCopy() {
           message: `
             <div style="max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 18px;">
               <p><strong>Debug mode: fullscreen request is skipped.</strong></p>
-              <p>Click continue to proceed.</p>
+              <p>${isPart2Only ? "Press the right arrow key to proceed." : "Click continue to proceed."}</p>
             </div>
           `,
-          buttonLabel: "Continue (Debug)",
+          buttonLabel: isPart2Only ? "" : "Continue (Debug)",
         };
   }
 
@@ -35,18 +37,20 @@ function getCopy() {
           <div style="max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 18px;">
             <p><strong>L'esperimento passerà ora alla modalità a schermo intero.</strong></p>
             <p>Non uscire dallo schermo intero finché lo studio non è completato.</p>
+            ${isPart2Only ? '<p>Premi la freccia destra per procedere.</p>' : ""}
           </div>
         `,
-        buttonLabel: "Attiva Schermo Intero",
+        buttonLabel: isPart2Only ? "" : "Attiva Schermo Intero",
       }
     : {
         message: `
           <div style="max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 18px;">
             <p><strong>The experiment will now switch to full screen mode.</strong></p>
             <p>Please do not exit full screen until the study is complete.</p>
+            ${isPart2Only ? "<p>Press the right arrow key to proceed.</p>" : ""}
           </div>
         `,
-        buttonLabel: "Enter Full Screen",
+        buttonLabel: isPart2Only ? "" : "Enter Full Screen",
       };
 }
 
@@ -66,6 +70,23 @@ export const fullscreen_trial = {
     const copy = getCopy();
     trial.message = copy.message;
     trial.button_label = copy.buttonLabel;
+  },
+  on_load: () => {
+    if (!isPart2Only) {
+      return;
+    }
+
+    const listener = jsPsych.pluginAPI.getKeyboardResponse({
+      callback_function: () => {
+        jsPsych.pluginAPI.cancelKeyboardResponse(listener);
+        const button = document.querySelector("#jspsych-fullscreen-btn");
+        button?.click();
+      },
+      valid_responses: ["arrowright"],
+      persist: false,
+      allow_held_key: false,
+      rt_method: "performance",
+    });
   },
 
   on_finish: (data) => {

@@ -77,6 +77,40 @@ function addExperimentProperties() {
   });
 }
 
+function logDebugStimulusMapping() {
+  if (!CONFIG.debug) {
+    return;
+  }
+
+  const assignment = getSubjectAssignment();
+  const rows = Array.from({ length: G.nbNodes }, (_, experimentIndex) => {
+    const graphNode = Number(assignment.nodeToGraph?.[experimentIndex] ?? experimentIndex + 1);
+    const set1ObjectId = Number(assignment.objectToNodes?.[experimentIndex] ?? experimentIndex + 1);
+    const set2ObjectId = Number(assignment.objectToNodes?.[experimentIndex + G.nbNodes] ?? experimentIndex + G.nbNodes + 1);
+
+    return {
+      subject: assignment.subjNb,
+      graph_node: graphNode,
+      experiment_node: experimentIndex + 1,
+      set1_object_id: set1ObjectId,
+      set1_image: PATHS.nodeImages1(experimentIndex),
+      set1_small_image: PATHS.nodeImages1Small(experimentIndex),
+      set2_object_id: set2ObjectId,
+      set2_image: PATHS.nodeImages2(experimentIndex),
+      set2_small_image: PATHS.nodeImages2Small(experimentIndex),
+    };
+  }).sort((a, b) => a.graph_node - b.graph_node);
+
+  console.group(`Debug stimulus mapping for subject ${assignment.subjNb}`);
+  console.log("Rows are sorted by graph node.");
+  console.table(rows);
+  console.log("Raw randomization arrays", {
+    nodeToGraph: assignment.nodeToGraph,
+    objectToNodes: assignment.objectToNodes,
+  });
+  console.groupEnd();
+}
+
 async function bootstrap() {
   if (CONFIG.singleTrialExport?.enabled) {
     await runSingleTrialExporter();
@@ -101,6 +135,7 @@ async function bootstrap() {
   refreshGraphState();
   refreshDesign();
   addExperimentProperties();
+  logDebugStimulusMapping();
 
   console.log("CSV mapping check: stimulus paths", {
     subject: assignment.subjNb,

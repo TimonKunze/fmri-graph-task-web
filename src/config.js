@@ -5,7 +5,7 @@ import { SIZES } from "./config/sizes.js";
 const baseConfig = {
   mode: "dev", // "dev" | "prod"
 
-  activePart: 3, // 1 | 2 | 3
+  activePart: 2, // 1 | 2 | 3
 
   defaultLanguage: "en", // "en" | "it"
 
