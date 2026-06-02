@@ -1,5 +1,6 @@
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { CONFIG } from "../config";
+import { jsPsych } from "../main.js";
 import { getCurrentLanguage } from "../state/participant.js";
 
 function getPartString() {
@@ -26,17 +27,23 @@ function getPartString() {
 }
 
 function getCopy() {
+  const isPart2Only = CONFIG.part2 && !CONFIG.part1 && !CONFIG.part3;
+
   if (getCurrentLanguage() === "it") {
     return {
       welcome: "Benvenuto/a al nostro esperimento!",
-      prompt: "Fai clic sul pulsante qui sotto quando sei pronto/a per iniziare.",
+      prompt: isPart2Only
+        ? "Premi il tasto freccia destra quando sei pronto/a per iniziare."
+        : "Fai clic sul pulsante qui sotto quando sei pronto/a per iniziare.",
       continueLabel: "Continua",
     };
   }
 
   return {
     welcome: "Welcome to our experiment!",
-    prompt: "Please click the button below when you are ready to begin.",
+    prompt: isPart2Only
+      ? "Press the right arrow key when you are ready to begin."
+      : "Please click the button below when you are ready to begin.",
     continueLabel: "Continue",
   };
 }
@@ -50,6 +57,7 @@ export const welcome_trial = {
     trial_name: "welcome",
   },
   on_start: (trial) => {
+    const isPart2Only = CONFIG.part2 && !CONFIG.part1 && !CONFIG.part3;
     const copy = getCopy();
     trial.stimulus = `
       <div style="max-width: 700px; margin: 0 auto; font-size: 18px; line-height: 1.6;">
@@ -60,9 +68,27 @@ export const welcome_trial = {
         >
         <p><strong>${getCurrentLanguage() === "it" ? "Benvenuto/a a " : "Welcome to "}${getPartString()}${getCurrentLanguage() === "it" ? "nostro esperimento!" : "our experiment!"}</strong></p>
         <p>${copy.prompt}</p>
+        ${isPart2Only ? `<div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>` : ""}
       </div>
     `;
-    trial.choices = [copy.continueLabel];
+    trial.choices = isPart2Only ? [] : [copy.continueLabel];
+  },
+  on_load: () => {
+    const isPart2Only = CONFIG.part2 && !CONFIG.part1 && !CONFIG.part3;
+    if (!isPart2Only) {
+      return;
+    }
+
+    const listener = jsPsych.pluginAPI.getKeyboardResponse({
+      callback_function: () => {
+        jsPsych.pluginAPI.cancelKeyboardResponse(listener);
+        jsPsych.finishTrial({ response: "arrowright", response_side: "right" });
+      },
+      valid_responses: ["arrowright"],
+      persist: false,
+      allow_held_key: false,
+      rt_method: "performance",
+    });
   },
 
   on_finish: (data) => {

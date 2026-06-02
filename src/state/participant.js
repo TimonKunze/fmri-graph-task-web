@@ -1,4 +1,6 @@
-const DEFAULT_LANGUAGE = "it";
+import { CONFIG } from "../config.js";
+
+const DEFAULT_LANGUAGE = CONFIG.defaultLanguage || "en";
 
 const participantSetup = {
   subjectCode: null,

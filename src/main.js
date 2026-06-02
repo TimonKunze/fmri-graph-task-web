@@ -10,6 +10,7 @@ import { SIZES } from "./config/sizes.js";
 import { STIMULUS_CONDITION_MAP } from "./config/stimulus_assignment.js";
 import { participant_setup_trial } from "./trials/participant_setup_trial.js";
 import { getParticipantSetup } from "./state/participant.js";
+import { runSingleTrialExporter } from "./exporters/singleTrialExporter.js";
 import {
   getRandomizationAssignment,
   getSubjectAssignment,
@@ -77,6 +78,11 @@ function addExperimentProperties() {
 }
 
 async function bootstrap() {
+  if (CONFIG.singleTrialExport?.enabled) {
+    await runSingleTrialExporter();
+    return;
+  }
+
   const response = await fetch("/config/randomization_table.csv");
   const csvText = await response.text();
   loadRandomizationRows(csvText);
@@ -123,7 +129,8 @@ async function bootstrap() {
     }
   });
 
-  jsPsych.options.show_progress_bar = true;
+  const showProgressBar = !(CONFIG.part2 && !CONFIG.part1 && !CONFIG.part3);
+  jsPsych.options.show_progress_bar = showProgressBar;
   window.__JSPSYCH_DISPLAY_DATA_ON_FINISH__ = CONFIG.debug;
   await jsPsych.run(timeline);
 }

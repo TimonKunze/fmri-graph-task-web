@@ -119,6 +119,18 @@ const INSTRUCTION_COPY = {
       Dopo la dimostrazione, potrai ripeterla tutte le volte che vuoi oppure continuare con il compito reale.
     </p>
   `,
+    part2Start: `
+    <h3>Inizio dell'esperimento</h3>
+    <p>
+      Benissimo. Ora hai imparato come funziona il compito.
+    </p>
+    <p>
+      Quando premi il tasto freccia destra, inizierà l'esperimento vero e proprio.
+    </p>
+    <p>
+      È prevista una pausa circa ogni 8 minuti, durante la quale potrai riposarti un momento. L'esperimento durerà circa un'ora in totale.
+    </p>
+  `,
     part3First: `
     <h2>Compito 2</h2>
     <h3>Istruzioni</h3>
@@ -269,27 +281,34 @@ const INSTRUCTION_COPY = {
     <p>
     Occasionally, <strong>two images</strong> will appear after a single image. In those cases,
     please remember the single image shown immediately before. Unlike yesterday, the two images
-    will not form a known connection. Your task is to decide which of the two images can be
-    reached from the previous image using <strong>fewer known connections</strong>, while taking
-    the role of the flying figure.
+    will not form a known connection. 
+    </p>
+    <p>
+    Your task is to decide which of the two images can be reached from the previous image using
+    <strong>fewer known connections</strong>, while taking the role of the flying figure.
     </p>
     <p>
     Use the left and right arrow keys to respond.
     </p>
     <p>
-    To continue, press the right arrow key, and we will show you a short demo.
+    Press the right arrow key now, and we will show you a short demo.
     </p>
     `,
     part2Demo: `
-    <h3>Demo</h3>
     <p>
-    This is only a <strong>demo</strong> and is <strong>not</strong> part of the real task.
+    Imagine that, yesterday, you learned these three known connections, while all other connections are unknown.
+    </p>
+    `,
+    part2Start: `
+    <h3>Start of the Experiment</h3>
+    <p>
+    Good. You have now learned the task.
     </p>
     <p>
-    At the top, you will see two short example animations. In the middle of the screen, you will first see a single image and then one path-choice trial.
+    When you press the right arrow key, the actual experiment will begin.
     </p>
     <p>
-    After the demo, you can repeat it as often as you like or continue to the real task.
+    There will be a scheduled break about every 8 minutes, so you will have regular opportunities to rest briefly. The experiment will take about one hour in total.
     </p>
     `,
     part3First: `

@@ -36,8 +36,12 @@ export const PATHS = {
     language === "it" ? "/participant_info_ital.pdf" : "/participant_info_engl.pdf",
 
   testExample: "./stimuli/other/test_example.png",
-  part2DemoGif1: "/practice_trials/relation_1.gif",
-  part2DemoGif2: "/practice_trials/relation_2.gif",
+  part2DemoVideo1: "/practice_trials/videos/link_2_1.mp4",
+  part2DemoVideo2: "/practice_trials/videos/link_1_3.mp4",
+  part2DemoVideo3: "/practice_trials/videos/link_3_4.mp4",
+
+  movingObjExport: "/practice_trials/stimuli/moving_obj.png",
+  nodeExport: (i) => `/practice_trials/stimuli/node${i}.png`,
 
   data_dir: "data",
 };

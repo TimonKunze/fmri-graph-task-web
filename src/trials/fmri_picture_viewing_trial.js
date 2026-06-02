@@ -1,3 +1,4 @@
+import { CONFIG } from "../config.js";
 import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
 
 export function createFmriPictureViewingTrial({
@@ -27,9 +28,9 @@ export function createFmriPictureViewingTrial({
         >
       </div>
     `,
-    choices: "NO_KEYS",
+    choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
     trial_duration: duration,
-    response_ends_trial: false,
+    response_ends_trial: CONFIG.debug,
     data: {
       trial_name: trialName,
       part: 2,

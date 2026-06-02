@@ -16,6 +16,7 @@ import { preload_trial } from "../trials/preload_trial.js";
 import { welcome_trial } from "../trials/welcome_trial.js";
 import { part2_intro_trial } from "../trials/part2_intro_trial.js";
 import { createPart2DemoTimeline } from "../trials/part2_demo_trial.js";
+import { part2_start_trial } from "../trials/part2_start_trial.js";
 import { createFmriPathChoiceTrial } from "../trials/fmri_path_choice_trial.js";
 import { createFmriPictureViewingTrial } from "../trials/fmri_picture_viewing_trial.js";
 import { consent_trial } from "../trials/consent_trial.js";
@@ -196,7 +197,10 @@ export function makePart2Timeline() {
   };
 
   tl.push(part2_intro_trial);
-  tl.push(createPart2DemoTimeline(shortestPathDistanceMatrix));
+  if (!CONFIG.debug) {
+    tl.push(createPart2DemoTimeline(shortestPathDistanceMatrix));
+    tl.push(part2_start_trial);
+  }
 
   const createPart2BlockBreakTrial = (blockIndex) => ({
     type: jsPsychHtmlKeyboardResponse,
@@ -215,6 +219,7 @@ export function makePart2Timeline() {
         : `
           <div class="instr-screen">
             <p>You have completed block ${blockIndex} of ${totalFmriBlocks}.</p>
+            <p>Please take a moment of rest.</p>
             <p>When you are ready, press the right arrow key to start the next block.</p>
             <div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>
           </div>
@@ -235,8 +240,8 @@ export function makePart2Timeline() {
           <div style="font-size: 48px; line-height: 1;">+</div>
         </div>
       `,
-      choices: "NO_KEYS",
-      response_ends_trial: false,
+      choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
+      response_ends_trial: CONFIG.debug,
       trial_duration: Math.round(itiSeconds * 1000),
       data: {
         trial_name: "part2_fmri_iti",
@@ -251,8 +256,9 @@ export function makePart2Timeline() {
   fmriBlocks.forEach((block, blockIndex) => {
     let previousNodeIndex = null;
     let previousItiSeconds = null;
+    const blockItems = CONFIG.debug ? block.slice(0, 8) : block;
 
-    block.forEach((item, trialIndex) => {
+    blockItems.forEach((item, trialIndex) => {
       if (Number.isInteger(item)) {
         tl.push(
           createFmriPictureViewingTrial({
@@ -264,7 +270,7 @@ export function makePart2Timeline() {
           })
         );
         previousNodeIndex = item;
-        if (trialIndex < block.length - 1) {
+        if (trialIndex < blockItems.length - 1) {
           const itiSeconds = sampleFmriItiSeconds();
           tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
           previousItiSeconds = itiSeconds;
@@ -303,7 +309,7 @@ export function makePart2Timeline() {
           })
         );
         previousNodeIndex = null;
-        if (trialIndex < block.length - 1) {
+        if (trialIndex < blockItems.length - 1) {
           const itiSeconds = sampleFmriItiSeconds();
           tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
           previousItiSeconds = itiSeconds;

@@ -1,3 +1,4 @@
+import { CONFIG } from "../config.js";
 import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
 import { getCurrentLanguage } from "../state/participant.js";
 
@@ -6,12 +7,10 @@ function getPrompt() {
 
   return isItalian
     ? `
-      <p>Vedrai <strong>due possibili immagini di destinazione</strong> e dovrai giudicare quale percorso indiretto dall'immagine precedente richiede meno soste tramite connessioni note.</p>
-      <p><strong>Per favore conta il numero di soste.</strong></p>
+    <p>Quale percorso dall'immagine precedente richiede meno connessioni note?</p>
     `
     : `
-      <p>You will see <strong>two possible destination images</strong>, and your task is to judge which indirect route from the previous image requires fewer stopovers via known connections.</p>
-      <p><strong>Please count the number of stopovers.</strong></p>
+    <p>Which route from the previous image requires fewer known connections?</p>
     `;
 }
 
@@ -23,6 +22,23 @@ function createImageChoice(imageSrc, imageWidth, imageHeight, alt) {
       style="width:${imageWidth}px;height:${imageHeight}px;object-fit:contain;display:block;"
     >
   `;
+}
+
+function normalizeArrowResponse(response) {
+  if (response === null || response === undefined) {
+    return null;
+  }
+
+  const normalized = String(response).toLowerCase();
+  if (normalized === "arrowleft" || normalized === "left" || normalized === "37") {
+    return "left";
+  }
+
+  if (normalized === "arrowright" || normalized === "right" || normalized === "39") {
+    return "right";
+  }
+
+  return null;
 }
 
 export function createFmriPathChoiceTrial({
@@ -65,7 +81,7 @@ export function createFmriPathChoiceTrial({
         </div>
       </div>
     `,
-    choices: ["arrowleft", "arrowright"],
+    choices: CONFIG.debug ? "ALL_KEYS" : ["arrowleft", "arrowright"],
     data: {
       trial_name: trialName,
       part: 2,
@@ -85,10 +101,12 @@ export function createFmriPathChoiceTrial({
       ...dataExtras,
     },
     on_finish: (data) => {
-      if (data.response === "arrowleft") {
+      const normalizedResponse = normalizeArrowResponse(data.response);
+
+      if (normalizedResponse === "left") {
         data.response = 0;
         data.response_side = "left";
-      } else if (data.response === "arrowright") {
+      } else if (normalizedResponse === "right") {
         data.response = 1;
         data.response_side = "right";
       } else {
