@@ -4,7 +4,7 @@ import {
     makeLearnIntroTimeline,
     makeLearnTimeline,
     makePart2Timeline,
-    makeTestTimeline,  
+    makePart3Timeline,  
 } from "../timelines/timelines.js";
 
 export function buildTimeline() {
@@ -20,7 +20,7 @@ export function buildTimeline() {
   } else if (CONFIG.part2) {
       tl.push(...makePart2Timeline());
   } else if (CONFIG.part3) {
-      tl.push(...makeTestTimeline({ part: 3, includePartIntro: false }));
+      tl.push(...makePart3Timeline());
   }
 
   return tl;

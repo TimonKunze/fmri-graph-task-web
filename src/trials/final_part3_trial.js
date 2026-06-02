@@ -12,9 +12,9 @@ export const finalPart3Trial = {
     return `
       <div style="max-width: 800px; margin: 0 auto; line-height: 1.6; text-align: left;">
         <h2>${isItalian ? "Congratulazioni!" : "Congratulations!"}</h2>
-        <p>${isItalian ? "Hai completato l'ultimo compito della Parte III." : "You've finished the last task of Part III."}</p>
-        <h3>${isItalian ? "Grazie per la partecipazione!" : "Thank you for participating!"}</h3>
-        <p>${isItalian ? "Ora anche frutti, ortaggi e figura volante possono finalmente riposarsi." : "Now the fruits, vegetables, and flying figure can finally take a break too."}</p>
+        <p>${isItalian ? "Hai completato l'ultimo compito della Parte III e quindi l'intero esperimento." : "You've finished the last task of Part III and therefore the entire experiment."}</p>
+        <h3>${isItalian ? "Grazie per la partecipazione e ti auguriamo una splendida continuazione di giornata!" : "Thank you for participating, and have a wonderful rest of the day!"}</h3>
+        <p>${isItalian ? "Ora anche i frutti, gli ortaggi e la figura volante possono finalmente riposarsi." : "Finally, fruits, vegetables, and flying figures can take a break too."}</p>
         <img src="/stimuli/collected_pic/fruit_salad.png" alt="Fruit salad" style="max-width: 220px; height: auto; display: block; margin: 20px auto 0 auto;">
       </div>
     `;

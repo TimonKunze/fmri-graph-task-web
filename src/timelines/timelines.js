@@ -17,6 +17,7 @@ import { welcome_trial } from "../trials/welcome_trial.js";
 import { part2_intro_trial } from "../trials/part2_intro_trial.js";
 import { createPart2DemoTimeline } from "../trials/part2_demo_trial.js";
 import { part2_start_trial } from "../trials/part2_start_trial.js";
+import { part2EvalIntroTrial } from "../trials/part2_eval_intro_trial.js";
 import { createFmriPathChoiceTrial } from "../trials/fmri_path_choice_trial.js";
 import { createFmriPictureViewingTrial } from "../trials/fmri_picture_viewing_trial.js";
 import { consent_trial } from "../trials/consent_trial.js";
@@ -172,6 +173,10 @@ export function makeLearnTimeline() {
 
   
 
+  if (CONFIG.includeEvalTrials) {
+    tl.push(createConfidenceTrial("part1"));
+    tl.push(createFreeEvalTrial("part1"));
+  }
   tl.push(finalPart1Trial);
 
   return tl;
@@ -326,43 +331,43 @@ export function makePart2Timeline() {
 }
 
 // ------------------------------------
-// Test Time line
+// Part 3 Time line
 // ------------------------------------
-export const testTimeline = [];
-export function makeTestTimeline({ part = 3, includePartIntro = false } = {}) {
+export function makePart3Timeline() {
     let tl = [];
     const testLayouts = getTestLayoutOrder();
-    
-    if (includePartIntro) {
-      tl.push(part2_intro_trial);
+
+    if (CONFIG.includeEvalTrials) {
+      tl.push(part2EvalIntroTrial);
+      tl.push(createConfidenceTrial("part2"));
+      tl.push(createFreeEvalTrial("part2"));
     }
 
-    if (CONFIG.debug) {
-        let learnPassI = 1;
-        tl.push(createLearnTrialAnim(
-            DESIGN.randomPoss, G.relations[0], 0, learnPassI, 0)
-        );
-    }
-
-    // Instruction 4 & Task 4 (Spatialpos) for both layout conditions
+    // Instruction Arena task (Spatialpos) for both layout conditions
     // ---------------------------------------------------------------
     tl.push(spatialPosInstrTrial1);
-    for (const layoutType of testLayouts) {
-      tl.push(createConditionTransitionTrial("test4_condition_transition"));
-      tl.push(createSpatialPosTrial(layoutType));
-      tl.push(spatialPosInstrTrial2);
-      tl.push(createPosDrawTrial("first", layoutType));
-        for (let i=0; i<5; i++) {
-            tl.push(createCondPosDrawTrial(layoutType));
-      }
+    tl.push(createSpatialPosTrial(testLayouts[0]));
+    tl.push(spatialPosInstrTrial2);
+    tl.push(createPosDrawTrial("first", testLayouts[0]));
+    for (let i=0; i<5; i++) {
+        tl.push(createCondPosDrawTrial(testLayouts[0]));
     }
-    tl.push(createConfidenceTrial("spatialpos"));
-    tl.push(createFreeEvalTrial("spatialpos"));
+    tl.push(createConditionTransitionTrial("test4_condition_transition"));
+    tl.push(createSpatialPosTrial(testLayouts[1]));
+    tl.push(createPosDrawTrial("first", testLayouts[1]));
+    for (let i=0; i<5; i++) {
+        tl.push(createCondPosDrawTrial(testLayouts[1]));
+    }
+    // }
+    if (CONFIG.includeEvalTrials) {
+      tl.push(createConfidenceTrial("part3"));
+      tl.push(createFreeEvalTrial("part3"));
+    }
 
     // Cheater & Final
     // ---------------
     tl.push(cheater_trial);
-    tl.push(part === 3 ? finalPart3Trial : part === 2 ? finalPart2Trial : finalPart1Trial);
+    tl.push(finalPart3Trial);
 
     return tl;
 }

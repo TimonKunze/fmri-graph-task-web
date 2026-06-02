@@ -144,6 +144,9 @@ const INSTRUCTION_COPY = {
     <p>
       Per questa parte non è prevista una prova di pratica. Prenditi tutto il tempo di cui hai bisogno.
     </p>
+    <p>
+      Dopo aver premuto "Continua", la prova successiva inizierà con il primo insieme di elementi.
+    </p>
     <br>
   `,
     part3Second: `
@@ -320,12 +323,15 @@ const INSTRUCTION_COPY = {
     environment</strong> in a way that seems reasonable to you.
     </p>
     <p>
-    At the beginning, the fruits and vegetables will appear on the right-hand side. To place one in the
+    At the beginning, fruits and vegetables will appear on the right-hand side. To place one in the
     environment, click on it and drag it to the position you think fits best. You can adjust the arrangement
     as often as you like by dragging the items again.
     </p>
     <p>
     There is no practice trial for this part. Take as much time as you need.
+    </p>
+    <p>
+    After pressing "Continue," the next trial will begin with the first set of items.
     </p>
     <br>
   `,
