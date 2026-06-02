@@ -8,13 +8,17 @@ export function createFmriPictureViewingTrial({
   imageWidth = 320,
   imageHeight = imageWidth,
   prompt = "",
+  topHtml = "",
   alt = "Stimulus",
   trialIndex = null,
+  trialName = "part2_single_stimulus",
+  dataExtras = {},
 } = {}) {
   return {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: `
       <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+        ${topHtml}
         ${prompt ? `<p>${prompt}</p>` : ""}
         <img
           src="${imageSrc}"
@@ -27,13 +31,14 @@ export function createFmriPictureViewingTrial({
     trial_duration: duration,
     response_ends_trial: false,
     data: {
-      trial_name: "part2_single_stimulus",
+      trial_name: trialName,
       part: 2,
       block_index: blockIndex,
       trial_index: trialIndex,
       node_index: nodeIndex,
       image_src: imageSrc,
       duration,
+      ...dataExtras,
     },
   };
 }

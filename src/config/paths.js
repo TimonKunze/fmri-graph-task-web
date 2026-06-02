@@ -36,6 +36,8 @@ export const PATHS = {
     language === "it" ? "/participant_info_ital.pdf" : "/participant_info_engl.pdf",
 
   testExample: "./stimuli/other/test_example.png",
+  part2DemoGif1: "/practice_trials/relation_1.gif",
+  part2DemoGif2: "/practice_trials/relation_2.gif",
 
   data_dir: "data",
 };

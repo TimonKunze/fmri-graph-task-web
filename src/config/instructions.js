@@ -104,7 +104,19 @@ const INSTRUCTION_COPY = {
       Usa i tasti freccia sinistra e freccia destra per rispondere.
     </p>
     <p>
-      Per continuare, fai clic su "Continua" e ti mostreremo una breve dimostrazione.
+      Per continuare, premi il tasto freccia destra e ti mostreremo una breve dimostrazione.
+    </p>
+  `,
+    part2Demo: `
+    <h3>Dimostrazione</h3>
+    <p>
+      Questa è solo una <strong>dimostrazione</strong> e <strong>non</strong> fa parte del compito reale.
+    </p>
+    <p>
+      In alto vedrai due brevi animazioni di esempio. Al centro dello schermo vedrai prima una singola immagine e poi una prova di scelta del percorso.
+    </p>
+    <p>
+      Dopo la dimostrazione, potrai ripeterla tutte le volte che vuoi oppure continuare con il compito reale.
     </p>
   `,
     part3First: `
@@ -156,10 +168,17 @@ const INSTRUCTION_COPY = {
     <h2>Task 1</h2>
     <h3>Instructions</h3>
     <p>
-    In this task, you will see several fruits and vegetables arranged in an environment. Your task is to <strong>find a hidden flying figure</strong> by clicking on them. Once you find it, observe where it moves from and where it moves to, and remember this connection.
+    In this task, you will see several fruits and vegetables arranged in an environment. Your task is
+    to <strong>find a hidden flying figure</strong> by clicking on them. Once you find it, observe
+    where it moves from and where it moves to, and remember this connection.
     </p>
     <p>
-    Next, we ask you to <strong>draw the path of the flying figure</strong> by clicking on one fruit or vegetable and dragging the cursor to another. This creates a connection between the two, and a green or red line indicates whether the connection is correct. You can continue to the next trial only after drawing the correct connection or after making more than 10 incorrect attempts. Please note that the positions of the fruits and vegetables may change from time to time, but this should not affect your ability to draw the correct connection.
+    Next, we ask you to <strong>draw the path of the flying figure</strong> by clicking on one fruit
+    or vegetable and dragging the cursor to another. This creates a connection between the two, and
+    a green or red line indicates whether the connection is correct. You can continue to the next trial
+    only after drawing the correct connection or after making more than 10 incorrect attempts. Please
+    note that the positions of the fruits and vegetables may change from time to time, but this should
+    not affect your ability to draw the correct connection.
     </p>
     <p>
     Note that the direction in which you see the flying figure move is not important, because whenever it moves from
@@ -174,7 +193,8 @@ const INSTRUCTION_COPY = {
     with a different flying figure.
     </p>
     <p>
-    Before starting with the first set of items, you will have the chance to complete <strong>two example trials</strong> by
+    Before starting with the first set of items, you will have the chance to complete <strong>two practice
+    trials</strong> by
     clicking "Continue." Afterward, you will complete ${firstSetBlocks} ${firstSetBlockLabelEn} with the first set of items,
     followed by ${secondSetBlocks} ${secondSetBlockLabelEn} with the second set.
     </p>
@@ -211,7 +231,6 @@ const INSTRUCTION_COPY = {
     This time, there is no practice trial, so you can begin right away.
     </p>
   `,
-
     task1Part2: `
     <h1>Part II</h1>
     <br>
@@ -258,7 +277,19 @@ const INSTRUCTION_COPY = {
     Use the left and right arrow keys to respond.
     </p>
     <p>
-    To continue, click 'Continue,' and we will show you a short demo.
+    To continue, press the right arrow key, and we will show you a short demo.
+    </p>
+    `,
+    part2Demo: `
+    <h3>Demo</h3>
+    <p>
+    This is only a <strong>demo</strong> and is <strong>not</strong> part of the real task.
+    </p>
+    <p>
+    At the top, you will see two short example animations. In the middle of the screen, you will first see a single image and then one path-choice trial.
+    </p>
+    <p>
+    After the demo, you can repeat it as often as you like or continue to the real task.
     </p>
     `,
     part3First: `

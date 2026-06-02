@@ -15,6 +15,7 @@ import { age_trial } from "../trials/age_trial.js";
 import { preload_trial } from "../trials/preload_trial.js";
 import { welcome_trial } from "../trials/welcome_trial.js";
 import { part2_intro_trial } from "../trials/part2_intro_trial.js";
+import { createPart2DemoTimeline } from "../trials/part2_demo_trial.js";
 import { createFmriPathChoiceTrial } from "../trials/fmri_path_choice_trial.js";
 import { createFmriPictureViewingTrial } from "../trials/fmri_picture_viewing_trial.js";
 import { consent_trial } from "../trials/consent_trial.js";
@@ -195,27 +196,29 @@ export function makePart2Timeline() {
   };
 
   tl.push(part2_intro_trial);
+  tl.push(createPart2DemoTimeline(shortestPathDistanceMatrix));
 
   const createPart2BlockBreakTrial = (blockIndex) => ({
-    type: jsPsychHtmlButtonResponse,
+    type: jsPsychHtmlKeyboardResponse,
     stimulus: "",
-    choices: [""],
+    choices: ["arrowright"],
     on_start: (trial) => {
       const isItalian = getCurrentLanguage() === "it";
       trial.stimulus = isItalian
         ? `
           <div class="instr-screen">
             <p>Hai completato il blocco ${blockIndex} di ${totalFmriBlocks}.</p>
-            <p>Quando sei pronto/a, fai clic qui sotto per iniziare il blocco successivo.</p>
+            <p>Quando sei pronto/a, premi la freccia destra per iniziare il blocco successivo.</p>
+            <div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>
           </div>
         `
         : `
           <div class="instr-screen">
             <p>You have completed block ${blockIndex} of ${totalFmriBlocks}.</p>
-            <p>When you are ready, click below to start the next block.</p>
+            <p>When you are ready, press the right arrow key to start the next block.</p>
+            <div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>
           </div>
         `;
-      trial.choices = [t({ it: "Inizia il blocco successivo", en: "Start next block" })];
     },
     data: {
       trial_name: "part2_block_break",
