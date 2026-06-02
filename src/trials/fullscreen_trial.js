@@ -12,8 +12,8 @@ function getCopy() {
       ? {
           message: `
             <div style="max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 18px;">
-              <p><strong>Modalita debug: la richiesta di schermo intero viene saltata.</strong></p>
-              <p>Fai clic su continua per procedere.</p>
+              <p><strong>Modalità debug: la richiesta di schermo intero viene saltata.</strong></p>
+              <p>Fai clic su "Continua" per procedere.</p>
             </div>
           `,
           buttonLabel: "Continua (Debug)",
@@ -33,8 +33,8 @@ function getCopy() {
     ? {
         message: `
           <div style="max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 18px;">
-            <p><strong>L'esperimento passera ora alla modalita a schermo intero.</strong></p>
-            <p>Non uscire dallo schermo intero finche lo studio non e completato.</p>
+            <p><strong>L'esperimento passerà ora alla modalità a schermo intero.</strong></p>
+            <p>Non uscire dallo schermo intero finché lo studio non è completato.</p>
           </div>
         `,
         buttonLabel: "Attiva Schermo Intero",

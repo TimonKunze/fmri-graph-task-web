@@ -18,7 +18,7 @@ export const cheater_trial = {
   on_start: (trial) => {
     trial.questions[0].prompt = getInstructions().cheater;
     trial.questions[0].options = t({
-      it: ["Si", "No", "A volte"],
+      it: ["Sì", "No", "A volte"],
       en: ["Yes", "No", "Sometimes"],
     });
     trial.button_label = t({ it: "Continua", en: "Continue" });

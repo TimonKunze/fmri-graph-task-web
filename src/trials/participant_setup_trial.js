@@ -22,7 +22,7 @@ const COPY = {
     missingLanguage: "Please select a language.",
   },
   it: {
-    title: "Impostazione partecipante",
+    title: "Impostazioni del partecipante",
     intro: "Compila i campi seguenti prima di iniziare l'esperimento.",
     subjectLabel: "Codice identificativo del soggetto",
     subjectHint: "Inserisci un numero intero",
@@ -31,7 +31,7 @@ const COPY = {
     languageLabel: "Lingua",
     languagePlaceholder: "Seleziona una lingua",
     continueLabel: "Continua",
-    invalidSubject: "Inserisci un codice soggetto valido come numero intero.",
+    invalidSubject: "Inserisci un codice identificativo valido sotto forma di numero intero.",
     missingLanguage: "Seleziona una lingua.",
   },
 };

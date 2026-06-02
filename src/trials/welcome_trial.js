@@ -19,7 +19,7 @@ function getPartString() {
   if (activeParts.length === 1) {
     const romanPart = romanNumerals[activeParts[0]] ?? String(activeParts[0]);
     return language === "it"
-      ? `alla Parte ${romanPart} del `
+      ? `Parte ${romanPart} del `
       : `Part ${romanPart} of `;
   }
 
@@ -59,6 +59,15 @@ export const welcome_trial = {
   on_start: (trial) => {
     const isPart2Only = CONFIG.part2 && !CONFIG.part1 && !CONFIG.part3;
     const copy = getCopy();
+    const isItalian = getCurrentLanguage() === "it";
+    const partString = getPartString();
+    const heading = partString
+      ? isItalian
+        ? `Benvenuto/a alla ${partString}nostro esperimento!`
+        : `Welcome to ${partString}our experiment!`
+      : isItalian
+        ? "Benvenuto/a al nostro esperimento!"
+        : "Welcome to our experiment!";
     trial.stimulus = `
       <div style="max-width: 700px; margin: 0 auto; font-size: 18px; line-height: 1.6;">
       <img 
@@ -66,7 +75,7 @@ export const welcome_trial = {
           alt="Welcome image fruit salad"
           style="max-width: 250px; height: auto; display: block; margin: 0 auto 24px auto;"
         >
-        <p><strong>${getCurrentLanguage() === "it" ? "Benvenuto/a a " : "Welcome to "}${getPartString()}${getCurrentLanguage() === "it" ? "nostro esperimento!" : "our experiment!"}</strong></p>
+        <p><strong>${heading}</strong></p>
         <p>${copy.prompt}</p>
         ${isPart2Only ? `<div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>` : ""}
       </div>

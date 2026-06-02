@@ -18,16 +18,12 @@ export const PATHS = {
   movingObj2Mirrored: "/stimuli/bats2/moving_obj_mirrored.png",
     
   // Objects Layout 1
-  nodeImages1Small: (i) => `/stimuli/collected_pic/node${getObjectNodeId("set1", i)}.png`, // TODO: don't use small images anymore
+  nodeImages1Small: (i) => `/stimuli/collected_pic/small_imgs/node${getObjectNodeId("set1", i)}.png`,
   nodeImages1: (i) => `/stimuli/collected_pic/node${getObjectNodeId("set1", i)}.png`,
-  // nodeImages1Small: (i) => `/stimuli/collected_pic2/node${getObjectNodeId("set1", i)}.png`, // TODO: don't use small images anymore
-  // nodeImages1: (i) => `/stimuli/collected_pic2/node${getObjectNodeId("set1", i)}.png`,
 
   // Objects Layout 2
-  nodeImages2Small: (i) => `/stimuli/collected_pic/node${getObjectNodeId("set2", i)}.png`,
+  nodeImages2Small: (i) => `/stimuli/collected_pic/small_imgs/node${getObjectNodeId("set2", i)}.png`,
   nodeImages2: (i) => `/stimuli/collected_pic/node${getObjectNodeId("set2", i)}.png`,
-  // nodeImages2Small: (i) => `/stimuli/collected_pic2/node${getObjectNodeId("set2", i)}.png`,
-  // nodeImages2: (i) => `/stimuli/collected_pic2/node${getObjectNodeId("set2", i)}.png`,
 
   dashPath: `/stimuli/other/dash.png`,
   dotPath: `/stimuli/other/dot.png`,

@@ -6,7 +6,7 @@ INPUT_DIR="../public/stimuli/collected_pic/"
 OUTPUT_DIR="../public/stimuli/collected_pic/small_imgs/"
 # Resize width (adjust as needed)
 # RESIZE_WIDTH=85 # size for default imgs
-RESIZE_WIDTH=85 # size for small images
+RESIZE_WIDTH=110 # size for small images
 # Resize height (adjust as needed, 0 to maintain aspect ratio)
 RESIZE_HEIGHT=0
 

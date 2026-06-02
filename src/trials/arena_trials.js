@@ -669,15 +669,13 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
 
     prompt: function () {
       const isItalian = getCurrentLanguage() === "it";
-      const agentLabel = secondStimSet ? (isItalian ? "pipistrello" : "bat") : (isItalian ? "ape" : "bee");
-      const nodeLabel = secondStimSet ? (isItalian ? "chioma" : "treetop") : (isItalian ? "fiore" : "flower");
       return c_type === "first"
         ? isItalian
-          ? `Assicurati che ${agentLabel === "ape" ? "l'ape" : "il pipistrello"} possa raggiungere ogni ${nodeLabel}, cioe che nessun ${nodeLabel} sia scollegato.`
-          : `Make sure the ${agentLabel} can reach each ${nodeLabel}, i.e. no ${nodeLabel} is disconnected.`
+          ? `Assicurati che l'elemento volante possa raggiungere ogni frutto e ortaggio, cioè che nessun elemento sia scollegato.`
+          : `Make sure the flying figure can reach every fruit and vegetable, i.e. no item is disconnected.`
         : isItalian
-          ? `Non tutti i ${nodeLabel === "chioma" ? "punti della chioma" : "fiori"} sono raggiungibili per ${agentLabel === "ape" ? "l'ape" : "il pipistrello"}. Aggiungi una o piu connessioni.`
-          : `Not all ${nodeLabel}s are reachable for the ${agentLabel}. Please add one or more connections.`;
+          ? `Non tutti i frutti e gli ortaggi sono raggiungibili per l'elemento volante. Aggiungi una o più connessioni.`
+          : `Not all fruits and vegetables are reachable for the flying figure. Please add one or more connections.`;
     },
   };
 }

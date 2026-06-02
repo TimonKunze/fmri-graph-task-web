@@ -15,7 +15,7 @@ export const age_trial = {
   ],
   on_start: (trial) => {
     const copy = t({
-      it: { prompt: "Inserisci la tua eta:", placeholder: "es. 25" },
+      it: { prompt: "Inserisci la tua età:", placeholder: "es. 25" },
       en: { prompt: "Please enter your age:", placeholder: "e.g., 25" },
     });
     trial.questions[0].prompt = copy.prompt;

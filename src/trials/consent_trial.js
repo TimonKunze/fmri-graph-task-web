@@ -10,7 +10,7 @@ function getCopy() {
   if (getCurrentLanguage() === "it") {
     return {
       title: "Consenso",
-      intro: "Stai per partecipare a uno studio psicologico che prevede l'osservazione di un'ape che si muove da un fiore all'altro.",
+      intro: "Stai per partecipare a uno studio psicologico in cui ti verrà chiesto di ricordare le connessioni tra elementi.",
       downloadLead: "Scarica e leggi il",
       infoSheet: "foglio informativo per il partecipante",
       infoTail: "Contiene i dettagli dello studio e il modo in cui verranno utilizzati i tuoi dati.",
@@ -33,7 +33,7 @@ function getCopy() {
 
   return {
     title: "Consent",
-    intro: "You are about to participate in a psychological study that involves tracking a bee moving from one flower to another.",
+    intro: "You are about to participate in a psychological study in which you will be asked to remember the connections between items.",
     downloadLead: "Please download and read the",
     infoSheet: "participant information sheet",
     infoTail: "It provides details about the study and how your data will be used.",

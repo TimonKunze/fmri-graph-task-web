@@ -68,25 +68,6 @@ const INSTRUCTION_COPY = {
       Questa volta non c'è una prova di pratica, quindi puoi iniziare subito.
     </p>
   `,
-    task1Part2: `
-    <h1>Parte II</h1>
-    <br>
-    <h2>Compito 1</h2>
-    <h3>Istruzioni</h3>
-    <p>
-      Nella parte di ieri dell'esperimento, hai imparato che l'elemento volante si sposta solo tra alcune coppie di frutti e ortaggi. Queste sono le <strong>connessioni note</strong>.
-    </p>
-    <p>
-      Oggi, l'elemento volante deve spostarsi tra frutti e ortaggi che <strong>non sono direttamente collegati</strong>. Per raggiungerli, deve viaggiare <strong>indirettamente</strong>, passando attraverso altri elementi e usando le <strong>connessioni note di ieri</strong>.
-    </p>
-    <p>
-      Ogni volta che l'elemento volante si ferma su un elemento intermedio, questo conta come una sosta e richiede tempo. Il tuo compito è quindi aiutarlo a trovare il percorso con il <strong>minor numero di soste</strong>.
-    </p>
-    <p>
-      Nella parte seguente, svolgerai questo compito per l'elemento volante.
-    </p>
-    <br>
-  `,
     part2Intro: `
     <h1>Parte II</h1>
     <br>
@@ -113,7 +94,7 @@ const INSTRUCTION_COPY = {
       Questa è solo una <strong>dimostrazione</strong> e <strong>non</strong> fa parte del compito reale.
     </p>
     <p>
-      In alto vedrai due brevi animazioni di esempio. Al centro dello schermo vedrai prima una singola immagine e poi una prova di scelta del percorso.
+      In alto vedrai tre brevi video di esempio. Al centro dello schermo vedrai prima immagini singole e poi una prova di scelta del percorso.
     </p>
     <p>
       Dopo la dimostrazione, potrai ripeterla tutte le volte che vuoi oppure continuare con il compito reale.
@@ -132,7 +113,7 @@ const INSTRUCTION_COPY = {
     </p>
   `,
     part3First: `
-    <h2>Compito 2</h2>
+    <h2>Parte III</h2>
     <h3>Istruzioni</h3>
     <br>
     <p>
@@ -154,8 +135,10 @@ const INSTRUCTION_COPY = {
     <p>
       Successivamente, ti mostreremo l'ambiente con i frutti e gli ortaggi disposti come li hai collocati in precedenza. Questa volta, ti chiediamo di <strong>disegnare le connessioni note</strong> così come le ricordi.
     </p>
-    <p>
-      Come nel compito precedente, puoi disegnare le connessioni <strong>trascinando il cursore</strong> da un frutto o ortaggio a un altro. Se vuoi rimuovere una connessione che hai già disegnato, puoi <strong>fare doppio clic</strong> su di essa oppure usare il <strong>pulsante di reset</strong>, che elimina tutte le connessioni disegnate in una sola volta.
+    <p>Come nel compito di ieri, puoi disegnare le connessioni <strong>trascinando il cursore</strong> da un frutto
+    o ortaggio a un altro. Se vuoi rimuovere una connessione che hai già disegnato, puoi <strong>fare
+    doppio clic</strong> su di essa oppure usare il <strong>pulsante di reset</strong>, che elimina
+    tutte le connessioni disegnate in una sola volta.
     </p>
     <p>
       Assicurati che l'elemento volante possa raggiungere ogni frutto e ortaggio attraverso almeno una connessione.
@@ -246,36 +229,12 @@ const INSTRUCTION_COPY = {
     This time, there is no practice trial, so you can begin right away.
     </p>
   `,
-    task1Part2: `
-    <h1>Part II</h1>
-    <br>
-    <h2>Task 1</h2>
-    <h3>Instructions</h3>
-    <p>
-    In yesterday's part of the experiment, you learned that the flying figure moves only between certain pairs of fruits and
-    vegetables. These are the <strong>known connections</strong>.
-    </p>
-    <p>
-    Today, the flying figure needs to move between fruits and vegetables that are <strong>not directly
-    connected</strong>. To reach them, it must travel <strong>indirectly</strong> by
-    passing through other fruits and vegetables using the <strong>known connections from yesterday</strong>.
-    </p>
-    <p>
-    Each time the flying figure stops at an intermediate item, this counts as a stopover and takes time.
-    Your task is therefore to help it find the route with the <strong>fewest stopovers</strong>.
-    </p>
-    <p>
-    In the following, you will carry out this task for the flying figure.
-    </p>
-    <br>
-    `,
     part2Intro: `
     <h1>Part II</h1>
     <br>
     <h3>Instructions</h3>
     <p>
-    In yesterday's part of the experiment, you learned that the flying figure moves only between
-    certain pairs of fruits and vegetables. These are the <strong>known connections</strong>.
+    In yesterday's part of the experiment, you learned that the flying figures moved only between certain pairs of fruits and vegetables. These are the <strong>known connections</strong>.
     </p>
     <p>
     Today, you will first see single images of fruits and vegetables, presented one after another.
@@ -287,7 +246,7 @@ const INSTRUCTION_COPY = {
     will not form a known connection. 
     </p>
     <p>
-    Your task is to decide which of the two images can be reached from the previous image using
+    Your task is to decide which of the two items can be reached from the previous item using
     <strong>fewer known connections</strong>, while taking the role of the flying figure.
     </p>
     <p>
@@ -299,7 +258,7 @@ const INSTRUCTION_COPY = {
     `,
     part2Demo: `
     <p>
-    Imagine that, yesterday, you learned these three known connections, while all other connections are unknown.
+    Imagine that, yesterday, you learned these three known connections, while all other connections remained unknown.
     </p>
     `,
     part2Start: `
@@ -319,8 +278,7 @@ const INSTRUCTION_COPY = {
     <h3>Instructions</h3>
     <br>
     <p>
-    In the next part of the experiment, we ask you to <strong>arrange the fruits and vegetables in the
-    environment</strong> in a way that seems reasonable to you.
+    In the next part of the experiment, we ask you to <strong>arrange the fruits and vegetables in the environment</strong> in a way that seems reasonable to you.
     </p>
     <p>
     At the beginning, fruits and vegetables will appear on the right-hand side. To place one in the
@@ -342,7 +300,7 @@ const INSTRUCTION_COPY = {
     This time, we ask you to <strong>draw the known connections</strong> as you remember them.
     </p>
     <p>
-    As in the earlier task, you can draw connections by <strong>dragging the cursor</strong> from one fruit or vegetable
+    As in yesterday's task, you can draw connections by <strong>dragging the cursor</strong> from one fruit or vegetable
     to another. If you want to remove a connection you have already drawn, you can <strong>double-click</strong> on it
     or use the <strong>reset button</strong>, which deletes all previously drawn connections at once.
     </p>

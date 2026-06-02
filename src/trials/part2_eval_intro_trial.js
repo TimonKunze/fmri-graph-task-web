@@ -14,7 +14,7 @@ export const part2EvalIntroTrial = {
       <div class="instr-screen">
         <h3>${t({ it: "Valutazione del compito precedente", en: "Evaluation of the Previous Task" })}</h3>
         <p>${t({
-          it: "Prima di iniziare la Parte III, ti chiediamo di ripensare brevemente al Parte II.",
+          it: "Prima di iniziare la Parte III, ti chiediamo di ripensare brevemente alla Parte II.",
           en: "Before starting Part III, please briefly think back to Part II.",
         })}</p>
         <p>${t({

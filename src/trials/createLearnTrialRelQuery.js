@@ -57,9 +57,7 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
       const prompt = isItalian
         ? `Indica se la connessione tra i due frutti e ortaggi mostrati era nota oppure no all'elemento volante.`
         : `Please indicate whether the connection between the two shown fruits and vegetables was known to the flying figure or not.`;
-      const nodeAlt = isItalian
-        ? nodeLabel === "flower" ? "fiore" : "chioma"
-        : nodeLabel;
+      const nodeAlt = isItalian ? "elemento" : "item";
       trial.stimulus = `
         <div style="${wrapStyle}">
           <p>${prompt}</p>
