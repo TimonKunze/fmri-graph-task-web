@@ -6,7 +6,7 @@ import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
 import * as jsPsychModule from "jspsych";
 import makeP5JSPlugin from "../plugins/jspsych-p5js-plugin/plugin-p5js.js";
 
-export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") {
+export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "", { nodeImagePathOverride = null } = {}) {
     
   const jsPsychP5JS = makeP5JSPlugin(jsPsychModule);
   const attemptout = CONFIG.maxAttemptsDraw;
@@ -16,9 +16,9 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "") 
   const nodeSize = secondStimSet
     ? SIZES.task14Treetop
     : SIZES.task14Flower;
-  const nodeImageSmallPath = secondStimSet
+  const nodeImageSmallPath = nodeImagePathOverride ?? (secondStimSet
     ? PATHS.nodeImages2Small
-    : PATHS.nodeImages1Small;
+    : PATHS.nodeImages1Small);
 
   let trialEnded = false;
 

@@ -4,6 +4,11 @@ import { getCurrentLanguage } from "../state/participant.js";
 
 function getPartString() {
   const language = getCurrentLanguage();
+  const romanNumerals = {
+    1: "I",
+    2: "II",
+    3: "III",
+  };
   const activeParts = [
     CONFIG.part1 ? 1 : null,
     CONFIG.part2 ? 2 : null,
@@ -11,9 +16,10 @@ function getPartString() {
   ].filter(Number.isFinite);
 
   if (activeParts.length === 1) {
+    const romanPart = romanNumerals[activeParts[0]] ?? String(activeParts[0]);
     return language === "it"
-      ? `alla PARTE ${activeParts[0]} del `
-      : `PART ${activeParts[0]} of `;
+      ? `alla Parte ${romanPart} del `
+      : `Part ${romanPart} of `;
   }
 
   return "";

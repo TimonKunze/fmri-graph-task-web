@@ -10,6 +10,47 @@ function cheerUpFromFraction(fraction) {
   return isItalian ? "Coraggio, puoi fare meglio!" : "Arrgh! I'm sure you can do better!";
 }
 
+function formatBlockLabel(block, isItalian) {
+  if (block === "sample") {
+    return isItalian ? "blocco di pratica" : "practice block";
+  }
+
+  const ordinalMap = isItalian
+    ? {
+        first: "primo",
+        second: "secondo",
+        third: "terzo",
+        fourth: "quarto",
+        fifth: "quinto",
+        sixth: "sesto",
+      }
+    : {
+        first: "first",
+        second: "second",
+        third: "third",
+        fourth: "fourth",
+        fifth: "fifth",
+        sixth: "sixth",
+      };
+
+  const setLabel = block.startsWith("rotational")
+    ? isItalian ? "primo insieme" : "first set"
+    : block.startsWith("unconstrained")
+      ? isItalian ? "secondo insieme" : "second set"
+      : "";
+
+  const ordinalKey = Object.keys(ordinalMap).find((key) => block.includes(key));
+  const ordinalLabel = ordinalKey ? ordinalMap[ordinalKey] : block;
+
+  if (!setLabel || !ordinalKey) {
+    return block;
+  }
+
+  return isItalian
+    ? `${ordinalLabel} blocco del ${setLabel}`
+    : `${ordinalLabel} block of the ${setLabel}`;
+}
+
 export function createDrawingTrialSummary(jsPsych, trlsBack, block = "") {
   if (!Number.isFinite(trlsBack) || trlsBack <= 0) {
     throw new Error("[createDrawingTrialSummary] trlsBack must be a positive number");
@@ -33,19 +74,11 @@ export function createDrawingTrialSummary(jsPsych, trlsBack, block = "") {
 
       const cheerUp = cheerUpFromFraction(fraction);
       const isItalian = getCurrentLanguage() === "it";
-      const blockLabel = block
-        .replaceAll("rotational", isItalian ? "rotazionale" : "rotational")
-        .replaceAll("unconstrained", isItalian ? "non vincolato" : "unconstrained")
-        .replaceAll("first", isItalian ? "primo" : "first")
-        .replaceAll("second", isItalian ? "secondo" : "second")
-        .replaceAll("third", isItalian ? "terzo" : "third")
-        .replaceAll("fourth", isItalian ? "quarto" : "fourth")
-        .replaceAll("fifth", isItalian ? "quinto" : "fifth")
-        .replaceAll("sixth", isItalian ? "sesto" : "sixth");
+      const blockLabel = formatBlockLabel(block, isItalian);
 
       trial.stimulus = `
         <div class="instr-screen">
-          <p>${isItalian ? `Ben fatto. Hai completato il blocco ${blockLabel}.` : `Well done. You finished the ${block} block.`}</p>
+          <p>${isItalian ? `Ben fatto. Hai completato il ${blockLabel}.` : `Well done. You finished the ${blockLabel}.`}</p>
           <br />
           <p>${isItalian ? `Hai disegnato correttamente il <strong>${pct}%</strong> delle connessioni al primo tentativo.` : `You drew <strong>${pct}%</strong> connections correctly on the first try.`}</p>
           <p>${cheerUp}</p>

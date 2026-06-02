@@ -15,7 +15,7 @@ export function createLearnTrialAnim(
   learnPassI,
   rotAngle,
   type,
-  { adjMat = null, staticFlag = false } = {}
+  { adjMat = null, staticFlag = false, nodeImagePathOverride = null } = {}
 ) {
   const P5Plugin = makeP5JSPlugin(jsPsychModule);
   const nbNodes = nodePos.length;
@@ -31,9 +31,9 @@ export function createLearnTrialAnim(
   const movingObjMirroredPath = secondStimSet
     ? PATHS.movingObj2Mirrored
     : PATHS.movingObj1Mirrored;
-  const nodeImageSmallPath = secondStimSet
+  const nodeImageSmallPath = nodeImagePathOverride ?? (secondStimSet
     ? PATHS.nodeImages2Small
-    : PATHS.nodeImages1Small;
+    : PATHS.nodeImages1Small);
 
   let saveNodesClicked = [];
   let trialEnded = false;

@@ -1,24 +1,22 @@
 const baseConfig = {
-  mode: "prod", // "dev" | "prod"
+  mode: "dev", // "dev" | "prod"
 
   // Flags
-  part1: true,
-  part2: false,
+  part1: false,
+  part2: true,
   part3: false,
-
-  showNum: false,
 
   graphHex: "10248905",  // TODO: change to correct graph
   varType: "unconstrained", // or "rotational"
 
   feedback: true,
-
   keyChoice: null,
 };
 
 const configProfiles = {
   dev: {
     debug: true,
+    telegram: false,
     quick_run: true,
     randomize: false,
     nbLearnBlocks: [1, 1],
@@ -27,6 +25,7 @@ const configProfiles = {
   },
   prod: {
     debug: false,
+    telegram: true,
     quick_run: false,
     randomize: true,
     nbLearnBlocks: [3, 3],

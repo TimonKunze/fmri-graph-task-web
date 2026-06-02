@@ -34,17 +34,6 @@ export const testOneInstrTrial2 = {
                 : "We provide you with <strong>two unknown pairs of flowers</strong>, and ask you to judge which indirect route from flower to flower via known connections requires the least stopovers."
             }
             </p>
-
-            <p>${isItalian ? "Il compito si presenta cosi:" : "The task looks like this:"}</p>
-
-            <p>
-            <img
-                alt="${isItalian ? "Esempio del compito" : "Example of the task"}"
-                src="${PATHS.testExample}"
-                style="max-width:${stim_width_ex}px;max-height:${stim_width_ex}px;"
-            >
-            </p>
-
             <p>
             ${
               isItalian

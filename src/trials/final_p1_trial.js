@@ -8,9 +8,9 @@ export const finalTrialP1 = {
   choices: [""],
   on_start: (trial) => {
     trial.stimulus = getCurrentLanguage() === "it"
-      ? `<p>Hai completato l'ultimo compito della parte I.</p><br>`
-      : `<p>You have finished the last task of part I.</p><br>`;
-    trial.choices = [t({ it: "Vai alla parte II", en: "Go to part II" })];
+      ? `<p>Hai completato l'ultimo compito della Parte I.</p><br>`
+      : `<p>You have finished the last task of Part I.</p><br>`;
+    trial.choices = [t({ it: "Vai alla Parte II", en: "Go to Part II" })];
   },
   // on_start: function() {
   //   // Download and save the data

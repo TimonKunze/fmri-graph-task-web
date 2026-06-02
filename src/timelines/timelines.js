@@ -10,6 +10,7 @@ import { createDrawingTrial } from "../trials/createDrawingTrial.js";
 import { gender_trial } from "../trials/gender_trial.js";
 import { learnInstrEndTrial } from "../trials/learn_instr_end_trial.js";
 import { learnInstrTrial } from "../trials/learn_instr_trial.js";
+import { learnSetTransitionTrial } from "../trials/learn_set_transition_trial.js";
 import { age_trial } from "../trials/age_trial.js";
 import { preload_trial } from "../trials/preload_trial.js";
 import { welcome_trial } from "../trials/welcome_trial.js";
@@ -51,6 +52,23 @@ export function makeLearnIntroTimeline(config = CONFIG) {
 
   const learnPassI = null;
   const sampleRels = G_SAMPLE.relations;
+  const orderedLayouts = getLearnLayoutOrder();
+  const fallbackLayouts = [];
+  if (Array.isArray(config.nbLearnBlocks)) {
+    for (let i = 0; i < Number(config.nbLearnBlocks[0] ?? 0); i++) fallbackLayouts.push("rotational");
+    for (let i = 0; i < Number(config.nbLearnBlocks[1] ?? 0); i++) fallbackLayouts.push("unconstrained");
+  } else {
+    fallbackLayouts.push(config.varType);
+  }
+  const firstLayoutType = (orderedLayouts ?? fallbackLayouts)[0] ?? "rotational";
+  const sampleType = firstLayoutType;
+  const sampleNodePathFn = firstLayoutType === "unconstrained"
+    ? PATHS.nodeImages2Small
+    : PATHS.nodeImages1Small;
+  const firstSetIndices = Array.from({ length: G.nbNodes }, (_, i) => i)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, G_SAMPLE.nodepos.length);
+  const sampleNodeImagePath = (index) => sampleNodePathFn(firstSetIndices[index]);
 
   for (let trialI = 0; trialI < sampleRels.length; trialI++) {
     tl.push(
@@ -60,8 +78,8 @@ export function makeLearnIntroTimeline(config = CONFIG) {
         trialI,
         learnPassI,
         0,
-        "sample",
-        config
+        sampleType,
+        { ...config, nodeImagePathOverride: sampleNodeImagePath }
       )
     );
 
@@ -71,7 +89,8 @@ export function makeLearnIntroTimeline(config = CONFIG) {
         G_SAMPLE.relations[trialI],
         trialI,
         null,
-        "sample"
+        sampleType,
+        { nodeImagePathOverride: sampleNodeImagePath }
       )
     );
   }
@@ -112,28 +131,6 @@ export function makeLearnTimeline() {
   let blockCounter = 0;
   let relQueryInstrShown = false;
 
-  const makePhaseTransitionTrial = (phaseName) => ({
-    type: jsPsychHtmlButtonResponse,
-    stimulus: "",
-    choices: [""],
-    on_start: (trial) => {
-      const isItalian = getCurrentLanguage() === "it";
-      const phaseLabel = phaseName === "rotational"
-        ? isItalian ? "rotazionale" : "rotational"
-        : isItalian ? "non vincolata" : "unconstrained";
-      trial.stimulus = `
-        <div class="instr-screen">
-          <p>${isItalian ? `Stai per iniziare la fase di apprendimento <strong>${phaseLabel}</strong>.` : `You are now starting the <strong>${phaseLabel}</strong> learning phase.`}</p>
-        </div>
-      `;
-      trial.choices = [t({ it: "Continua", en: "Continue" })];
-    },
-    data: {
-      trial_name: "learn_phase_transition",
-      learn_phase: phaseName,
-    },
-  });
-
   const pushBlock = (layoutType, nodePositions) => {
     blockCounter += 1;
     const ordinalBlock = blockNames[blockCounter - 1] ?? `block_${blockCounter}`;
@@ -164,10 +161,10 @@ export function makeLearnTimeline() {
   let previousLayout = null;
 
   for (const layoutType of learnLayouts) {
-    if (layoutType !== previousLayout) {
-      tl.push(makePhaseTransitionTrial(layoutType));
-      previousLayout = layoutType;
+    if (previousLayout !== null && layoutType !== previousLayout) {
+      tl.push(learnSetTransitionTrial);
     }
+    previousLayout = layoutType;
     pushBlock(layoutType, layoutType === "rotational" ? DESIGN.rotationPos : DESIGN.randomPoss);
   }
 

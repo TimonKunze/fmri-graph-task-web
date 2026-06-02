@@ -7,7 +7,6 @@ import { getCurrentLanguage } from "../state/participant.js";
 
 export function createFinalTrial(part) {
   const isNumber = Number.isFinite(part);
-  const showDataButton = CONFIG.debug ? ["Show data."] : [];
 
   return {
     type: jsPsychHtmlButtonResponse,
@@ -25,14 +24,11 @@ export function createFinalTrial(part) {
         <div style="max-width: 800px; margin: 0 auto; line-height: 1.6; text-align: left;">
           <p>${isItalian ? "Hai completato l'ultimo compito" : "You've finished the last task"}${partInsert}.</p>
           <h3>${seeYou}${isItalian ? "Grazie per la partecipazione!" : "Thank you for participating!"}</h3>
-          <p>${isItalian ? "Questa schermata si chiudera automaticamente tra 5 secondi." : "This screen will close automatically after 5 seconds."}</p>
         </div>
       `;
     },
 
-    trial_duration: 5000,
-
-    choices: showDataButton,
+    choices: [],
 
     data: {
       trial_name: "final_learn_trial",
@@ -40,11 +36,10 @@ export function createFinalTrial(part) {
     },
 
     on_start: (trial) => {
-      if (CONFIG.debug) {
-        trial.choices = [getCurrentLanguage() === "it" ? "Mostra dati." : "Show data."];
-      }
       const partLabel = isNumber ? part : "n/a";
+      if (CONFIG.telegram) {
         sendMessage(`${jsPsych.data.subject_id} part **${partLabel}** finish.`);
+      }
     },
 
     on_finish: (data) => {
