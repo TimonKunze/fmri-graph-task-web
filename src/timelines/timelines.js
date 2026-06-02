@@ -39,7 +39,7 @@ import { finalPart3Trial } from "../trials/final_part3_trial.js";
 import { PATHS } from "../config/paths.js";
 import { jsPsych } from "../main.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
-import { getFmriTrialBlocks, getLearnLayoutOrder, getTestLayoutOrder } from "../state/subjectAssignment.js";
+import { getFmriTrialBlocks, getLearnLayoutOrder, getSubjectAssignment, getTestLayoutOrder } from "../state/subjectAssignment.js";
 import { createShortestPathDistanceMatrix } from "../utils/graph-tools.js";
 
 // ------------------------------------
@@ -190,6 +190,40 @@ export function makePart2Timeline() {
   const fmriBlocks = (getFmriTrialBlocks() ?? []).filter(Array.isArray);
   const totalFmriBlocks = fmriBlocks.length;
   const shortestPathDistanceMatrix = createShortestPathDistanceMatrix(G.adjM);
+  const assignment = getSubjectAssignment();
+  const expToCanonical = (assignment.nodeToGraph ?? []).map((value) => Number(value) - 1);
+  const canonicalToExp = new Array(expToCanonical.length);
+  expToCanonical.forEach((canonicalIndex, experimentIndex) => {
+    canonicalToExp[canonicalIndex] = experimentIndex;
+  });
+  const learnLayoutOrder = getLearnLayoutOrder();
+  const firstStimSet = learnLayoutOrder?.[0] === "unconstrained" ? "set2" : "set1";
+  const secondStimSet = firstStimSet === "set1" ? "set2" : "set1";
+  const decodeFmriNode = (rawNode) => {
+    if (!Number.isInteger(rawNode) || rawNode < 0 || rawNode >= G.nbNodes * 2) {
+      throw new Error(`[makePart2Timeline] Invalid fMRI node index: ${rawNode}`);
+    }
+
+    const graphNodeIndex = rawNode % G.nbNodes;
+    const stimSet = rawNode < G.nbNodes ? firstStimSet : secondStimSet;
+    const experimentNodeIndex = canonicalToExp[graphNodeIndex];
+
+    if (!Number.isInteger(experimentNodeIndex)) {
+      throw new Error(
+        `[makePart2Timeline] Could not map graph node ${graphNodeIndex} to experiment node for raw fMRI node ${rawNode}.`
+      );
+    }
+
+    return {
+      rawNode,
+      stimSet,
+      graphNodeIndex,
+      experimentNodeIndex,
+      imageSrc: stimSet === "set2"
+        ? PATHS.nodeImages2(experimentNodeIndex)
+        : PATHS.nodeImages1(experimentNodeIndex),
+    };
+  };
   const sampleFmriItiSeconds = () => {
     while (true) {
       const sample = -3 * Math.log(1 - Math.random());
@@ -258,21 +292,29 @@ export function makePart2Timeline() {
 
   fmriBlocks.forEach((block, blockIndex) => {
     let previousNodeIndex = null;
+    let previousStimSet = null;
     let previousItiSeconds = null;
     const blockItems = CONFIG.debug ? block.slice(0, 8) : block;
 
     blockItems.forEach((item, trialIndex) => {
       if (Number.isInteger(item)) {
+        const decodedNode = decodeFmriNode(item);
         tl.push(
           createFmriPictureViewingTrial({
-            imageSrc: PATHS.nodeImages1(item),
-            nodeIndex: item,
+            imageSrc: decodedNode.imageSrc,
+            nodeIndex: decodedNode.experimentNodeIndex,
             blockIndex,
             duration: 2000,
             trialIndex,
+            dataExtras: {
+              raw_node_index: decodedNode.rawNode,
+              graph_node_index: decodedNode.graphNodeIndex,
+              stim_set: decodedNode.stimSet,
+            },
           })
         );
-        previousNodeIndex = item;
+        previousNodeIndex = decodedNode.experimentNodeIndex;
+        previousStimSet = decodedNode.stimSet;
         if (trialIndex < blockItems.length - 1) {
           const itiSeconds = sampleFmriItiSeconds();
           tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
@@ -282,12 +324,23 @@ export function makePart2Timeline() {
       }
 
       if (Array.isArray(item) && item.length === 2) {
-        const [leftNodeIndex, rightNodeIndex] = item;
+        const leftNode = decodeFmriNode(item[0]);
+        const rightNode = decodeFmriNode(item[1]);
+        if (leftNode.stimSet !== rightNode.stimSet) {
+          throw new Error(
+            `[makePart2Timeline] fMRI choice pair spans two stimulus sets: ${item[0]} (${leftNode.stimSet}) vs ${item[1]} (${rightNode.stimSet}).`
+          );
+        }
+        if (previousStimSet !== null && previousStimSet !== leftNode.stimSet) {
+          throw new Error(
+            `[makePart2Timeline] fMRI choice pair stimulus set ${leftNode.stimSet} does not match previous stimulus set ${previousStimSet}.`
+          );
+        }
         const leftPathLength = Number.isInteger(previousNodeIndex)
-          ? shortestPathDistanceMatrix[previousNodeIndex]?.[leftNodeIndex] ?? null
+          ? shortestPathDistanceMatrix[previousNodeIndex]?.[leftNode.experimentNodeIndex] ?? null
           : null;
         const rightPathLength = Number.isInteger(previousNodeIndex)
-          ? shortestPathDistanceMatrix[previousNodeIndex]?.[rightNodeIndex] ?? null
+          ? shortestPathDistanceMatrix[previousNodeIndex]?.[rightNode.experimentNodeIndex] ?? null
           : null;
         const correctChoice = leftPathLength === null || rightPathLength === null
           ? null
@@ -297,21 +350,28 @@ export function makePart2Timeline() {
 
         tl.push(
           createFmriPathChoiceTrial({
-            leftImageSrc: PATHS.nodeImages1(leftNodeIndex),
-            rightImageSrc: PATHS.nodeImages1(rightNodeIndex),
-            leftNodeIndex,
-            rightNodeIndex,
+            leftImageSrc: leftNode.imageSrc,
+            rightImageSrc: rightNode.imageSrc,
+            leftNodeIndex: leftNode.experimentNodeIndex,
+            rightNodeIndex: rightNode.experimentNodeIndex,
             referenceNodeIndex: previousNodeIndex,
             itiSecondsPrevious: previousItiSeconds,
             leftPathLength,
             rightPathLength,
             correctChoice,
-            stimSet: "set1",
+            stimSet: leftNode.stimSet,
             blockIndex,
             trialIndex,
+            dataExtras: {
+              left_raw_node_index: leftNode.rawNode,
+              right_raw_node_index: rightNode.rawNode,
+              left_graph_node_index: leftNode.graphNodeIndex,
+              right_graph_node_index: rightNode.graphNodeIndex,
+            },
           })
         );
         previousNodeIndex = null;
+        previousStimSet = null;
         if (trialIndex < blockItems.length - 1) {
           const itiSeconds = sampleFmriItiSeconds();
           tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
