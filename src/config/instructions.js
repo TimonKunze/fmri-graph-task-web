@@ -87,24 +87,27 @@ const INSTRUCTION_COPY = {
     </p>
     <br>
   `,
-    taskPart2Intro: `
+    part2Intro: `
     <h1>Parte II</h1>
     <br>
-    <h2>Istruzioni</h2>
+    <h3>Istruzioni</h3>
     <p>
-      In questa parte continuerai a usare le connessioni note apprese in precedenza.
+      Nella parte di ieri dell'esperimento, hai imparato che l'elemento volante si sposta solo tra alcune coppie di frutti e ortaggi. Queste sono le <strong>connessioni note</strong>.
     </p>
     <p>
-      In ogni prova, vedrai prima un singolo frutto o ortaggio. Successivamente, vedrai due frutti o ortaggi e dovrai decidere quale dei due può essere raggiunto dal primo con il minor numero di soste, passando attraverso le connessioni note.
+      Oggi, vedrai prima immagini singole di frutti e ortaggi, presentate una dopo l'altra. Ti preghiamo di osservare attentamente ciascuna immagine.
     </p>
     <p>
-      Ti preghiamo di basare la tua risposta sulle connessioni apprese in precedenza e di contare attentamente il numero di soste.
+      A volte, dopo un'immagine singola, appariranno due immagini. In questi casi, cerca di ricordare l'immagine singola mostrata immediatamente prima. A differenza di ieri, le due immagini non formeranno una connessione nota. Il tuo compito sarà decidere quale delle due immagini può essere raggiunta a partire dall'immagine precedente usando un numero minore di connessioni note, assumendo il ruolo dell'elemento volante.
     </p>
     <p>
       Usa i tasti freccia sinistra e freccia destra per rispondere.
     </p>
+    <p>
+      Per continuare, fai clic su "Continua" e ti mostreremo una breve dimostrazione.
+    </p>
   `,
-    task2Part2First: `
+    part3First: `
     <h2>Compito 2</h2>
     <h3>Istruzioni</h3>
     <br>
@@ -119,7 +122,7 @@ const INSTRUCTION_COPY = {
     </p>
     <br>
   `,
-    task2Part2Sec: `
+    part3Second: `
     <h3>Istruzioni</h3>
     <p>
       Successivamente, ti mostreremo l'ambiente con i frutti e gli ortaggi disposti come li hai collocati in precedenza. Questa volta, ti chiediamo di <strong>disegnare le connessioni note</strong> così come le ricordi.
@@ -210,46 +213,56 @@ const INSTRUCTION_COPY = {
   `,
 
     task1Part2: `
-      <h1>Part II</h1>
-      <br>
-      <h2>Task 1</h2>
-      <h3>Instructions</h3>
-      <p>
-      In yesterday's part of the experiment, you learned that the flying figure moves only between certain pairs of fruits and vegetables. These are the <strong>known connections</strong>.
-      </p>
-      <p>
-      Today, the flying figure needs to move between fruits and vegetables that are <strong>not directly
-      connected</strong>. To reach them, it must travel <strong>indirectly</strong> by
-      passing through other fruits and vegetables using the <strong>known connections from yesterday</strong>.
-      </p>
-      <p>
-      Each time the flying figure stops at an intermediate item, this counts as a stopover and takes time.
-      Your task is therefore to help it find the route with the <strong>fewest stopovers</strong>.
-      </p>
-      <p>
-      In the following, you will carry out this task for the flying figure.
-      </p>
-      <br>
+    <h1>Part II</h1>
+    <br>
+    <h2>Task 1</h2>
+    <h3>Instructions</h3>
+    <p>
+    In yesterday's part of the experiment, you learned that the flying figure moves only between certain pairs of fruits and
+    vegetables. These are the <strong>known connections</strong>.
+    </p>
+    <p>
+    Today, the flying figure needs to move between fruits and vegetables that are <strong>not directly
+    connected</strong>. To reach them, it must travel <strong>indirectly</strong> by
+    passing through other fruits and vegetables using the <strong>known connections from yesterday</strong>.
+    </p>
+    <p>
+    Each time the flying figure stops at an intermediate item, this counts as a stopover and takes time.
+    Your task is therefore to help it find the route with the <strong>fewest stopovers</strong>.
+    </p>
+    <p>
+    In the following, you will carry out this task for the flying figure.
+    </p>
+    <br>
     `,
-    taskPart2Intro: `
-      <h1>Part II</h1>
-      <br>
-      <h2>Instructions</h2>
-      <p>
-        In this part, you will continue to use the known connections you learned earlier.
-      </p>
-      <p>
-        On each trial, you will first see a single fruit or vegetable. After that, you will see two fruits or vegetables and decide which of the two can be reached from the first with fewer stopovers by moving through the known connections.
-      </p>
-      <p>
-        Please base your answer on the connections you learned earlier and count the number of stopovers carefully.
-      </p>
-      <p>
-        Use the left and right arrow keys to respond.
-      </p>
+    part2Intro: `
+    <h1>Part II</h1>
+    <br>
+    <h3>Instructions</h3>
+    <p>
+    In yesterday's part of the experiment, you learned that the flying figure moves only between
+    certain pairs of fruits and vegetables. These are the <strong>known connections</strong>.
+    </p>
+    <p>
+    Today, you will first see single images of fruits and vegetables, presented one after another.
+    Please pay close attention to each image.
+    </p>
+    <p>
+    Occasionally, <strong>two images</strong> will appear after a single image. In those cases,
+    please remember the single image shown immediately before. Unlike yesterday, the two images
+    will not form a known connection. Your task is to decide which of the two images can be
+    reached from the previous image using <strong>fewer known connections</strong>, while taking
+    the role of the flying figure.
+    </p>
+    <p>
+    Use the left and right arrow keys to respond.
+    </p>
+    <p>
+    To continue, click 'Continue,' and we will show you a short demo.
+    </p>
     `,
-    task2Part2First: `
-    <h2>Task 2</h2>
+    part3First: `
+    <h2>Part III</h2>
     <h3>Instructions</h3>
     <br>
     <p>
@@ -266,7 +279,7 @@ const INSTRUCTION_COPY = {
     </p>
     <br>
   `,
-    task2Part2Sec: `
+    part3Second: `
     <h3>Instructions</h3>
     <p>
     Next, we will show you the environment with the fruits and vegetables arranged as you placed them before.
@@ -286,7 +299,7 @@ const INSTRUCTION_COPY = {
     <br>
   `,
     cheater: `
-    <h3>Congratulations, you are nearly done. One last question:</h3>
+    <h3>Congratulations, you are nearly done. One very last question:</h3>
     <br>
     <p>
     Did you use any form of external aid to learn the flying figure's connections in Part I, or to

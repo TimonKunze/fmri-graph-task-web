@@ -12,7 +12,7 @@ export const part2_intro_trial = {
     stim_set: "set1",
   },
   on_start: (trial) => {
-    trial.stimulus = getInstructions().taskPart2Intro;
+    trial.stimulus = getInstructions().part2Intro;
     trial.choices = [t({ it: "Continua", en: "Continue" })];
   },
 };
