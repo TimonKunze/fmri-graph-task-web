@@ -10,7 +10,7 @@ import { SIZES } from "../config/sizes.js";
 import * as htools from "../utils/helper-tools.js";
 
 
-export function createLearnTrials(nodePoss, block, layoutType = CONFIG.varType) {
+export function createLearnTrials(nodePoss, block, layoutType) {
 
   let learnTrialsTL = [];
   const task1TrialLimit = CONFIG.quick_run ? 2 : Number.POSITIVE_INFINITY;

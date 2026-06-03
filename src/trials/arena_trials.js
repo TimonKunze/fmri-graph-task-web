@@ -33,7 +33,7 @@ function getPart3NodeMapping(layoutType) {
 }
 
 
-export function createSpatialPosTrial(layoutType = CONFIG.varType) {
+export function createSpatialPosTrial(layoutType) {
   console.log("PATHS.nodeImages1Small exists?", typeof PATHS.nodeImages1Small);
   console.log("example path [0]:", PATHS.nodeImages1Small?.(0));
   const secondStimSet = useSecondStimSet(layoutType);
@@ -360,7 +360,7 @@ export function createSpatialPosTrial(layoutType = CONFIG.varType) {
 }
 
 
-export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType) {
+export function createPosDrawTrial(c_type = "first", layoutType) {
   // State that must persist across p5 callbacks for this trial instance
   let trialEnded = false;
 
@@ -706,7 +706,7 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
   };
 }
 
-export function createCondPosDrawTrial(layoutType = CONFIG.varType) {
+export function createCondPosDrawTrial(layoutType) {
   return {
     timeline: [createPosDrawTrial("conditional", layoutType)],
     conditional_function: function () {

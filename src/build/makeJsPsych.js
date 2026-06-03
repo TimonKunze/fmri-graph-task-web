@@ -1,10 +1,7 @@
 import { initJsPsych } from "jspsych";
 import { save_data } from "../utils/save_data.js"; // or wherever your save lives
 import { CONFIG } from "../config.js";
-
-function randomID8() {
-  return Math.random().toString(36).slice(2, 10);
-}
+import { getParticipantSetup } from "../state/participant.js";
 
 function computePart({ part1, part2, part3 }) {
   const activeParts = [
@@ -23,7 +20,16 @@ function computePart({ part1, part2, part3 }) {
 export function makeJsPsych({ data_dir }) {
   const part = computePart(CONFIG);
   let debugAdvanceHandler = null;
-  const subject_id = randomID8();
+
+  function makeShortTimestamp() {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const hh = String(now.getHours()).padStart(2, "0");
+    const min = String(now.getMinutes()).padStart(2, "0");
+    return `${yyyy}${mm}${dd}-${hh}${min}`;
+  }
 
   const jsPsych = initJsPsych({
     show_progress_bar: true,
@@ -68,13 +74,13 @@ export function makeJsPsych({ data_dir }) {
 
     on_data_update: (data) => {
       const dataJsonl = JSON.stringify(data) + "\n";
-      const file_name = `${CONFIG.varType}_${subject_id}_p${part}.jsonl`;
+      const participantSetup = getParticipantSetup();
+      const subjectCode = participantSetup?.subjectCode ?? "unknown";
+      const timestamp = makeShortTimestamp();
+      const file_name = `subj${subjectCode}_p${part}_${timestamp}.jsonl`;
       save_data(dataJsonl, data_dir, file_name);
     },
   });
-
-  // make subject_id globally available in data
-  jsPsych.data.addProperties({subject_id});
 
   return jsPsych;
 }

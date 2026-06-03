@@ -6,7 +6,7 @@ export const STIMULUS_CONDITION_MAP = {
 };
 
 export function getLayoutType(typeOrLayout) {
-  if (typeof typeOrLayout !== "string") return CONFIG.varType;
+  if (typeof typeOrLayout !== "string") return "rotational";
   if (typeOrLayout.startsWith("unconstrained")) return "unconstrained";
   if (typeOrLayout.startsWith("rotational")) return "rotational";
   return typeOrLayout;

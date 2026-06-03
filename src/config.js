@@ -15,7 +15,6 @@ const baseConfig = {
   defaultLanguage: "en", // "en" | "it"
 
   graphHex: "10248905",  // TODO: change to correct graph
-  varType: "unconstrained", // or "rotational"
 
   feedback: true,
   includeEvalTrials: true,

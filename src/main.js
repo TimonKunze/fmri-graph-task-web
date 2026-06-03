@@ -39,7 +39,6 @@ function addExperimentProperties() {
   jsPsych.data.addProperties({
     study_id,
     session_id,
-    group_name: CONFIG.varType,
     date: new Date().toDateString(),
     time: new Date().toTimeString(),
     subject_assignment: assignment,

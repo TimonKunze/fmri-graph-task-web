@@ -56,14 +56,10 @@ export function makeLearnIntroTimeline(config = CONFIG) {
   const learnPassI = null;
   const sampleRels = G_SAMPLE.relations;
   const orderedLayouts = getLearnLayoutOrder();
-  const fallbackLayouts = [];
-  if (Array.isArray(config.nbLearnBlocks)) {
-    for (let i = 0; i < Number(config.nbLearnBlocks[0] ?? 0); i++) fallbackLayouts.push("rotational");
-    for (let i = 0; i < Number(config.nbLearnBlocks[1] ?? 0); i++) fallbackLayouts.push("unconstrained");
-  } else {
-    fallbackLayouts.push(config.varType);
+  if (!Array.isArray(orderedLayouts) || orderedLayouts.length === 0) {
+    throw new Error("[makeLearnIntroTimeline] Missing randomized Part I layout order.");
   }
-  const firstLayoutType = (orderedLayouts ?? fallbackLayouts)[0] ?? "rotational";
+  const firstLayoutType = orderedLayouts[0];
   const sampleType = firstLayoutType;
   const sampleNodePathFn = firstLayoutType === "unconstrained"
     ? PATHS.nodeImages2Small
@@ -129,6 +125,9 @@ export function makeCoreTimeline() {
 export function makeLearnTimeline() {
   const tl = [];
   const orderedLayouts = getLearnLayoutOrder();
+  if (!Array.isArray(orderedLayouts) || orderedLayouts.length === 0) {
+    throw new Error("[makeLearnTimeline] Missing randomized Part I layout order.");
+  }
 
   const blockNames = ["first", "second", "third", "fourth", "fifth", "sixth"];
   let blockCounter = 0;
@@ -152,18 +151,9 @@ export function makeLearnTimeline() {
     }
   };
 
-  const fallbackLayouts = [];
-  if (Array.isArray(CONFIG.nbLearnBlocks)) {
-    for (let i = 0; i < Number(CONFIG.nbLearnBlocks[0] ?? 0); i++) fallbackLayouts.push("rotational");
-    for (let i = 0; i < Number(CONFIG.nbLearnBlocks[1] ?? 0); i++) fallbackLayouts.push("unconstrained");
-  } else {
-    fallbackLayouts.push(CONFIG.varType);
-  }
-
-  const learnLayouts = orderedLayouts ?? fallbackLayouts;
   let previousLayout = null;
 
-  for (const layoutType of learnLayouts) {
+  for (const layoutType of orderedLayouts) {
     if (previousLayout !== null && layoutType !== previousLayout) {
       tl.push(learnSetTransitionTrial);
     }
@@ -397,6 +387,9 @@ export function makePart2Timeline() {
 export function makePart3Timeline() {
     let tl = [];
     const testLayouts = getTestLayoutOrder();
+    if (!Array.isArray(testLayouts) || testLayouts.length < 2) {
+      throw new Error("[makePart3Timeline] Missing randomized Part III layout order.");
+    }
 
     if (CONFIG.includeEvalTrials) {
       tl.push(part2EvalIntroTrial);

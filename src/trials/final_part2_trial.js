@@ -24,7 +24,8 @@ export const finalPart2Trial = {
   },
   on_start: () => {
     if (CONFIG.telegram) {
-      sendMessage(`${jsPsych.data.subject_id} part **2** finish.`);
+      const subjectCode = jsPsych.data.get().last(1).values()[0]?.subject_identity_code ?? "unknown";
+      sendMessage(`${subjectCode} part **2** finish.`);
     }
   },
   on_finish: (data) => {
