@@ -57,3 +57,14 @@ The experiment saves a combination of global metadata and trial-specific fields 
 - Part II single-image trials save the shown node with fields such as `node_index`, `raw_node_index`, `graph_node_index`, `stim_set`, and `layout_type`.
 - Part II path-choice trials save both options and the reference image with fields such as `reference_node_index`, `left_node_index`, `right_node_index`, `left_raw_node_index`, `right_raw_node_index`, `left_graph_node_index`, `right_graph_node_index`, `path_length_left`, `path_length_right`, `correct_choice`, and `response_side`.
 - Each trial also has its own `trial_name`, and additional task-specific fields are saved where needed, for example response times, drawn relations, accuracy values, or confidence/evaluation responses.
+
+
+## To Deploy the experiment use
+
+First deploy with:
+
+DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-03 npm run build:parts -- "deployment 2026-06-03"
+
+Then copy to the server with:
+
+rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-03/

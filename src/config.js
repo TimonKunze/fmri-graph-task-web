@@ -2,10 +2,15 @@ import { COLORS } from "./config/colors.js";
 import { PATHS } from "./config/paths.js";
 import { SIZES } from "./config/sizes.js";
 
-const baseConfig = {
-  mode: "dev", // "dev" | "prod"
+function parseEnvNumber(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
 
-  activePart: 2, // 1 | 2 | 3
+const baseConfig = {
+  mode: "prod", // "dev" | "prod"
+
+  activePart: 3, // 1 | 2 | 3
 
   defaultLanguage: "en", // "en" | "it"
 
@@ -70,10 +75,16 @@ const singleTrialExport = {
 };
 
 const selectedProfile = configProfiles[baseConfig.mode] || {};
+const resolvedActivePart = parseEnvNumber(import.meta.env?.VITE_ACTIVE_PART, baseConfig.activePart);
+const deploymentDate = import.meta.env?.VITE_DEPLOYMENT_DATE ?? null;
+const deploymentComment = import.meta.env?.VITE_DEPLOYMENT_COMMENT ?? "";
 
 export const CONFIG = {
   ...baseConfig,
   ...selectedProfile,
+  activePart: resolvedActivePart,
+  deploymentDate,
+  deploymentComment,
   singleTrialExport,
 };
 

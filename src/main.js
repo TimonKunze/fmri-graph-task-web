@@ -74,6 +74,8 @@ function addExperimentProperties() {
     feedback_flag: CONFIG.feedback,
     stimulus_condition_map: STIMULUS_CONDITION_MAP,
     experiment_version: EXPERIMENT_VERSION,
+    deployment_date: CONFIG.deploymentDate,
+    deployment_comment: CONFIG.deploymentComment,
   });
 }
 
