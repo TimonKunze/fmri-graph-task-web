@@ -1,4 +1,5 @@
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
+import { CONFIG } from "../config.js";
 import { jsPsych } from "../main.js";
 import {
   getCurrentLanguage,
@@ -40,6 +41,16 @@ function getCopy() {
   return t(COPY);
 }
 
+function getPartHeading() {
+  const romanNumerals = {
+    1: "I",
+    2: "II",
+    3: "III",
+  };
+  const romanPart = romanNumerals[CONFIG.activePart] ?? String(CONFIG.activePart);
+  return getCurrentLanguage() === "it" ? `Parte ${romanPart}` : `Part ${romanPart}`;
+}
+
 let latestParticipantSetup = {
   subjectCode: null,
   experimenterNote: "",
@@ -50,6 +61,7 @@ export const participant_setup_trial = {
   type: jsPsychHtmlButtonResponse,
   stimulus: () => {
     const copy = getCopy();
+    const partHeading = getPartHeading();
     const languageOptions = LANGUAGE_OPTIONS.map(
       ({ value, label }) =>
         `<option value="${value}" ${value === getCurrentLanguage() ? "selected" : ""}>${label}</option>`
@@ -57,7 +69,7 @@ export const participant_setup_trial = {
 
     return `
       <div style="max-width: 700px; margin: 0 auto; text-align: left; line-height: 1.6;">
-        <h2>${copy.title}</h2>
+        <h2>${partHeading}: ${copy.title}</h2>
         <p>${copy.intro}</p>
         <div style="display: grid; gap: 16px;">
           <label>
