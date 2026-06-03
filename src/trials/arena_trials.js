@@ -34,8 +34,6 @@ function getPart3NodeMapping(layoutType) {
 
 
 export function createSpatialPosTrial(layoutType) {
-  console.log("PATHS.nodeImages1Small exists?", typeof PATHS.nodeImages1Small);
-  console.log("example path [0]:", PATHS.nodeImages1Small?.(0));
   const secondStimSet = useSecondStimSet(layoutType);
   const arenaNodeSize = secondStimSet ? SIZES.task14Treetop : SIZES.task14Flower;
   const arenaNodeImageSmallPath = secondStimSet ? PATHS.nodeImages2Small : PATHS.nodeImages1Small;

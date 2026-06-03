@@ -26,21 +26,27 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit('Method not allowed.');
 }
 
-if (!isset($_POST['exp_data'], $_POST['file_name'])) {
+if (!isset($_POST['exp_data'], $_POST['file_name'], $_POST['experiment_folder'])) {
     http_response_code(400);
     exit('Missing required fields.');
 }
 
 $exp_data = (string) $_POST['exp_data'];
 $file_name = basename((string) $_POST['file_name']);
+$experiment_folder = basename((string) $_POST['experiment_folder']);
 
 if (!preg_match('/^[A-Za-z0-9._-]+$/', $file_name)) {
     http_response_code(400);
     exit('Invalid file name.');
 }
 
-// Store all experiment data in a fixed directory next to this PHP script.
-$data_dir = __DIR__ . '/data';
+if (!preg_match('/^[A-Za-z0-9._-]+$/', $experiment_folder)) {
+    http_response_code(400);
+    exit('Invalid experiment folder.');
+}
+
+// Store data in the specific experiment folder next to /exp_data/.
+$data_dir = dirname(__DIR__) . '/' . $experiment_folder . '/data';
 
 if (!is_dir($data_dir) && !mkdir($data_dir, 0775, true)) {
     http_response_code(500);
