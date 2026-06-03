@@ -26,7 +26,9 @@ export const finalPart3Trial = {
     part: 3,
   },
   on_start: () => {
-    jsPsych.setProgressBar(1);
+    if (jsPsych.progressBar) {
+      jsPsych.progressBar.progress = 1;
+    }
     if (CONFIG.telegram) {
       const subjectCode = jsPsych.data.get().last(1).values()[0]?.subject_identity_code ?? "unknown";
       sendMessage(`${subjectCode} part **3** finish.`);

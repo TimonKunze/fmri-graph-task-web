@@ -8,7 +8,7 @@ function parseEnvNumber(value, fallback) {
 }
 
 const baseConfig = {
-  mode: "prod", // "dev" | "prod"
+  mode: "dev", // "dev" | "prod"
 
   activePart: 3, // 1 | 2 | 3
 
