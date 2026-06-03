@@ -15,7 +15,11 @@
 
 // TODO: test or use old version
 export async function save_data(data, data_dir, file_name) {
-  const response = await fetch("./exp_data/save_data.php", {
+  const saveUrl =
+    (typeof import.meta !== "undefined" && import.meta.env?.VITE_SAVE_DATA_URL) ||
+    "./exp_data/save_data.php";
+
+  const response = await fetch(saveUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",

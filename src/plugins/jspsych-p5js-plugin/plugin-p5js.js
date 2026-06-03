@@ -1,6 +1,10 @@
 // p5.js integration
 import p5 from "p5";
 
+// p5's Friendly Error System parses sketch source code at runtime.
+// After bundling/minification this can fail on valid code, especially in production builds.
+// Disabling it avoids those parser crashes in deployed experiments.
+p5.disableFriendlyErrors = true;
 
 export default function makeP5JSPlugin(jspsych) {
   'use strict';
