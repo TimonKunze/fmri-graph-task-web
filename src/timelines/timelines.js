@@ -238,6 +238,7 @@ export function makePart2Timeline() {
         ? `
           <div class="instr-screen">
             <p>Hai completato il blocco ${blockIndex} di ${totalFmriBlocks}.</p>
+            <p>Per favore, prenditi un <strong>momento di riposo</strong>.</p>
             <p>Quando sei pronto/a, premi la freccia destra per iniziare il blocco successivo.</p>
             <div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>
           </div>
@@ -245,7 +246,7 @@ export function makePart2Timeline() {
         : `
           <div class="instr-screen">
             <p>You have completed block ${blockIndex} of ${totalFmriBlocks}.</p>
-            <p>Please take a moment of rest.</p>
+            <p>Please take a <strong>moment of rest</strong>.</p>
             <p>When you are ready, press the right arrow key to start the next block.</p>
             <div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>
           </div>
