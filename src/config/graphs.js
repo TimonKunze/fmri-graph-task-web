@@ -105,7 +105,7 @@ export function refreshGraphState() {
   }
 
   const assignment = getSubjectAssignment();
-  const expToCanonical = assignment.nodeToGraph.map((value) => Number(value) - 1);
+  const expToCanonical = assignment.experimentNodeToGraphNode.map((value) => Number(value));
   const canonicalToExp = invertPermutation(expToCanonical);
   const adjM = remapAdjacencyMatrix(baseGraph.adjM, expToCanonical);
   const constantPos = remapPositionSets(baseGraph.constantPos ?? null, expToCanonical);

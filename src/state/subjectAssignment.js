@@ -1,13 +1,13 @@
-const IDENTITY_NODE_TO_GRAPH = [1, 2, 3, 4, 5, 6, 7, 8];
-const IDENTITY_OBJECT_TO_NODES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+const IDENTITY_NODE_TO_GRAPH = [0, 1, 2, 3, 4, 5, 6, 7];
+const IDENTITY_OBJECT_TO_NODES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 const currentAssignment = {
-  subjNb: null,
-  nodeToGraph: [...IDENTITY_NODE_TO_GRAPH],
+  subjectCode: null,
+  experimentNodeToGraphNode: [...IDENTITY_NODE_TO_GRAPH],
   objectToNodes: [...IDENTITY_OBJECT_TO_NODES],
-  learnBlockOrder: null,
-  testBlockOrder: null,
-  fmriTrials: null,
+  part1LayoutOrder: null,
+  part3LayoutOrder: null,
+  part2RawNodeBlocks: null,
 };
 
 let randomizationRows = [];
@@ -74,19 +74,20 @@ export function loadRandomizationRows(csvText) {
     .map((line) => {
       const values = splitCsvLine(line);
       const row = Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]));
-      const subjNb = Number(row.SubjNb);
+      const subjectCode = Number(row.subject_code);
 
-      if (!Number.isInteger(subjNb)) {
+      if (!Number.isInteger(subjectCode)) {
         return null;
       }
 
       return {
-        subjNb,
-        nodeToGraph: parseNumberArray(row.NodeToGraph) ?? [...IDENTITY_NODE_TO_GRAPH],
-        objectToNodes: parseNumberArray(row.ObjectToNodes) ?? [...IDENTITY_OBJECT_TO_NODES],
-        learnBlockOrder: parseNumberArray(row.learnBlockOrder),
-        testBlockOrder: parseNumberArray(row.testBlockOrder),
-        fmriTrials: parseNestedArray(row.fMRI_trials),
+        subjectCode,
+        experimentNodeToGraphNode:
+          parseNumberArray(row.experiment_node_to_graph_node) ?? [...IDENTITY_NODE_TO_GRAPH],
+        objectToNodes: parseNumberArray(row.object_id_by_experiment_node) ?? [...IDENTITY_OBJECT_TO_NODES],
+        part1LayoutOrder: parseNumberArray(row.part1_layout_order),
+        part3LayoutOrder: parseNumberArray(row.part3_layout_order),
+        part2RawNodeBlocks: parseNestedArray(row.part2_raw_node_blocks),
       };
     })
     .filter(Boolean);
@@ -95,72 +96,93 @@ export function loadRandomizationRows(csvText) {
 }
 
 export function getRandomizationAssignment(subjNb) {
-  return randomizationRows.find((row) => row.subjNb === Number(subjNb)) ?? null;
+  return randomizationRows.find((row) => row.subjectCode === Number(subjNb)) ?? null;
 }
 
 export function setSubjectAssignment(assignment) {
-  currentAssignment.subjNb = assignment?.subjNb ?? null;
-  currentAssignment.nodeToGraph = [...(assignment?.nodeToGraph ?? IDENTITY_NODE_TO_GRAPH)];
+  currentAssignment.subjectCode = assignment?.subjectCode ?? null;
+  currentAssignment.experimentNodeToGraphNode = [
+    ...(assignment?.experimentNodeToGraphNode ?? IDENTITY_NODE_TO_GRAPH),
+  ];
   currentAssignment.objectToNodes = [...(assignment?.objectToNodes ?? IDENTITY_OBJECT_TO_NODES)];
-  currentAssignment.learnBlockOrder = assignment?.learnBlockOrder
-    ? [...assignment.learnBlockOrder]
+  currentAssignment.part1LayoutOrder = assignment?.part1LayoutOrder
+    ? [...assignment.part1LayoutOrder]
     : null;
-  currentAssignment.testBlockOrder = assignment?.testBlockOrder
-    ? [...assignment.testBlockOrder]
+  currentAssignment.part3LayoutOrder = assignment?.part3LayoutOrder
+    ? [...assignment.part3LayoutOrder]
     : null;
-  currentAssignment.fmriTrials = assignment?.fmriTrials
-    ? assignment.fmriTrials.map((block) => Array.isArray(block) ? [...block] : block)
+  currentAssignment.part2RawNodeBlocks = assignment?.part2RawNodeBlocks
+    ? assignment.part2RawNodeBlocks.map((block) => Array.isArray(block) ? [...block] : block)
     : null;
 }
 
 export function getSubjectAssignment() {
   return {
-    subjNb: currentAssignment.subjNb,
-    nodeToGraph: [...currentAssignment.nodeToGraph],
+    subjNb: currentAssignment.subjectCode,
+    subjectCode: currentAssignment.subjectCode,
+    experimentNodeToGraphNode: [...currentAssignment.experimentNodeToGraphNode],
     objectToNodes: [...currentAssignment.objectToNodes],
-    learnBlockOrder: currentAssignment.learnBlockOrder
-      ? [...currentAssignment.learnBlockOrder]
+    learnBlockOrder: currentAssignment.part1LayoutOrder
+      ? [...currentAssignment.part1LayoutOrder]
       : null,
-    testBlockOrder: currentAssignment.testBlockOrder
-      ? [...currentAssignment.testBlockOrder]
+    part1LayoutOrder: currentAssignment.part1LayoutOrder
+      ? [...currentAssignment.part1LayoutOrder]
       : null,
-    fmriTrials: currentAssignment.fmriTrials
-      ? currentAssignment.fmriTrials.map((block) => Array.isArray(block) ? [...block] : block)
+    part3LayoutOrder: currentAssignment.part3LayoutOrder
+      ? [...currentAssignment.part3LayoutOrder]
+      : null,
+    part2RawNodeBlocks: currentAssignment.part2RawNodeBlocks
+      ? currentAssignment.part2RawNodeBlocks.map((block) => Array.isArray(block) ? [...block] : block)
       : null,
   };
 }
 
 export function getObjectNodeId(setName, index) {
   const offset = setName === "set2" ? 8 : 0;
-  return currentAssignment.objectToNodes[offset + index] ?? offset + index + 1;
+  return (currentAssignment.objectToNodes[offset + index] ?? offset + index) + 1;
+}
+
+export function getNodeMappingForStimSet(setName, nbNodes = 8) {
+  const rawOffset = setName === "set2" ? nbNodes : 0;
+  const experimentNodes = Array.from({ length: nbNodes }, (_, i) => i);
+  const graphNodes = experimentNodes.map((experimentNode) =>
+    Number(currentAssignment.experimentNodeToGraphNode?.[experimentNode] ?? experimentNode)
+  );
+  const rawExperimentNodes = experimentNodes.map((experimentNode) => rawOffset + experimentNode);
+
+  return {
+    experimentNodes,
+    graphNodes,
+    rawExperimentNodes,
+  };
 }
 
 export function getLearnLayoutOrder() {
-  if (!Array.isArray(currentAssignment.learnBlockOrder)) {
+  if (!Array.isArray(currentAssignment.part1LayoutOrder)) {
     return null;
   }
 
-  return currentAssignment.learnBlockOrder.map((item) =>
-    Number(item) === 1 ? "rotational" : "unconstrained"
+  return currentAssignment.part1LayoutOrder.map((item) =>
+    Number(item) === 0 ? "rotational" : "unconstrained"
   );
 }
 
 export function getTestLayoutOrder() {
-  if (!Array.isArray(currentAssignment.testBlockOrder)) {
+  if (!Array.isArray(currentAssignment.part3LayoutOrder)) {
     return null;
   }
 
-  return currentAssignment.testBlockOrder.map((item) =>
-    Number(item) === 1 ? "rotational" : "unconstrained"
+  return currentAssignment.part3LayoutOrder.map((item) =>
+    Number(item) === 0 ? "rotational" : "unconstrained"
   );
 }
 
-export function getFmriTrialBlocks() {
-  if (!Array.isArray(currentAssignment.fmriTrials)) {
+export function getPart2RawNodeBlocks() {
+  if (!Array.isArray(currentAssignment.part2RawNodeBlocks)) {
     return null;
   }
 
-  return currentAssignment.fmriTrials.map((block) =>
+  return currentAssignment.part2RawNodeBlocks.map((block) =>
     Array.isArray(block) ? [...block] : []
   );
 }

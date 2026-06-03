@@ -4,6 +4,7 @@ import { CONFIG } from "../config.js";
 import { jsPsych } from "../main.js";
 import { SIZES } from "../config/sizes.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
+import { getNodeMappingForStimSet } from "../state/subjectAssignment.js";
 import { getCurrentLanguage } from "../state/participant.js";
 
 
@@ -23,6 +24,8 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
 
   const [startNode, endNode] = rel;
   const isKnown = !!known;
+  const stimSet = getStimSet(type);
+  const nodeMapping = getNodeMappingForStimSet(stimSet);
 
   const imgStyle = `width:${STIM_SIZE}px;height:${STIM_SIZE}px;object-fit:contain;`;
   const rowStyle = `display:flex;align-items:center;justify-content:center;gap:12px;`;
@@ -48,7 +51,10 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
       stim_size_px: STIM_SIZE,
       stim_agent: agentLabel,
       stim_nodes: nodeLabel,
-      stim_set: getStimSet(type),
+      stim_set: stimSet,
+      experiment_nodes: nodeMapping.experimentNodes,
+      graph_nodes: nodeMapping.graphNodes,
+      raw_experiment_nodes: nodeMapping.rawExperimentNodes,
     },
     on_start: function (trial) {
       const isItalian = getCurrentLanguage() === "it";

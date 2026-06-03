@@ -3,6 +3,7 @@ import { PATHS } from "../config/paths.js";
 import { COLORS } from "../config/colors.js";
 import { CONFIG } from "../config.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
+import { getNodeMappingForStimSet } from "../state/subjectAssignment.js";
 import * as jsPsychModule from "jspsych";
 import makeP5JSPlugin from "../plugins/jspsych-p5js-plugin/plugin-p5js.js";
 
@@ -19,6 +20,8 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "", 
   const nodeImageSmallPath = nodeImagePathOverride ?? (secondStimSet
     ? PATHS.nodeImages2Small
     : PATHS.nodeImages1Small);
+  const stimSet = getStimSet(type);
+  const nodeMapping = getNodeMappingForStimSet(stimSet, nodePos.length);
 
   let trialEnded = false;
 
@@ -276,7 +279,10 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "", 
       data.attempts_drawtest = attempts;
       data.attemptout_drawtest = attemptout;
       data.rt_drawtest = rt;
-      data.stim_set = getStimSet(type);
+      data.stim_set = stimSet;
+      data.experiment_nodes = nodeMapping.experimentNodes;
+      data.graph_nodes = nodeMapping.graphNodes;
+      data.raw_experiment_nodes = nodeMapping.rawExperimentNodes;
     },
 
     key_choices: CONFIG.keyChoice,

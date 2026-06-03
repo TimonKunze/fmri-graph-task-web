@@ -7,12 +7,30 @@ import { SIZES } from "../config/sizes.js";
 import { G } from "../config/graphs.js";
 import { PATHS } from "../config/paths.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
+import { getSubjectAssignment } from "../state/subjectAssignment.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
 
 import { jsPsych } from "../main.js";
 import { rotatePoint } from "../utils/geometry.js";
 import { shortenLine, addUniqueArray } from "../utils/helper-tools.js";
 import { isConnected, transformToAdjacencyObject } from "../utils/graph-tools.js";
+
+function getPart3NodeMapping(layoutType) {
+  const assignment = getSubjectAssignment();
+  const isUnconstrained = useSecondStimSet(layoutType);
+  const rawOffset = isUnconstrained ? G.nbNodes : 0;
+  const experimentNodes = Array.from({ length: G.nbNodes }, (_, i) => i);
+  const graphNodes = experimentNodes.map((experimentNode) =>
+    Number(assignment.experimentNodeToGraphNode?.[experimentNode] ?? experimentNode)
+  );
+  const rawExperimentNodes = experimentNodes.map((experimentNode) => rawOffset + experimentNode);
+
+  return {
+    experimentNodes,
+    graphNodes,
+    rawExperimentNodes,
+  };
+}
 
 
 export function createSpatialPosTrial(layoutType = CONFIG.varType) {
@@ -322,12 +340,16 @@ export function createSpatialPosTrial(layoutType = CONFIG.varType) {
       trialEnded = true;
       endTimeRT = performance.now();
       const rt = endTimeRT-startTimeRT;
+      const nodeMapping = getPart3NodeMapping(layoutType);
       data = {
         trial_name: "test_spatialpos_norel",
         nodepos_spatialpos_norel: saveNodePos,
         rt_spatialpos_norel: rt,
         layout_type: layoutType,
         stim_set: getStimSet(layoutType),
+        experiment_nodes: nodeMapping.experimentNodes,
+        graph_nodes: nodeMapping.graphNodes,
+        raw_experiment_nodes: nodeMapping.rawExperimentNodes,
       }
       jsPsych.data.addDataToLastTrial(data);
     },
@@ -636,6 +658,7 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
     on_finish: function (data) {
       const endTimeRT = performance.now();
       const rt = endTimeRT - startTimeRT;
+      const nodeMapping = getPart3NodeMapping(layoutType);
 
       // Convert edges (by positions) into relations (by indices)
       const posToIndex = new Map(towPosLastTrial.map((pos, idx) => [JSON.stringify(pos), idx]));
@@ -663,6 +686,9 @@ export function createPosDrawTrial(c_type = "first", layoutType = CONFIG.varType
       data.c_type = c_type;
       data.layout_type = layoutType;
       data.stim_set = getStimSet(layoutType);
+      data.experiment_nodes = nodeMapping.experimentNodes;
+      data.graph_nodes = nodeMapping.graphNodes;
+      data.raw_experiment_nodes = nodeMapping.rawExperimentNodes;
     },
     button_choices: [""],
     key_choices: CONFIG.keyChoice,

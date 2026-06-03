@@ -39,7 +39,7 @@ import { finalPart3Trial } from "../trials/final_part3_trial.js";
 import { PATHS } from "../config/paths.js";
 import { jsPsych } from "../main.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
-import { getFmriTrialBlocks, getLearnLayoutOrder, getSubjectAssignment, getTestLayoutOrder } from "../state/subjectAssignment.js";
+import { getPart2RawNodeBlocks, getLearnLayoutOrder, getSubjectAssignment, getTestLayoutOrder } from "../state/subjectAssignment.js";
 import { createShortestPathDistanceMatrix } from "../utils/graph-tools.js";
 
 // ------------------------------------
@@ -187,11 +187,11 @@ export function makeLearnTimeline() {
 // ------------------------------------
 export function makePart2Timeline() {
   const tl = [];
-  const fmriBlocks = (getFmriTrialBlocks() ?? []).filter(Array.isArray);
+  const fmriBlocks = (getPart2RawNodeBlocks() ?? []).filter(Array.isArray);
   const totalFmriBlocks = fmriBlocks.length;
   const shortestPathDistanceMatrix = createShortestPathDistanceMatrix(G.adjM);
   const assignment = getSubjectAssignment();
-  const expToCanonical = (assignment.nodeToGraph ?? []).map((value) => Number(value) - 1);
+  const expToCanonical = (assignment.experimentNodeToGraphNode ?? []).map((value) => Number(value));
   const canonicalToExp = new Array(expToCanonical.length);
   expToCanonical.forEach((canonicalIndex, experimentIndex) => {
     canonicalToExp[canonicalIndex] = experimentIndex;

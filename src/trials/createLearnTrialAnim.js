@@ -3,6 +3,7 @@ import { PATHS } from "../config/paths.js";
 import { COLORS } from "../config/colors.js";
 import { CONFIG } from "../config.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
+import { getNodeMappingForStimSet } from "../state/subjectAssignment.js";
 import * as gtools from "../utils/graph-tools.js";
 import * as jsPsychModule from "jspsych";
 import makeP5JSPlugin from "../plugins/jspsych-p5js-plugin/plugin-p5js.js";
@@ -34,6 +35,8 @@ export function createLearnTrialAnim(
   const nodeImageSmallPath = nodeImagePathOverride ?? (secondStimSet
     ? PATHS.nodeImages2Small
     : PATHS.nodeImages1Small);
+  const stimSet = getStimSet(type);
+  const nodeMapping = getNodeMappingForStimSet(stimSet, nbNodes);
 
   let saveNodesClicked = [];
   let trialEnded = false;
@@ -49,7 +52,10 @@ export function createLearnTrialAnim(
       relation,
       angle: rotAngle,
       type,
-      stim_set: getStimSet(type),
+      stim_set: stimSet,
+      experiment_nodes: nodeMapping.experimentNodes,
+      graph_nodes: nodeMapping.graphNodes,
+      raw_experiment_nodes: nodeMapping.rawExperimentNodes,
     },
 
     top_level_declarations(p) {

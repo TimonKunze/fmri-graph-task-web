@@ -43,12 +43,12 @@ function addExperimentProperties() {
     date: new Date().toDateString(),
     time: new Date().toTimeString(),
     subject_assignment: assignment,
-    subj_nb: assignment.subjNb,
-    node_to_graph: assignment.nodeToGraph,
+    subject_code: assignment.subjectCode,
+    experiment_node_to_graph_node: assignment.experimentNodeToGraphNode,
     object_to_nodes: assignment.objectToNodes,
     learn_block_order: assignment.learnBlockOrder,
-    test_block_order: assignment.testBlockOrder,
-    fmri_trial_blocks: assignment.fmriTrials,
+    part3_layout_order: assignment.part3LayoutOrder,
+    part2_raw_node_blocks: assignment.part2RawNodeBlocks,
     random_node_positions: DESIGN.randomPoss,
     rotation_node_positions: DESIGN.rotationPos,
     canvas_size: SIZES.env,
@@ -83,29 +83,55 @@ function logDebugStimulusMapping() {
   }
 
   const assignment = getSubjectAssignment();
-  const rows = Array.from({ length: G.nbNodes }, (_, experimentIndex) => {
-    const graphNode = Number(assignment.nodeToGraph?.[experimentIndex] ?? experimentIndex + 1);
-    const set1ObjectId = Number(assignment.objectToNodes?.[experimentIndex] ?? experimentIndex + 1);
-    const set2ObjectId = Number(assignment.objectToNodes?.[experimentIndex + G.nbNodes] ?? experimentIndex + G.nbNodes + 1);
+  const graphRows = Array.from({ length: G.nbNodes }, (_, experimentIndex) => {
+    const graphNodeZeroBased = Number(
+      assignment.experimentNodeToGraphNode?.[experimentIndex] ?? experimentIndex
+    );
+    const rotationalObjectId = Number(assignment.objectToNodes?.[experimentIndex] ?? experimentIndex);
+    const unconstrainedObjectId = Number(
+      assignment.objectToNodes?.[experimentIndex + G.nbNodes] ?? experimentIndex + G.nbNodes
+    );
 
     return {
-      subject: assignment.subjNb,
-      graph_node: graphNode,
-      experiment_node: experimentIndex + 1,
-      set1_object_id: set1ObjectId,
-      set1_image: PATHS.nodeImages1(experimentIndex),
-      set1_small_image: PATHS.nodeImages1Small(experimentIndex),
-      set2_object_id: set2ObjectId,
-      set2_image: PATHS.nodeImages2(experimentIndex),
-      set2_small_image: PATHS.nodeImages2Small(experimentIndex),
+      graph_node: graphNodeZeroBased,
+      experiment_node: experimentIndex,
+      rotational_raw_experiment_node: graphNodeZeroBased,
+      rotational_object_id: rotationalObjectId,
+      rotational_image: PATHS.nodeImages1(experimentIndex),
+      unconstrained_raw_experiment_node: graphNodeZeroBased + G.nbNodes,
+      unconstrained_object_id: unconstrainedObjectId,
+      unconstrained_image: PATHS.nodeImages2(experimentIndex),
     };
   }).sort((a, b) => a.graph_node - b.graph_node);
 
-  console.group(`Debug stimulus mapping for subject ${assignment.subjNb}`);
-  console.log("Rows are sorted by graph node.");
-  console.table(rows);
+  const rotationalRows = graphRows.map((row) => ({
+    graph_node: row.graph_node,
+    raw_experiment_node: row.rotational_raw_experiment_node,
+    experiment_node: row.experiment_node,
+    object_id: row.rotational_object_id,
+    image: row.rotational_image,
+  }));
+
+  const unconstrainedRows = graphRows.map((row) => ({
+    graph_node: row.graph_node,
+    raw_experiment_node: row.unconstrained_raw_experiment_node,
+    experiment_node: row.experiment_node,
+    object_id: row.unconstrained_object_id,
+    image: row.unconstrained_image,
+  }));
+
+  console.group(`Debug stimulus mapping for subject ${assignment.subjectCode}`);
+  console.log("Interpretation used by Part II:");
+  console.log("raw fMRI nodes 0..7 -> rotational layout (set1), raw fMRI nodes 8..15 -> unconstrained layout (set2).");
+  console.log("Both tables below are sorted by graph_node.");
+  console.group("Rotational / set1 / raw fMRI nodes 0..7");
+  console.table(rotationalRows);
+  console.groupEnd();
+  console.group("Unconstrained / set2 / raw fMRI nodes 8..15");
+  console.table(unconstrainedRows);
+  console.groupEnd();
   console.log("Raw randomization arrays", {
-    nodeToGraph: assignment.nodeToGraph,
+    experimentNodeToGraphNode: assignment.experimentNodeToGraphNode,
     objectToNodes: assignment.objectToNodes,
   });
   console.groupEnd();
@@ -138,14 +164,14 @@ async function bootstrap() {
   logDebugStimulusMapping();
 
   console.log("CSV mapping check: stimulus paths", {
-    subject: assignment.subjNb,
+    subject_code: assignment.subjectCode,
     set1Paths: Array.from({ length: G.nbNodes }, (_, i) => PATHS.nodeImages1(i)),
     set2Paths: Array.from({ length: G.nbNodes }, (_, i) => PATHS.nodeImages2(i)),
   });
 
   console.log("CSV mapping check: graph remapping", {
-    subject: assignment.subjNb,
-    nodeToGraph: assignment.nodeToGraph,
+    subject_code: assignment.subjectCode,
+    experimentNodeToGraphNode: assignment.experimentNodeToGraphNode,
     adjacencyMatrix: G.adjM,
     relations: G.relations,
     sampleTest3Pairs: DESIGN.test3Pairs.slice(0, 3),
