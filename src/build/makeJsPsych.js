@@ -21,14 +21,12 @@ export function makeJsPsych({ data_dir }) {
   const part = computePart(CONFIG);
   let debugAdvanceHandler = null;
 
-  function makeShortTimestamp() {
+  function makeShortDate() {
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
-    const hh = String(now.getHours()).padStart(2, "0");
-    const min = String(now.getMinutes()).padStart(2, "0");
-    return `${yyyy}${mm}${dd}-${hh}${min}`;
+    return `${yyyy}${mm}${dd}`;
   }
 
   const jsPsych = initJsPsych({
@@ -76,8 +74,8 @@ export function makeJsPsych({ data_dir }) {
       const dataJsonl = JSON.stringify(data) + "\n";
       const participantSetup = getParticipantSetup();
       const subjectCode = participantSetup?.subjectCode ?? "unknown";
-      const timestamp = makeShortTimestamp();
-      const file_name = `subj${subjectCode}_p${part}_${timestamp}.jsonl`;
+      const dateString = makeShortDate();
+      const file_name = `subj${subjectCode}_p${part}_${dateString}.jsonl`;
       save_data(dataJsonl, data_dir, file_name);
     },
   });

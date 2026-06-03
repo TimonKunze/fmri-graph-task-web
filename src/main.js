@@ -40,6 +40,7 @@ function addExperimentProperties() {
     study_id,
     session_id,
     date: new Date().toDateString(),
+    session_timestamp: Date.now(),
     subject_assignment: assignment,
     subject_code: assignment.subjectCode,
     experiment_node_to_graph_node: assignment.experimentNodeToGraphNode,
