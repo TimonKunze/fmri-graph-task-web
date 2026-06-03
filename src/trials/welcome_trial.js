@@ -1,5 +1,6 @@
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { CONFIG } from "../config";
+import { PATHS } from "../config/paths.js";
 import { jsPsych } from "../main.js";
 import { getCurrentLanguage } from "../state/participant.js";
 
@@ -71,7 +72,7 @@ export const welcome_trial = {
     trial.stimulus = `
       <div style="max-width: 700px; margin: 0 auto; font-size: 18px; line-height: 1.6;">
       <img 
-          src="/stimuli/collected_pic/fruit_salad.png" 
+          src="${PATHS.fruitSalad}" 
           alt="Welcome image fruit salad"
           style="max-width: 250px; height: auto; display: block; margin: 0 auto 24px auto;"
         >

@@ -145,7 +145,7 @@ async function bootstrap() {
     return;
   }
 
-  const response = await fetch("/config/randomization_table.csv");
+  const response = await fetch(PATHS.randomizationTable);
   const csvText = await response.text();
   loadRandomizationRows(csvText);
 

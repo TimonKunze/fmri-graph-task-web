@@ -1,5 +1,6 @@
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { CONFIG } from "../config";
+import { PATHS } from "../config/paths.js";
 import { sendMessage } from "../utils/telegram";
 import { jsPsych } from "../main";
 import { getCurrentLanguage } from "../state/participant.js";
@@ -15,7 +16,7 @@ export const finalPart3Trial = {
         <p>${isItalian ? "Hai completato l'ultimo compito della Parte III e quindi l'intero esperimento." : "You've finished the last task of Part III and therefore the entire experiment."}</p>
         <h3>${isItalian ? "Grazie per la partecipazione e ti auguriamo una splendida continuazione di giornata!" : "Thank you for participating, and have a wonderful rest of the day!"}</h3>
         <p>${isItalian ? "Ora anche i frutti, gli ortaggi e l'elemento volante possono finalmente concedersi un po' di riposo." : "Finally, fruits, vegetables, and flying figures can take a break too."}</p>
-        <img src="/stimuli/collected_pic/fruit_salad.png" alt="Fruit salad" style="max-width: 220px; height: auto; display: block; margin: 20px auto 0 auto;">
+        <img src="${PATHS.fruitSalad}" alt="Fruit salad" style="max-width: 220px; height: auto; display: block; margin: 20px auto 0 auto;">
       </div>
     `;
   },

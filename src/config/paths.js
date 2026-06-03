@@ -1,43 +1,48 @@
 import { getObjectNodeId } from "../state/subjectAssignment.js";
 
+const BASE_URL = (import.meta.env?.BASE_URL ?? "/").replace(/\/+$/, "");
+const withBase = (path) => `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+
 export const PATHS = {
     // Layout 1 object: Fly
-  // movingObj1: "/stimuli/fly/moving_obj.png",
-  // movingObj1Mirrored: "/stimuli/fly/moving_obj_mirrored.png",
-  movingObj1: "/stimuli/drone/moving_obj.png",
-  movingObj1Mirrored: "/stimuli/drone/moving_obj_mirrored.png",
+  // movingObj1: withBase("/stimuli/fly/moving_obj.png"),
+  // movingObj1Mirrored: withBase("/stimuli/fly/moving_obj_mirrored.png"),
+  movingObj1: withBase("/stimuli/drone/moving_obj.png"),
+  movingObj1Mirrored: withBase("/stimuli/drone/moving_obj_mirrored.png"),
 
     // Layout 2 object: Wasp
-  // movingObj2: "/stimuli/wasp/moving_obj.png",
-  // movingObj2Mirrored: "/stimuli/wasp/moving_obj_mirrored.png",
-  // movingObj2: "/stimuli/fly2/moving_obj.png",
-  // movingObj2Mirrored: "/stimuli/fly2/moving_obj_mirrored.png",
-  // movingObj2: "/stimuli/bats/moving_obj.png",
-  // movingObj2Mirrored: "/stimuli/bats/moving_obj_mirrored.png",
-  movingObj2: "/stimuli/bats2/moving_obj.png",
-  movingObj2Mirrored: "/stimuli/bats2/moving_obj_mirrored.png",
+  // movingObj2: withBase("/stimuli/wasp/moving_obj.png"),
+  // movingObj2Mirrored: withBase("/stimuli/wasp/moving_obj_mirrored.png"),
+  // movingObj2: withBase("/stimuli/fly2/moving_obj.png"),
+  // movingObj2Mirrored: withBase("/stimuli/fly2/moving_obj_mirrored.png"),
+  // movingObj2: withBase("/stimuli/bats/moving_obj.png"),
+  // movingObj2Mirrored: withBase("/stimuli/bats/moving_obj_mirrored.png"),
+  movingObj2: withBase("/stimuli/bats2/moving_obj.png"),
+  movingObj2Mirrored: withBase("/stimuli/bats2/moving_obj_mirrored.png"),
     
   // Objects Layout 1
-  nodeImages1Small: (i) => `/stimuli/collected_pic/small_imgs/node${getObjectNodeId("set1", i)}.png`,
-  nodeImages1: (i) => `/stimuli/collected_pic/node${getObjectNodeId("set1", i)}.png`,
+  nodeImages1Small: (i) => withBase(`/stimuli/collected_pic/small_imgs/node${getObjectNodeId("set1", i)}.png`),
+  nodeImages1: (i) => withBase(`/stimuli/collected_pic/node${getObjectNodeId("set1", i)}.png`),
 
   // Objects Layout 2
-  nodeImages2Small: (i) => `/stimuli/collected_pic/small_imgs/node${getObjectNodeId("set2", i)}.png`,
-  nodeImages2: (i) => `/stimuli/collected_pic/node${getObjectNodeId("set2", i)}.png`,
+  nodeImages2Small: (i) => withBase(`/stimuli/collected_pic/small_imgs/node${getObjectNodeId("set2", i)}.png`),
+  nodeImages2: (i) => withBase(`/stimuli/collected_pic/node${getObjectNodeId("set2", i)}.png`),
 
-  dashPath: `/stimuli/other/dash.png`,
-  dotPath: `/stimuli/other/dot.png`,
-  undoPath: `/stimuli/other/undo_arrow.png`,
+  dashPath: withBase("/stimuli/other/dash.png"),
+  dotPath: withBase("/stimuli/other/dot.png"),
+  undoPath: withBase("/stimuli/other/undo_arrow.png"),
   participantInfo: (language = "en") =>
-    language === "it" ? "/participant_info_ital.pdf" : "/participant_info_engl.pdf",
+    language === "it" ? withBase("/participant_info_ital.pdf") : withBase("/participant_info_engl.pdf"),
 
-  testExample: "./stimuli/other/test_example.png",
-  part2DemoVideo1: "/practice_trials/videos/link_2_1.mp4",
-  part2DemoVideo2: "/practice_trials/videos/link_1_3.mp4",
-  part2DemoVideo3: "/practice_trials/videos/link_3_4.mp4",
+  testExample: withBase("/stimuli/other/test_example.png"),
+  part2DemoVideo1: withBase("/practice_trials/videos/link_2_1.mp4"),
+  part2DemoVideo2: withBase("/practice_trials/videos/link_1_3.mp4"),
+  part2DemoVideo3: withBase("/practice_trials/videos/link_3_4.mp4"),
 
-  movingObjExport: "/practice_trials/stimuli/moving_obj.png",
-  nodeExport: (i) => `/practice_trials/stimuli/node${i}.png`,
+  movingObjExport: withBase("/practice_trials/stimuli/moving_obj.png"),
+  nodeExport: (i) => withBase(`/practice_trials/stimuli/node${i}.png`),
+  randomizationTable: withBase("/config/randomization_table.csv"),
+  fruitSalad: withBase("/stimuli/collected_pic/fruit_salad.png"),
 
   data_dir: "data",
 };
