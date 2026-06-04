@@ -15,40 +15,21 @@ function formatBlockLabel(block, isItalian) {
     return isItalian ? "blocco di pratica" : "practice block";
   }
 
-  const ordinalMap = isItalian
-    ? {
-        first: "primo",
-        second: "secondo",
-        third: "terzo",
-        fourth: "quarto",
-        fifth: "quinto",
-        sixth: "sesto",
-      }
-    : {
-        first: "first",
-        second: "second",
-        third: "third",
-        fourth: "fourth",
-        fifth: "fifth",
-        sixth: "sixth",
-      };
-
   const setLabel = block.startsWith("rotational")
     ? isItalian ? "primo insieme" : "first set"
     : block.startsWith("unconstrained")
       ? isItalian ? "secondo insieme" : "second set"
       : "";
 
-  const ordinalKey = Object.keys(ordinalMap).find((key) => block.includes(key));
-  const ordinalLabel = ordinalKey ? ordinalMap[ordinalKey] : block;
+  const blockNumber = block.match(/_(\d+)$/)?.[1] ?? "";
 
-  if (!setLabel || !ordinalKey) {
+  if (!setLabel || !blockNumber) {
     return block;
   }
 
   return isItalian
-    ? `${ordinalLabel} blocco del ${setLabel}`
-    : `${ordinalLabel} block of the ${setLabel}`;
+    ? `blocco ${blockNumber} del ${setLabel}`
+    : `block ${blockNumber} of the ${setLabel}`;
 }
 
 export function createDrawingTrialSummary(jsPsych, trlsBack, block = "") {

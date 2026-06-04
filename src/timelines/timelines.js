@@ -78,7 +78,11 @@ export function makeLearnIntroTimeline(config = CONFIG) {
         learnPassI,
         0,
         sampleType,
-        { ...config, nodeImagePathOverride: sampleNodeImagePath }
+        {
+          ...config,
+          nodeImagePathOverride: sampleNodeImagePath,
+          dataTypeOverride: "sample",
+        }
       )
     );
 
@@ -89,7 +93,10 @@ export function makeLearnIntroTimeline(config = CONFIG) {
         trialI,
         null,
         sampleType,
-        { nodeImagePathOverride: sampleNodeImagePath }
+        {
+          nodeImagePathOverride: sampleNodeImagePath,
+          dataTypeOverride: "sample",
+        }
       )
     );
   }
@@ -119,7 +126,7 @@ export function makeCoreTimeline() {
 }
 
 // ------------------------------------
-// Learn Time line
+// Part 1 Time line (learn and probe)
 // ------------------------------------
  
 export function makeLearnTimeline() {
@@ -129,14 +136,12 @@ export function makeLearnTimeline() {
     throw new Error("[makeLearnTimeline] Missing randomized Part I layout order.");
   }
 
-  const blockNames = ["first", "second", "third", "fourth", "fifth", "sixth"];
   let blockCounter = 0;
   let relQueryInstrShown = false;
 
   const pushBlock = (layoutType, nodePositions) => {
     blockCounter += 1;
-    const ordinalBlock = blockNames[blockCounter - 1] ?? `block_${blockCounter}`;
-    const block = `${layoutType}_${ordinalBlock}`;
+    const block = `${layoutType}_${blockCounter}`;
 
     tl.push(...createLearnTrials(nodePositions, block, layoutType));
 
@@ -160,8 +165,6 @@ export function makeLearnTimeline() {
     previousLayout = layoutType;
     pushBlock(layoutType, layoutType === "rotational" ? DESIGN.rotationPos : DESIGN.randomPoss);
   }
-
-  
 
   if (CONFIG.includeEvalTrials) {
     tl.push(createConfidenceTrial("part1"));

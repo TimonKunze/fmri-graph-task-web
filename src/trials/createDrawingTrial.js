@@ -7,7 +7,14 @@ import { getNodeMappingForStimSet } from "../state/subjectAssignment.js";
 import * as jsPsychModule from "jspsych";
 import makeP5JSPlugin from "../plugins/jspsych-p5js-plugin/plugin-p5js.js";
 
-export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "", { nodeImagePathOverride = null } = {}) {
+export function createDrawingTrial(
+  nodePos,
+  rel,
+  trialI,
+  learnPassI,
+  type = "",
+  { nodeImagePathOverride = null, dataTypeOverride = null } = {}
+) {
     
   const jsPsychP5JS = makeP5JSPlugin(jsPsychModule);
   const attemptout = CONFIG.maxAttemptsDraw;
@@ -22,6 +29,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "", 
     : PATHS.nodeImages1Small);
   const stimSet = getStimSet(type);
   const nodeMapping = getNodeMappingForStimSet(stimSet, nodePos.length);
+  const recordedType = dataTypeOverride ?? type;
 
   let trialEnded = false;
 
@@ -269,7 +277,7 @@ export function createDrawingTrial(nodePos, rel, trialI, learnPassI, type = "", 
       const rt = performance.now() - startTimeRT;
 
       data.trial_name = "draw_test";
-      data.type_drawtest = type;
+      data.type_drawtest = recordedType;
       data.trial_ind_drawtest = trialI;
       data.learnpass_ind_drawtest = learnPassI;
       data.nodepos_drawtest = nodePos;

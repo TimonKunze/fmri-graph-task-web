@@ -16,7 +16,12 @@ export function createLearnTrialAnim(
   learnPassI,
   rotAngle,
   type,
-  { adjMat = null, staticFlag = false, nodeImagePathOverride = null } = {}
+  {
+    adjMat = null,
+    staticFlag = false,
+    nodeImagePathOverride = null,
+    dataTypeOverride = null,
+  } = {}
 ) {
   const P5Plugin = makeP5JSPlugin(jsPsychModule);
   const nbNodes = nodePos.length;
@@ -37,6 +42,7 @@ export function createLearnTrialAnim(
     : PATHS.nodeImages1Small);
   const stimSet = getStimSet(type);
   const nodeMapping = getNodeMappingForStimSet(stimSet, nbNodes);
+  const recordedType = dataTypeOverride ?? type;
 
   let saveNodesClicked = [];
   let trialEnded = false;
@@ -51,7 +57,7 @@ export function createLearnTrialAnim(
       learnPassI,
       relation,
       angle: rotAngle,
-      type,
+      type: recordedType,
       stim_set: stimSet,
       experiment_nodes: nodeMapping.experimentNodes,
       graph_nodes: nodeMapping.graphNodes,
