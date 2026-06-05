@@ -58,11 +58,11 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
     },
     on_start: function (trial) {
       const isItalian = getCurrentLanguage() === "it";
-      const knownLabel = isItalian ? "Conosciuta" : "Known";
-      const unknownLabel = isItalian ? "Non conosciuta" : "Not known";
+      const knownLabel = isItalian ? "Connessa" : "Connected";
+      const unknownLabel = isItalian ? "Non connessa" : "Not connected";
       const prompt = isItalian
-        ? `Indica se la connessione tra i due frutti e ortaggi mostrati era nota oppure no all'elemento volante.`
-        : `Please indicate whether the connection between the two shown fruits and vegetables was known to the flying figure or not.`;
+        ? `Indica se il pipistrello ha volato lungo una connessione tra i due alimenti mostrati.`
+        : `Please indicate whether the bat flew along a connection between the two shown food items.`;
       const nodeAlt = isItalian ? "elemento" : "item";
       trial.stimulus = `
         <div style="${wrapStyle}">

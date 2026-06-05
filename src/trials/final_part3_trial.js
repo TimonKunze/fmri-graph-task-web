@@ -13,9 +13,13 @@ export const finalPart3Trial = {
     return `
       <div style="max-width: 800px; margin: 0 auto; line-height: 1.6; text-align: left;">
         <h2>${isItalian ? "Congratulazioni!" : "Congratulations!"}</h2>
-        <p>${isItalian ? "Hai completato l'ultimo compito della Parte III e quindi l'intero esperimento." : "You've finished the last task of Part III and therefore the entire experiment."}</p>
-        <h3>${isItalian ? "Grazie per la partecipazione e ti auguriamo una splendida continuazione di giornata!" : "Thank you for participating, and have a wonderful rest of the day!"}</h3>
-        <p>${isItalian ? "Ora anche i frutti, gli ortaggi e l'elemento volante possono finalmente concedersi un po' di riposo." : "Finally, fruits, vegetables, and flying figures can take a break too."}</p>
+        <p>${isItalian ? "Hai completato l'ultimo compito della Parte III e, con questo, l'intero esperimento." : "You've completed the last task of Part III and, with it, the entire experiment."}</p>
+        <h3>${isItalian ? "Grazie per la partecipazione. Ti auguriamo una splendida continuazione di giornata!" : "Thank you for participating. We wish you a wonderful rest of the day!"}</h3>
+        <p><strong>${isItalian ? "Curiosità:" : "Fun fact:"}</strong>
+        ${isItalian
+          ? " Alcuni pipistrelli amano talmente la frutta da essere chiamati letteralmente pipistrelli della frutta. Aiutano le foreste a crescere mangiando i frutti e disperdendone i semi mentre volano. Alcune specie possono trasportare i semi per molti chilometri, lontano dall'albero da cui hanno mangiato."
+          : " Some bats love fruit so much that they are literally called fruit bats. They help forests grow by eating fruit and spreading seeds as they fly. Some fruit bats can carry seeds many kilometers away from the tree they fed from."}</p>
+        <p>${isItalian ? "Le verdure, invece, tendono a piacere molto meno." : "Vegetables, however, are usually much less to their taste."}</p>
         <img src="${PATHS.fruitSalad}" alt="Fruit salad" style="max-width: 220px; height: auto; display: block; margin: 20px auto 0 auto;">
       </div>
     `;

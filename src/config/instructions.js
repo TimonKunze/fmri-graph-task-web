@@ -21,13 +21,13 @@ const INSTRUCTION_COPY = {
     <h2>Compito 1</h2>
     <h3>Istruzioni</h3>
     <p>
-      In questo compito vedrai diversi frutti e ortaggi disposti in un ambiente. Il tuo compito è <strong>trovare un elemento volante nascosto</strong> cliccando su di essi. Una volta trovato, osserva da dove parte e dove arriva, e cerca di ricordare questa connessione.
+      In questo compito vedrai diversi alimenti disposti in un ambiente. Il tuo compito è <strong>trovare un pipistrello nascosto</strong> cliccando su di essi. Una volta trovato, osserva da dove parte e dove arriva, e cerca di ricordare questa connessione.
     </p>
     <p>
-      Successivamente, ti chiediamo di <strong>disegnare il percorso dell'elemento volante</strong> cliccando su un frutto o ortaggio e trascinando il cursore fino a un altro. Questo crea una connessione tra i due elementi, e una linea verde o rossa indicherà se la connessione è corretta. Potrai passare alla prova successiva solo dopo aver disegnato la connessione corretta oppure dopo aver fatto più di 10 tentativi sbagliati. Tieni presente che la posizione di frutti e ortaggi può cambiare di tanto in tanto, ma questo non dovrebbe impedirti di disegnare la connessione giusta.
+      Successivamente, ti chiediamo di <strong>disegnare il percorso del pipistrello</strong> cliccando su un alimento e trascinando il cursore fino a un altro. Questo crea una connessione tra i due elementi, e una linea verde o rossa indicherà se la connessione è corretta. Potrai passare alla prova successiva solo dopo aver disegnato la connessione corretta oppure dopo aver fatto più di 10 tentativi sbagliati. Tieni presente che la posizione degli alimenti può cambiare di tanto in tanto, ma questo non dovrebbe impedirti di disegnare la connessione giusta.
     </p>
     <p>
-      Nota che la direzione in cui vedi muoversi l'elemento volante non è importante, perché ogni volta che si sposta da un elemento a un altro, vedrai anche lo stesso movimento nella direzione opposta. Allo stesso modo, non importa in quale direzione disegni la connessione.
+      Nota che la direzione in cui vedi muoversi il pipistrello non è importante, perché ogni volta che si sposta da un elemento a un altro, vedrai anche lo stesso movimento nella direzione opposta. Allo stesso modo, non importa in quale direzione disegni la connessione.
     </p>
     <p>
       Di tanto in tanto, riceverai un punteggio di prestazione basato sulla frequenza con cui la tua prima risposta è stata corretta in una serie di prove.
@@ -40,7 +40,7 @@ const INSTRUCTION_COPY = {
     <h3>Sei pronto/a?</h3>
     <br>
     <p>
-      La fase di pratica è ora terminata. Come spiegato in precedenza, il tuo compito è ricordare da dove è partito e dove è arrivato l'elemento volante in ogni prova.
+      La fase di pratica è ora terminata. Come spiegato in precedenza, il tuo compito è ricordare da dove è partito e dove è arrivato il pipistrello in ogni prova.
     </p>
     <p>
       Se sei pronto/a, fai clic sul pulsante "Continua" per iniziare l'esperimento.
@@ -55,14 +55,15 @@ const INSTRUCTION_COPY = {
     <h2>Compito 2</h2>
     <h3>Istruzioni</h3>
     <p>
-      Hai notato che l'elemento volante si spostava solo tra alcune coppie di frutti e ortaggi, ma non tra altre?
+      Hai notato che il pipistrello si spostava solo tra alcune coppie di alimenti?
     </p>
     <p>
-      Chiamiamo il primo tipo <strong>connessioni note</strong> e il secondo tipo <strong>connessioni sconosciute</strong>. Potresti anche aver notato che, ogni volta che l'elemento volante conosceva una connessione, si muoveva con la stessa facilità in entrambe le direzioni, quindi la direzione non è importante.
+      Chiamiamo queste coppie <strong>connessioni</strong>. Potresti anche aver notato che, ogni volta che il pipistrello seguiva una connessione, si muoveva con la stessa facilità in entrambe le direzioni. Questo significa che la direzione non è importante.
     </p>
     <p>
-      Nella parte seguente vedrai diverse coppie di frutti e ortaggi. Cerca di ricordare, dal compito precedente, <strong>se la connessione tra i due elementi mostrati era nota o sconosciuta per l'elemento volante</strong>.
-    Indica la tua risposta cliccando uno dei pulsanti.
+      Nella parte seguente vedrai diverse coppie di alimenti. Cerca di ricordare dal compito precedente
+      <strong>se tra i due elementi mostrati c'era una connessione oppure no</strong>. Indica la tua risposta
+      cliccando uno dei pulsanti.
     </p>
     <p>
       Questa volta non c'è una prova di pratica, quindi puoi iniziare subito.
@@ -73,13 +74,13 @@ const INSTRUCTION_COPY = {
     <br>
     <h3>Istruzioni</h3>
     <p>
-      Nella parte di ieri dell'esperimento, hai imparato che l'elemento volante si sposta solo tra alcune coppie di frutti e ortaggi. Queste sono le <strong>connessioni note</strong>.
+      Nella parte di ieri dell'esperimento, hai imparato che il pipistrello si sposta solo tra alcune coppie di alimenti. Queste sono le <strong>connessioni</strong>.
     </p>
     <p>
-      Oggi, vedrai prima immagini singole di frutti e ortaggi, presentate una dopo l'altra. Ti preghiamo di osservare attentamente ciascuna immagine.
+      Oggi, vedrai prima immagini singole di alimenti, presentate una dopo l'altra. Ti preghiamo di osservare attentamente ciascuna immagine.
     </p>
     <p>
-      A volte, dopo un'immagine singola, appariranno due immagini. In questi casi, cerca di ricordare l'immagine singola mostrata immediatamente prima. A differenza di ieri, le due immagini non formeranno una connessione nota. Il tuo compito sarà decidere quale delle due immagini può essere raggiunta a partire dall'immagine precedente usando un numero minore di connessioni note, assumendo il ruolo dell'elemento volante.
+      A volte, dopo un'immagine singola, appariranno due immagini. In questi casi, cerca di ricordare l'immagine singola mostrata immediatamente prima. A differenza di ieri, le due immagini non formeranno una connessione diretta. Il tuo compito sarà decidere quale delle due immagini può essere raggiunta a partire dall'immagine precedente usando un numero minore di connessioni, assumendo il ruolo del pipistrello.
     </p>
     <p>
       Usa i tasti freccia sinistra e freccia destra per rispondere.
@@ -117,10 +118,10 @@ const INSTRUCTION_COPY = {
     <h3>Istruzioni</h3>
     <br>
     <p>
-      Nella prossima parte dell'esperimento, ti chiediamo di <strong>disporre i frutti e gli ortaggi nell'ambiente</strong> in un modo che ti sembri ragionevole.
+      Nella prossima parte dell'esperimento, ti chiediamo di <strong>disporre gli alimenti nell'ambiente</strong> in un modo che ti sembri ragionevole.
     </p>
     <p>
-      All'inizio, i frutti e gli ortaggi appariranno sul lato destro. Per collocarne uno nell'ambiente, cliccaci sopra e trascinalo nella posizione che ti sembra più adatta. Puoi modificare la disposizione tutte le volte che vuoi trascinando di nuovo gli elementi.
+      All'inizio, gli alimenti appariranno sul lato destro. Per collocarne uno nell'ambiente, cliccaci sopra e trascinalo nella posizione che ti sembra più adatta. Puoi modificare la disposizione tutte le volte che vuoi trascinando di nuovo gli elementi.
     </p>
     <p>
       Per questa parte non è prevista una prova di pratica. Prenditi tutto il tempo di cui hai bisogno.
@@ -133,15 +134,15 @@ const INSTRUCTION_COPY = {
     part3Second: `
     <h3>Istruzioni</h3>
     <p>
-      Successivamente, ti mostreremo l'ambiente con i frutti e gli ortaggi disposti come li hai collocati in precedenza. Questa volta, ti chiediamo di <strong>disegnare le connessioni note</strong> così come le ricordi.
+      Successivamente, ti mostreremo l'ambiente con gli alimenti disposti come li hai collocati in precedenza. Questa volta, ti chiediamo di <strong>disegnare le connessioni</strong> così come le ricordi.
     </p>
-    <p>Come nel compito di ieri, puoi disegnare le connessioni <strong>trascinando il cursore</strong> da un frutto
-    o ortaggio a un altro. Se vuoi rimuovere una connessione che hai già disegnato, puoi <strong>fare
+    <p>Come nel compito di ieri, puoi disegnare le connessioni <strong>trascinando il cursore</strong> da un alimento
+    a un altro. Se vuoi rimuovere una connessione che hai già disegnato, puoi <strong>fare
     doppio clic</strong> su di essa oppure usare il <strong>pulsante di reset</strong>, che elimina
     tutte le connessioni disegnate in una sola volta.
     </p>
     <p>
-      Assicurati che l'elemento volante possa raggiungere ogni frutto e ortaggio attraverso almeno una connessione.
+      Assicurati che il pipistrello possa raggiungere ogni alimento attraverso almeno una connessione.
     </p>
     <p>
       Non c'è alcun limite di tempo. Prenditi tutto il tempo di cui hai bisogno e fai clic su "Continua" quando hai finito.
@@ -152,7 +153,7 @@ const INSTRUCTION_COPY = {
     <h3>Congratulazioni, hai quasi finito. Un'ultima domanda:</h3>
     <br>
     <p>
-      Hai utilizzato qualche forma di aiuto esterno per imparare le connessioni dell'elemento volante nella Parte I o per risolvere il compito nella Parte II (per esempio scrivendo le connessioni)?
+      Hai utilizzato qualche forma di aiuto esterno per imparare le connessioni del pipistrello nella Parte I o per risolvere il compito nella Parte II (per esempio scrivendo le connessioni)?
     </p>
     <p>
       (Per favore, rispondi onestamente. La tua risposta a questa domanda non influenzerà in alcun modo il tuo compenso.)
@@ -166,20 +167,20 @@ const INSTRUCTION_COPY = {
     <h2>Task 1</h2>
     <h3>Instructions</h3>
     <p>
-    In this task, you will see several fruits and vegetables arranged in an environment. Your task is
-    to <strong>find a hidden flying figure</strong> by clicking on them. Once you find it, observe
+    In this task, you will see several food items arranged in an environment. Your task is
+    to <strong>find a hidden bat</strong> by clicking on them. Once you find it, observe
     where it moves from and where it moves to, and remember this connection.
     </p>
     <p>
-    Next, we ask you to <strong>draw the path of the flying figure</strong> by clicking on one fruit
-    or vegetable and dragging the cursor to another. This creates a connection between the two, and
+    Next, we ask you to <strong>draw the path of the bat</strong> by clicking on one food item
+    and dragging the cursor to another. This creates a connection between the two, and
     a green or red line indicates whether the connection is correct. You can continue to the next trial
     only after drawing the correct connection or after making more than 10 incorrect attempts. Please
-    note that the positions of the fruits and vegetables may change from time to time, but this should
+    note that the positions of the food items may change from time to time, but this should
     not affect your ability to draw the correct connection.
     </p>
     <p>
-    Note that the direction in which you see the flying figure move is not important, because whenever it moves from
+    Note that the direction in which you see the bat move is not important, because whenever it moves from
     one item to another, you will also see the same movement in the opposite direction. Likewise, it does not matter
     in which direction you draw the connection.
     </p>
@@ -188,7 +189,7 @@ const INSTRUCTION_COPY = {
     </p>
     <p>
     Over the course of the experiment, you will work with two different sets of items, and each set will be associated
-    with a different flying figure.
+    with a different bat.
     </p>
     <p>
     Before starting with the first set of items, you will have the chance to complete <strong>two practice
@@ -201,7 +202,7 @@ const INSTRUCTION_COPY = {
     <h3>Are you ready?</h3>
     <br>
     <p>
-    The practice phase is now over. As explained earlier, your task is to remember where the flying figure started and
+    The practice phase is now over. As explained earlier, your task is to remember where the bat started and
     where it ended in each trial.
     </p>
     <p>
@@ -216,14 +217,16 @@ const INSTRUCTION_COPY = {
     <h2>Task 2</h2>
     <h3>Instructions</h3>
     <p>
-    Did you notice that the flying figure moved only between certain pairs of fruits and vegetables, but not between others?
+    Did you notice that the bat moved only between certain pairs of food items?
     </p>
     <p>
-    We call the first type <strong>known connections</strong> and the second type <strong>unknown connections</strong>. You may also have noticed that whenever the flying figure knew a connection, it moved equally well in both directions, so direction is not important.
+    We call these pairs <strong>connections</strong>. You may also have noticed that whenever the bat followed a connection,
+    it moved equally well in both directions. This means that direction does not matter.
     </p>
     <p>
-    In the following, you will see several pairs of fruits and vegetables. Please try to remember from the previous task <strong>whether the connection between the two shown items was known or unknown to the flying figure</strong>.
-    Indicate your answer by clicking one of the buttons.
+    In the following, you will see several pairs of food items. Please try to remember from the previous task
+    <strong>whether there was a connection between the two shown items or not</strong>. Indicate your answer
+    by clicking one of the buttons.
     </p>
     <p>
     This time, there is no practice trial, so you can begin right away.
@@ -234,20 +237,20 @@ const INSTRUCTION_COPY = {
     <br>
     <h3>Instructions</h3>
     <p>
-    In yesterday's part of the experiment, you learned that the flying figures moved only between certain pairs of fruits and vegetables. These are the <strong>known connections</strong>.
+    In yesterday's part of the experiment, you learned that the bat moved only between certain pairs of food items. These are the <strong>connections</strong>.
     </p>
     <p>
-    Today, you will first see single images of fruits and vegetables, presented one after another.
+    Today, you will first see single images of food items, presented one after another.
     Please pay close attention to each image.
     </p>
     <p>
     Occasionally, <strong>two images</strong> will appear after a single image. In those cases,
     please remember the single image shown immediately before. Unlike yesterday, the two images
-    will not form a known connection. 
+    will not form a direct connection. 
     </p>
     <p>
     Your task is to decide which of the two items can be reached from the previous item using
-    <strong>fewer known connections</strong>, while taking the role of the flying figure.
+    <strong>fewer connections</strong>, while taking the role of the bat.
     </p>
     <p>
     Use the left and right arrow keys to respond.
@@ -258,7 +261,7 @@ const INSTRUCTION_COPY = {
     `,
     part2Demo: `
     <p>
-    Imagine that, yesterday, you learned these three known connections, while all other connections remained unknown.
+    Imagine that, yesterday, you learned these three connections.
     </p>
     `,
     part2Start: `
@@ -278,10 +281,10 @@ const INSTRUCTION_COPY = {
     <h3>Instructions</h3>
     <br>
     <p>
-    In the next part of the experiment, we ask you to <strong>arrange the fruits and vegetables in the environment</strong> in a way that seems reasonable to you.
+    In the next part of the experiment, we ask you to <strong>arrange the food items in the environment</strong> in a way that seems reasonable to you.
     </p>
     <p>
-    At the beginning, fruits and vegetables will appear on the right-hand side. To place one in the
+    At the beginning, food items will appear on the right-hand side. To place one in the
     environment, click on it and drag it to the position you think fits best. You can adjust the arrangement
     as often as you like by dragging the items again.
     </p>
@@ -296,16 +299,16 @@ const INSTRUCTION_COPY = {
     part3Second: `
     <h3>Instructions</h3>
     <p>
-    Next, we will show you the environment with the fruits and vegetables arranged as you placed them before.
-    This time, we ask you to <strong>draw the known connections</strong> as you remember them.
+    Next, we will show you the environment with the food items arranged as you placed them before.
+    This time, we ask you to <strong>draw the connections</strong> as you remember them.
     </p>
     <p>
-    As in yesterday's task, you can draw connections by <strong>dragging the cursor</strong> from one fruit or vegetable
+    As in yesterday's task, you can draw connections by <strong>dragging the cursor</strong> from one food item
     to another. If you want to remove a connection you have already drawn, you can <strong>double-click</strong> on it
     or use the <strong>reset button</strong>, which deletes all previously drawn connections at once.
     </p>
     <p>
-    Please make sure that the flying figure can reach every fruit and vegetable through at least one connection.
+    Please make sure that the bat can reach every food item through at least one connection.
     </p>
     <p>
     There is no time limit. Take as much time as you need, and click "Continue" once you are done.
@@ -316,7 +319,7 @@ const INSTRUCTION_COPY = {
     <h3>Congratulations, you are nearly done. One very last question:</h3>
     <br>
     <p>
-    Did you use any form of external aid to learn the flying figure's connections in Part I, or to
+    Did you use any form of external aid to learn the bat's connections in Part I, or to
     solve the task in Part II (for example, by writing the connections down)?
     </p>
     <p>

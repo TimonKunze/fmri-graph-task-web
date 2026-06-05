@@ -7,10 +7,10 @@ function getPrompt() {
 
   return isItalian
     ? `
-    <p>Quale percorso dall'immagine precedente richiede meno connessioni note?</p>
+    <p>Quale percorso dall'immagine precedente richiede meno connessioni?</p>
     `
     : `
-    <p>Which route from the previous image requires fewer known connections?</p>
+    <p>Which route from the previous image requires fewer connections?</p>
     `;
 }
 

@@ -695,11 +695,11 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
       const isItalian = getCurrentLanguage() === "it";
       return c_type === "first"
         ? isItalian
-          ? `Assicurati che l'elemento volante possa raggiungere ogni frutto e ortaggio, cioè che nessun elemento sia scollegato.`
-          : `Make sure the flying figure can reach every fruit and vegetable, i.e. no item is disconnected.`
+          ? `Assicurati che il pipistrello possa raggiungere ogni alimento, cioè che nessun elemento sia scollegato.`
+          : `Make sure the bat can reach every food item, i.e. no item is disconnected.`
         : isItalian
-          ? `Non tutti i frutti e gli ortaggi sono raggiungibili per l'elemento volante. Aggiungi una o più connessioni.`
-          : `Not all fruits and vegetables are reachable for the flying figure. Please add one or more connections.`;
+          ? `Non tutti gli alimenti sono raggiungibili per il pipistrello. Aggiungi una o più connessioni.`
+          : `Not all food items are reachable for the bat. Please add one or more connections.`;
     },
   };
 }

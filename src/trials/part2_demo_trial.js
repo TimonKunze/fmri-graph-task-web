@@ -150,10 +150,10 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
     topHtml,
     promptOverride: t({
       it: `
-        <p>Ora scegli quale delle due immagini può essere raggiunta dall'immagine precedente usando meno connessioni note.</p>
+        <p>Ora scegli quale delle due immagini può essere raggiunta dall'immagine precedente usando meno connessioni.</p>
       `,
       en: `
-        <p>Now choose which of the two images can be reached from the previous image using fewer known connections.</p>
+        <p>Now choose which of the two images can be reached from the previous image using fewer connections.</p>
       `,
     }),
     trialName: "part2_demo_path_choice",
@@ -187,8 +187,8 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
               })}</p>
           ${wasCorrect
             ? t({
-                it: "<p>Tieni presente che nell'esperimento vero e proprio non verranno mostrati video. Dovrai ricordare da solo/a le connessioni note.</p><p>Premi la freccia sinistra per ripetere la dimostrazione oppure la freccia destra per continuare.</p>",
-                en: "<p>Please note that in the actual experiment, no videos will be shown and no feedback will be given. You need to remember and count the known connections on your own.</p><p>Press the left arrow key to repeat the demo or the right arrow key to continue.</p>",
+                it: "<p>Tieni presente che nell'esperimento vero e proprio non verranno mostrati video. Dovrai ricordare e contare da solo/a le connessioni.</p><p>Premi la freccia sinistra per ripetere la dimostrazione oppure la freccia destra per continuare.</p>",
+                en: "<p>Please note that in the actual experiment, no videos will be shown and no feedback will be given. You will need to remember and count the connections on your own.</p><p>Press the left arrow key to repeat the demo or the right arrow key to continue.</p>",
               })
             : t({
                 it: "<p>Premi la freccia sinistra per ripetere la dimostrazione.</p>",
