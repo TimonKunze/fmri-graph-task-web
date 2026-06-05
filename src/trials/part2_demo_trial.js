@@ -1,6 +1,7 @@
 import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
 import { getInstructions } from "../config/instructions.js";
 import { PATHS } from "../config/paths.js";
+import { TIMINGS } from "../config/timings.js";
 import { jsPsych } from "../main.js";
 import { t } from "../state/participant.js";
 import { createFmriPictureViewingTrial } from "./fmri_picture_viewing_trial.js";
@@ -117,7 +118,7 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
     pictureTrials.push(createFmriPictureViewingTrial({
       imageSrc: PATHS.nodeExport(nodeIndex + 1),
       nodeIndex,
-      duration: 2000,
+      duration: TIMINGS.part2.imagePresentationMs,
       topHtml,
       prompt: t({
         it: index === 0

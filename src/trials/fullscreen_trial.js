@@ -21,14 +21,15 @@ function getCopy() {
           buttonLabel: "Continua (Debug)",
         }
       : {
-          message: `
-            <div style="max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 18px;">
-              <p><strong>Debug mode: fullscreen request is skipped.</strong></p>
-              <p>${isPart2Only ? "Press the right arrow key to proceed." : "Click continue to proceed."}</p>
-            </div>
-          `,
-          buttonLabel: isPart2Only ? "" : "Continue (Debug)",
-        };
+        message: `
+          <div style="max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 18px;">
+            <p><strong>Debug mode: fullscreen request is skipped.</strong></p>
+            <p>${isPart2Only ? "Press the right arrow key to proceed." : "Click continue to proceed."}</p>
+            ${isPart2Only ? '<div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>' : ""}
+          </div>
+        `,
+        buttonLabel: isPart2Only ? "" : "Continue (Debug)",
+      };
   }
 
   return isItalian
@@ -38,6 +39,7 @@ function getCopy() {
             <p><strong>L'esperimento passerà ora alla modalità a schermo intero.</strong></p>
             <p>Non uscire dallo schermo intero finché lo studio non è completato.</p>
             ${isPart2Only ? '<p>Premi la freccia destra per procedere.</p>' : ""}
+            ${isPart2Only ? '<div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>' : ""}
           </div>
         `,
         buttonLabel: isPart2Only ? "" : "Attiva Schermo Intero",
@@ -48,6 +50,7 @@ function getCopy() {
             <p><strong>The experiment will now switch to full screen mode.</strong></p>
             <p>Please do not exit full screen until the study is complete.</p>
             ${isPart2Only ? "<p>Press the right arrow key to proceed.</p>" : ""}
+            ${isPart2Only ? '<div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>' : ""}
           </div>
         `,
         buttonLabel: isPart2Only ? "" : "Enter Full Screen",

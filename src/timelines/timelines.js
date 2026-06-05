@@ -37,6 +37,7 @@ import { finalPart1Trial } from "../trials/final_part1_trial.js";
 import { finalPart2Trial } from "../trials/final_part2_trial.js";
 import { finalPart3Trial } from "../trials/final_part3_trial.js";
 import { PATHS } from "../config/paths.js";
+import { TIMINGS, samplePart2ItiSeconds } from "../config/timings.js";
 import { jsPsych } from "../main.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
 import { getPart2RawNodeBlocks, getLearnLayoutOrder, getSubjectAssignment, getTestLayoutOrder } from "../state/subjectAssignment.js";
@@ -216,15 +217,6 @@ export function makePart2Timeline() {
         : PATHS.nodeImages1(experimentNodeIndex),
     };
   };
-  const sampleFmriItiSeconds = () => {
-    while (true) {
-      const sample = -3 * Math.log(1 - Math.random());
-      if (sample >= 2 && sample <= 4) {
-        return sample;
-      }
-    }
-  };
-
   tl.push(part2_intro_trial);
   if (!CONFIG.debug) {
     tl.push(createPart2DemoTimeline(shortestPathDistanceMatrix));
@@ -297,7 +289,7 @@ export function makePart2Timeline() {
             imageSrc: decodedNode.imageSrc,
             nodeIndex: decodedNode.experimentNodeIndex,
             blockIndex,
-            duration: 2000,
+            duration: TIMINGS.part2.imagePresentationMs,
             trialIndex,
             dataExtras: {
               raw_node_index: decodedNode.rawNode,
@@ -310,7 +302,7 @@ export function makePart2Timeline() {
         previousNodeIndex = decodedNode.experimentNodeIndex;
         previousStimSet = decodedNode.stimSet;
         if (trialIndex < blockItems.length - 1) {
-          const itiSeconds = sampleFmriItiSeconds();
+          const itiSeconds = samplePart2ItiSeconds();
           tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
           previousItiSeconds = itiSeconds;
         }
@@ -368,7 +360,7 @@ export function makePart2Timeline() {
         previousNodeIndex = null;
         previousStimSet = null;
         if (trialIndex < blockItems.length - 1) {
-          const itiSeconds = sampleFmriItiSeconds();
+          const itiSeconds = samplePart2ItiSeconds();
           tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
           previousItiSeconds = itiSeconds;
         }

@@ -1,0 +1,25 @@
+export const TIMINGS = {
+  part2: {
+    imagePresentationMs: 2000,
+    iti: {
+      minSeconds: 2,
+      maxSeconds: 4,
+      meanSeconds: 3,
+    },
+  },
+};
+
+export function samplePart2ItiSeconds() {
+  const {
+    minSeconds,
+    maxSeconds,
+    meanSeconds,
+  } = TIMINGS.part2.iti;
+
+  while (true) {
+    const sample = -meanSeconds * Math.log(1 - Math.random());
+    if (sample >= minSeconds && sample <= maxSeconds) {
+      return sample;
+    }
+  }
+}
