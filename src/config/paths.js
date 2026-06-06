@@ -5,8 +5,8 @@ const withBase = (path) => `${BASE_URL}${path.startsWith("/") ? path : `/${path}
 
 export const PATHS = {
     // Layout 1 object
-    movingObj2: withBase("/stimuli/bats2/moving_obj.png"),
-    movingObj2Mirrored: withBase("/stimuli/bats2/moving_obj_mirrored.png"),
+    movingObj1: withBase("/stimuli/bats2/moving_obj.png"),
+    movingObj1Mirrored: withBase("/stimuli/bats2/moving_obj_mirrored.png"),
 
     // Layout 2 object
     movingObj2: withBase("/stimuli/bats2/moving_obj.png"),

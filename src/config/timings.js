@@ -1,22 +1,33 @@
-import { CONFIG } from "../config.js";
-
 export const TIMINGS = {
   part2: {
-    imagePresentationMs: CONFIG.behavioral ? 500 : 2000,
-    iti: {
-      minSeconds: 2,
-      maxSeconds: 4,
-      meanSeconds: CONFIG.behavioral ? 2 : 3,
+    default: {
+      imagePresentationMs: 2000,
+      iti: {
+        minSeconds: 2,
+        maxSeconds: 4,
+        meanSeconds: 3,
+      },
+    },
+    behavioral: {
+      imagePresentationMs: 500,
+      iti: {
+        minSeconds: 2,
+        maxSeconds: 4,
+        meanSeconds: 2,
+      },
     },
   },
 };
 
-export function samplePart2ItiSeconds() {
+export function samplePart2ItiSeconds(
+  meanSecondsOverride = TIMINGS.part2.default.iti.meanSeconds,
+  itiConfig = TIMINGS.part2.default.iti
+) {
   const {
     minSeconds,
     maxSeconds,
-    meanSeconds,
-  } = TIMINGS.part2.iti;
+  } = itiConfig;
+  const meanSeconds = meanSecondsOverride;
 
   while (true) {
     const sample = -meanSeconds * Math.log(1 - Math.random());

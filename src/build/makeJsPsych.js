@@ -76,7 +76,9 @@ export function makeJsPsych({ data_dir }) {
       const subjectCode = participantSetup?.subjectCode ?? "unknown";
       const dateString = makeShortDate();
       const file_name = `subj${subjectCode}_p${part}_${dateString}.jsonl`;
-      save_data(dataJsonl, data_dir, file_name);
+      save_data(dataJsonl, data_dir, file_name).catch((error) => {
+        console.error("[save_data] Failed to save trial data:", error);
+      });
     },
   });
 

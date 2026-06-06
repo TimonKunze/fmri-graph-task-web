@@ -1,4 +1,5 @@
 import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
+import { CONFIG } from "../config.js";
 import { getInstructions } from "../config/instructions.js";
 import { PATHS } from "../config/paths.js";
 import { TIMINGS } from "../config/timings.js";
@@ -70,6 +71,7 @@ function getDemoExample(shortestPathDistanceMatrix) {
 export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
   const topHtml = createDemoTopHtml();
   const demoExample = getDemoExample(shortestPathDistanceMatrix);
+  const part2Timings = CONFIG.behavioral ? TIMINGS.part2.behavioral : TIMINGS.part2.default;
 
   const introTrial = {
     type: jsPsychHtmlKeyboardResponse,
@@ -118,7 +120,7 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
     pictureTrials.push(createFmriPictureViewingTrial({
       imageSrc: PATHS.nodeExport(nodeIndex + 1),
       nodeIndex,
-      duration: TIMINGS.part2.imagePresentationMs,
+      duration: part2Timings.imagePresentationMs,
       topHtml,
       prompt: t({
         it: index === 0

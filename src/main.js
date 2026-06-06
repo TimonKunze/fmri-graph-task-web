@@ -197,4 +197,16 @@ async function bootstrap() {
   await jsPsych.run(timeline);
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error("[bootstrap] Experiment failed to start:", error);
+  const message = error instanceof Error ? error.message : String(error);
+  const target = document.querySelector("#jspsych-target") ?? document.body;
+  if (target) {
+    target.innerHTML = `
+      <div style="max-width: 720px; margin: 48px auto; padding: 24px; line-height: 1.6; color: #222;">
+        <h2>Experiment failed to start</h2>
+        <p>${message}</p>
+      </div>
+    `;
+  }
+});

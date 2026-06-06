@@ -181,6 +181,7 @@ export function makeLearnTimeline() {
 // ------------------------------------
 export function makePart2Timeline() {
   const tl = [];
+  const part2Timings = CONFIG.behavioral ? TIMINGS.part2.behavioral : TIMINGS.part2.default;
   const fmriBlocks = (getPart2RawNodeBlocks() ?? []).filter(Array.isArray);
   const totalFmriBlocks = fmriBlocks.length;
   const shortestPathDistanceMatrix = createShortestPathDistanceMatrix(G.adjM);
@@ -289,7 +290,7 @@ export function makePart2Timeline() {
             imageSrc: decodedNode.imageSrc,
             nodeIndex: decodedNode.experimentNodeIndex,
             blockIndex,
-            duration: TIMINGS.part2.imagePresentationMs,
+            duration: part2Timings.imagePresentationMs,
             trialIndex,
             dataExtras: {
               raw_node_index: decodedNode.rawNode,
@@ -302,7 +303,10 @@ export function makePart2Timeline() {
         previousNodeIndex = decodedNode.experimentNodeIndex;
         previousStimSet = decodedNode.stimSet;
         if (trialIndex < blockItems.length - 1) {
-          const itiSeconds = samplePart2ItiSeconds();
+          const itiSeconds = samplePart2ItiSeconds(
+            part2Timings.iti.meanSeconds,
+            part2Timings.iti
+          );
           tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
           previousItiSeconds = itiSeconds;
         }
@@ -360,7 +364,10 @@ export function makePart2Timeline() {
         previousNodeIndex = null;
         previousStimSet = null;
         if (trialIndex < blockItems.length - 1) {
-          const itiSeconds = samplePart2ItiSeconds();
+          const itiSeconds = samplePart2ItiSeconds(
+            part2Timings.iti.meanSeconds,
+            part2Timings.iti
+          );
           tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
           previousItiSeconds = itiSeconds;
         }
