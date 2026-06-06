@@ -152,10 +152,16 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
     topHtml,
     promptOverride: t({
       it: `
-        <p>Ora scegli quale delle due immagini può essere raggiunta dall'immagine precedente usando meno connessioni.</p>
+        <p>
+        Ora scegli quale delle due immagini può essere raggiunta dall'immagine precedente usando meno connessioni.
+        Premi il tasto freccia sinistra per l'immagine a sinistra, oppure il tasto freccia destra per l'immagine a destra.
+        </p>
       `,
       en: `
-        <p>Now choose which of the two images can be reached from the previous image using fewer connections.</p>
+        <p>
+        Now choose which of the two images can be reached from the preceding image using fewer connections.
+        Press the left arrow key for the left image, or the right arrow key for the right image.
+        </p>
       `,
     }),
     trialName: "part2_demo_path_choice",
@@ -189,17 +195,13 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
               })}</p>
           ${wasCorrect
             ? t({
-                it: "<p>Tieni presente che nell'esperimento vero e proprio non verranno mostrati video. Dovrai ricordare e contare da solo/a le connessioni.</p><p>Premi la freccia sinistra per ripetere la dimostrazione oppure la freccia destra per continuare.</p>",
+                it: "<p>Tieni presente che nell'esperimento vero e proprio non verranno mostrati video. Dovrai ricordare e contare da solo/a le connessioni.</p><p>Premi il tasto freccia sinistra per ripetere la dimostrazione oppure il tasto freccia destra per continuare.</p>",
                 en: "<p>Please note that in the actual experiment, no videos will be shown and no feedback will be given. You will need to remember and count the connections on your own.</p><p>Press the left arrow key to repeat the demo or the right arrow key to continue.</p>",
               })
             : t({
-                it: "<p>Premi la freccia sinistra per ripetere la dimostrazione.</p>",
+                it: "<p>Premi il tasto freccia sinistra per ripetere la dimostrazione.</p>",
                 en: "<p>Press the left arrow key to repeat the demo.</p>",
               })}
-          <div style="display:flex;justify-content:center;gap:${wasCorrect ? "60px" : "0"};font-size:28px;font-weight:700;margin-top:20px;">
-            <span>&#8592;</span>
-            ${wasCorrect ? "<span>&#8594;</span>" : ""}
-          </div>
         </div>
       `;
     },

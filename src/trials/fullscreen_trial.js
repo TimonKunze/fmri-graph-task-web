@@ -38,22 +38,20 @@ function getCopy() {
           <div style="max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 18px;">
             <p><strong>L'esperimento passerà ora alla modalità a schermo intero.</strong></p>
             <p>Non uscire dallo schermo intero finché lo studio non è completato.</p>
-            ${isPart2Only ? '<p>Premi la freccia destra per procedere.</p>' : ""}
-            ${isPart2Only ? '<div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>' : ""}
+            ${isPart2Only ? '<p>Fai clic sul pulsante qui sotto per procedere.</p>' : ""}
           </div>
         `,
-        buttonLabel: isPart2Only ? "" : "Attiva Schermo Intero",
+        buttonLabel: "Attiva Schermo Intero",
       }
     : {
         message: `
           <div style="max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 18px;">
             <p><strong>The experiment will now switch to full screen mode.</strong></p>
             <p>Please do not exit full screen until the study is complete.</p>
-            ${isPart2Only ? "<p>Press the right arrow key to proceed.</p>" : ""}
-            ${isPart2Only ? '<div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>' : ""}
+            ${isPart2Only ? "<p>Click the button below to proceed.</p>" : ""}
           </div>
         `,
-        buttonLabel: isPart2Only ? "" : "Enter Full Screen",
+        buttonLabel: "Enter Full Screen",
       };
 }
 
@@ -73,23 +71,6 @@ export const fullscreen_trial = {
     const copy = getCopy();
     trial.message = copy.message;
     trial.button_label = copy.buttonLabel;
-  },
-  on_load: () => {
-    if (!isPart2Only) {
-      return;
-    }
-
-    const listener = jsPsych.pluginAPI.getKeyboardResponse({
-      callback_function: () => {
-        jsPsych.pluginAPI.cancelKeyboardResponse(listener);
-        const button = document.querySelector("#jspsych-fullscreen-btn");
-        button?.click();
-      },
-      valid_responses: ["arrowright"],
-      persist: false,
-      allow_held_key: false,
-      rt_method: "performance",
-    });
   },
 
   on_finish: (data) => {

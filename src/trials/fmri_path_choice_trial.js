@@ -3,15 +3,7 @@ import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response"
 import { getCurrentLanguage } from "../state/participant.js";
 
 function getPrompt() {
-  const isItalian = getCurrentLanguage() === "it";
-
-  return isItalian
-    ? `
-    <p>Quale percorso dall'immagine precedente richiede meno connessioni?</p>
-    `
-    : `
-    <p>Which route from the previous image requires fewer connections?</p>
-    `;
+  return "";
 }
 
 function createImageChoice(imageSrc, imageWidth, imageHeight, alt) {
@@ -72,11 +64,9 @@ export function createFmriPathChoiceTrial({
         <div style="display:flex;align-items:center;justify-content:center;gap:32px;margin-top:20px;">
           <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
             ${createImageChoice(leftImageSrc, imageWidth, imageHeight, leftAlt)}
-            <div style="font-size:20px;font-weight:700;">&#8592;</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
             ${createImageChoice(rightImageSrc, imageWidth, imageHeight, rightAlt)}
-            <div style="font-size:20px;font-weight:700;">&#8594;</div>
           </div>
         </div>
       </div>
