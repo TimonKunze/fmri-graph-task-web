@@ -153,7 +153,8 @@ const INSTRUCTION_COPY = {
     <h3>Congratulazioni, hai quasi finito. Un'ultima domanda:</h3>
     <br>
     <p>
-      Hai utilizzato qualche forma di aiuto esterno per imparare le connessioni del pipistrello nella Parte I o per risolvere il compito nella Parte II (per esempio scrivendo le connessioni)?
+    Hai utilizzato qualche forma di aiuto esterno per imparare le connessioni del pipistrello nella Parte I
+    o per risolvere il compito nelle Parti II o III (per esempio scrivendo le connessioni)?
     </p>
     <p>
       (Per favore, rispondi onestamente. La tua risposta a questa domanda non influenzerà in alcun modo il tuo compenso.)
@@ -320,7 +321,7 @@ const INSTRUCTION_COPY = {
     <br>
     <p>
     Did you use any form of external aid to learn the bat's connections in Part I, or to
-    solve the task in Part II (for example, by writing the connections down)?
+    solve the tasks in Part II and III (for example, by writing the connections down)?
     </p>
     <p>
     (Please answer honestly. Your response to this question will not affect your payment in any way.)

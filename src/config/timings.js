@@ -1,10 +1,12 @@
+import { CONFIG } from "../config.js";
+
 export const TIMINGS = {
   part2: {
-    imagePresentationMs: 2000,
+    imagePresentationMs: CONFIG.behavioral ? 500 : 2000,
     iti: {
       minSeconds: 2,
       maxSeconds: 4,
-      meanSeconds: 3,
+      meanSeconds: CONFIG.behavioral ? 2 : 3,
     },
   },
 };

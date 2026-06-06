@@ -18,6 +18,7 @@ const baseConfig = {
 
   feedback: true,
   includeEvalTrials: true,
+  behavioral: true,
   keyChoice: null,
 
   showSingleTrialExport: false,
