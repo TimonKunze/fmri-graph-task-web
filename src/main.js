@@ -48,6 +48,8 @@ function addExperimentProperties() {
     learn_block_order: assignment.learnBlockOrder,
     part3_layout_order: assignment.part3LayoutOrder,
     part2_raw_node_blocks: assignment.part2RawNodeBlocks,
+    part2_iti_times_behav: assignment.part2ItiTimesBehav,
+    part2_iti_times_fmri: assignment.part2ItiTimesFmri,
     random_node_positions: DESIGN.randomPoss,
     rotation_node_positions: DESIGN.rotationPos,
     canvas_size: SIZES.env,

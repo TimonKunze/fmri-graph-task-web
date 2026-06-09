@@ -8,6 +8,8 @@ const currentAssignment = {
   part1LayoutOrder: null,
   part3LayoutOrder: null,
   part2RawNodeBlocks: null,
+  part2ItiTimesBehav: null,
+  part2ItiTimesFmri: null,
 };
 
 let randomizationRows = [];
@@ -65,6 +67,17 @@ function parseNestedArray(value) {
   }
 }
 
+function parseNestedNumberArray(value) {
+  const parsed = parseNestedArray(value);
+  if (!Array.isArray(parsed)) {
+    return null;
+  }
+
+  return parsed.map((block) =>
+    Array.isArray(block) ? block.map((item) => Number(item)) : []
+  );
+}
+
 export function loadRandomizationRows(csvText) {
   const lines = csvText.trim().split(/\r?\n/);
   const [headerLine, ...dataLines] = lines;
@@ -88,6 +101,8 @@ export function loadRandomizationRows(csvText) {
         part1LayoutOrder: parseNumberArray(row.part1_layout_order),
         part3LayoutOrder: parseNumberArray(row.part3_layout_order),
         part2RawNodeBlocks: parseNestedArray(row.part2_raw_node_blocks),
+        part2ItiTimesBehav: parseNestedNumberArray(row.part2_iti_times_behav),
+        part2ItiTimesFmri: parseNestedNumberArray(row.part2_iti_times_fmri),
       };
     })
     .filter(Boolean);
@@ -114,6 +129,12 @@ export function setSubjectAssignment(assignment) {
   currentAssignment.part2RawNodeBlocks = assignment?.part2RawNodeBlocks
     ? assignment.part2RawNodeBlocks.map((block) => Array.isArray(block) ? [...block] : block)
     : null;
+  currentAssignment.part2ItiTimesBehav = assignment?.part2ItiTimesBehav
+    ? assignment.part2ItiTimesBehav.map((block) => Array.isArray(block) ? [...block] : [])
+    : null;
+  currentAssignment.part2ItiTimesFmri = assignment?.part2ItiTimesFmri
+    ? assignment.part2ItiTimesFmri.map((block) => Array.isArray(block) ? [...block] : [])
+    : null;
 }
 
 export function getSubjectAssignment() {
@@ -133,6 +154,12 @@ export function getSubjectAssignment() {
       : null,
     part2RawNodeBlocks: currentAssignment.part2RawNodeBlocks
       ? currentAssignment.part2RawNodeBlocks.map((block) => Array.isArray(block) ? [...block] : block)
+      : null,
+    part2ItiTimesBehav: currentAssignment.part2ItiTimesBehav
+      ? currentAssignment.part2ItiTimesBehav.map((block) => Array.isArray(block) ? [...block] : [])
+      : null,
+    part2ItiTimesFmri: currentAssignment.part2ItiTimesFmri
+      ? currentAssignment.part2ItiTimesFmri.map((block) => Array.isArray(block) ? [...block] : [])
       : null,
   };
 }
@@ -185,4 +212,16 @@ export function getPart2RawNodeBlocks() {
   return currentAssignment.part2RawNodeBlocks.map((block) =>
     Array.isArray(block) ? [...block] : []
   );
+}
+
+export function getPart2ItiTimes(behavioral = false) {
+  const source = behavioral
+    ? currentAssignment.part2ItiTimesBehav
+    : currentAssignment.part2ItiTimesFmri;
+
+  if (!Array.isArray(source)) {
+    return null;
+  }
+
+  return source.map((block) => Array.isArray(block) ? [...block] : []);
 }

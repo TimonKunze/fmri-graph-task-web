@@ -37,10 +37,16 @@ import { finalPart1Trial } from "../trials/final_part1_trial.js";
 import { finalPart2Trial } from "../trials/final_part2_trial.js";
 import { finalPart3Trial } from "../trials/final_part3_trial.js";
 import { PATHS } from "../config/paths.js";
-import { TIMINGS, samplePart2ItiSeconds } from "../config/timings.js";
+import { TIMINGS } from "../config/timings.js";
 import { jsPsych } from "../main.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
-import { getPart2RawNodeBlocks, getLearnLayoutOrder, getSubjectAssignment, getTestLayoutOrder } from "../state/subjectAssignment.js";
+import {
+  getPart2ItiTimes,
+  getPart2RawNodeBlocks,
+  getLearnLayoutOrder,
+  getSubjectAssignment,
+  getTestLayoutOrder,
+} from "../state/subjectAssignment.js";
 import { createShortestPathDistanceMatrix } from "../utils/graph-tools.js";
 
 // ------------------------------------
@@ -183,6 +189,7 @@ export function makePart2Timeline() {
   const tl = [];
   const part2Timings = CONFIG.behavioral ? TIMINGS.part2.behavioral : TIMINGS.part2.default;
   const fmriBlocks = (getPart2RawNodeBlocks() ?? []).filter(Array.isArray);
+  const part2ItiBlocks = (getPart2ItiTimes(CONFIG.behavioral) ?? []).filter(Array.isArray);
   const totalFmriBlocks = fmriBlocks.length;
   const shortestPathDistanceMatrix = createShortestPathDistanceMatrix(G.adjM);
   const assignment = getSubjectAssignment();
@@ -276,10 +283,22 @@ export function makePart2Timeline() {
     };
   };
 
+  const getItiSecondsForPosition = (blockIndex, itiIndex) => {
+    const itiSeconds = Number(part2ItiBlocks?.[blockIndex]?.[itiIndex]);
+    if (Number.isFinite(itiSeconds)) {
+      return itiSeconds;
+    }
+
+    throw new Error(
+      `[makePart2Timeline] Missing ITI value for block ${blockIndex}, iti index ${itiIndex}, subject ${assignment.subjectCode}.`
+    );
+  };
+
   fmriBlocks.forEach((block, blockIndex) => {
     let previousNodeIndex = null;
     let previousStimSet = null;
     let previousItiSeconds = null;
+    let itiIndex = 0;
     const blockItems = CONFIG.debug ? block.slice(0, 8) : block;
 
     blockItems.forEach((item, trialIndex) => {
@@ -303,12 +322,10 @@ export function makePart2Timeline() {
         previousNodeIndex = decodedNode.experimentNodeIndex;
         previousStimSet = decodedNode.stimSet;
         if (trialIndex < blockItems.length - 1) {
-          const itiSeconds = samplePart2ItiSeconds(
-            part2Timings.iti.meanSeconds,
-            part2Timings.iti
-          );
+          const itiSeconds = getItiSecondsForPosition(blockIndex, itiIndex);
           tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
           previousItiSeconds = itiSeconds;
+          itiIndex += 1;
         }
         return;
       }
@@ -364,12 +381,10 @@ export function makePart2Timeline() {
         previousNodeIndex = null;
         previousStimSet = null;
         if (trialIndex < blockItems.length - 1) {
-          const itiSeconds = samplePart2ItiSeconds(
-            part2Timings.iti.meanSeconds,
-            part2Timings.iti
-          );
+          const itiSeconds = getItiSecondsForPosition(blockIndex, itiIndex);
           tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
           previousItiSeconds = itiSeconds;
+          itiIndex += 1;
         }
       }
     });

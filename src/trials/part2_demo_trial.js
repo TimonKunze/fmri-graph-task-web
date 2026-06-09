@@ -1,3 +1,4 @@
+import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
 import { CONFIG } from "../config.js";
 import { getInstructions } from "../config/instructions.js";
@@ -19,6 +20,20 @@ function normalizeArrowResponse(response) {
   }
 
   if (normalized === "arrowright" || normalized === "right" || normalized === "39") {
+    return "right";
+  }
+
+  return null;
+}
+
+function normalizeButtonResponse(response, choices) {
+  const choice = Array.isArray(choices) ? choices[Number(response)] : null;
+
+  if (choice === "repeat") {
+    return "left";
+  }
+
+  if (choice === "continue") {
     return "right";
   }
 
@@ -169,9 +184,9 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
   });
 
   const repeatTrial = {
-    type: jsPsychHtmlKeyboardResponse,
+    type: jsPsychHtmlButtonResponse,
     stimulus: "",
-    choices: ["arrowleft", "arrowright"],
+    choices: [],
     data: {
       trial_name: "part2_demo_repeat_prompt",
       part: 2,
@@ -180,7 +195,7 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
     on_start: (trial) => {
       const previousTrial = jsPsych.data.get().last(1).values()[0] ?? {};
       const wasCorrect = previousTrial.response_side === "left";
-      trial.choices = wasCorrect ? ["arrowleft", "arrowright"] : ["arrowleft"];
+      trial.choices = wasCorrect ? ["repeat", "continue"] : ["repeat"];
 
       trial.stimulus = `
         <div class="instr-screen">
@@ -195,18 +210,18 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
               })}</p>
           ${wasCorrect
             ? t({
-                it: "<p>Tieni presente che nell'esperimento vero e proprio non verranno mostrati video. Dovrai ricordare e contare da solo/a le connessioni.</p><p>Premi il tasto freccia sinistra per ripetere la dimostrazione oppure il tasto freccia destra per continuare.</p>",
-                en: "<p>Please note that in the actual experiment, no videos will be shown and no feedback will be given. You will need to remember and count the connections on your own.</p><p>Press the left arrow key to repeat the demo or the right arrow key to continue.</p>",
+                it: "<p>Tieni presente che nell'esperimento vero e proprio non verranno mostrati video. Dovrai ricordare e contare da solo/a le connessioni.</p><p>Fai clic su un pulsante qui sotto per ripetere la dimostrazione oppure continuare.</p>",
+                en: "<p>Please note that in the actual experiment, no videos will be shown and no feedback will be given. You will need to remember and count the connections on your own.</p><p>Click a button below to repeat the demo or continue.</p>",
               })
             : t({
-                it: "<p>Premi il tasto freccia sinistra per ripetere la dimostrazione.</p>",
-                en: "<p>Press the left arrow key to repeat the demo.</p>",
+                it: "<p>Fai clic sul pulsante qui sotto per ripetere la dimostrazione.</p>",
+                en: "<p>Click the button below to repeat the demo.</p>",
               })}
         </div>
       `;
     },
     on_finish: (data) => {
-      const normalizedResponse = normalizeArrowResponse(data.response);
+      const normalizedResponse = normalizeButtonResponse(data.response, repeatTrial.choices);
       data.repeat_demo = normalizedResponse === "left";
       data.response_side = normalizedResponse;
     },
