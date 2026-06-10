@@ -10,11 +10,11 @@ function parseEnvNumber(value, fallback) {
 const baseConfig = {
   mode: "prod", // "dev" | "prod"
 
-  activePart: 1, // 1 | 2 | 3
+  activePart: 2, // 1 | 2 | 3
 
   defaultLanguage: "en", // "en" | "it"
 
-  graphHex: "1024C905",  // TODO: change to correct graph
+  graphHex: "1024C905",
 
   feedback: false,
   includeEvalTrials: true,

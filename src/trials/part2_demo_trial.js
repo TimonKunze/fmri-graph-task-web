@@ -9,6 +9,7 @@ import { t } from "../state/participant.js";
 import { createFmriPictureViewingTrial } from "./fmri_picture_viewing_trial.js";
 import { createFmriPathChoiceTrial } from "./fmri_path_choice_trial.js";
 
+// TODO: delete?
 function normalizeArrowResponse(response) {
   if (response === null || response === undefined) {
     return null;
@@ -26,6 +27,7 @@ function normalizeArrowResponse(response) {
   return null;
 }
 
+// TODO: dlete?
 function normalizeButtonResponse(response, choices) {
   const choice = Array.isArray(choices) ? choices[Number(response)] : null;
 
@@ -120,7 +122,7 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
       </div>
     `,
     choices: "NO_KEYS",
-    trial_duration: 3000,
+    trial_duration: 2000,
     response_ends_trial: false,
     data: {
       trial_name: "part2_demo_gap",
@@ -221,7 +223,7 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
       `;
     },
     on_finish: (data) => {
-      const normalizedResponse = normalizeButtonResponse(data.response, repeatTrial.choices);
+      const normalizedResponse = Number(data.response) === 0 ? "left" : "right";
       data.repeat_demo = normalizedResponse === "left";
       data.response_side = normalizedResponse;
     },

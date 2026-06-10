@@ -21,19 +21,36 @@ const INSTRUCTION_COPY = {
     <h2>Compito 1</h2>
     <h3>Istruzioni</h3>
     <p>
-      In questo compito vedrai diversi alimenti disposti in un ambiente. Il tuo compito è <strong>trovare un pipistrello nascosto</strong> cliccando su di essi. Una volta trovato, osserva da dove parte e dove arriva, e cerca di ricordare questa connessione.
+      In questo compito vedrai diversi alimenti disposti in un ambiente. Il tuo compito è
+      <strong>trovare il pipistrello nascosto</strong> cliccando sugli alimenti. Una volta trovato, osserva
+      tra quali due alimenti si sposta e ricorda questa connessione.
     </p>
     <p>
-      Successivamente, ti chiediamo di <strong>disegnare il percorso del pipistrello</strong> cliccando su un alimento e trascinando il cursore fino a un altro. Questo crea una connessione tra i due elementi, e una linea verde o rossa indicherà se la connessione è corretta. Potrai passare alla prova successiva solo dopo aver disegnato la connessione corretta oppure dopo aver fatto più di 10 tentativi sbagliati. Tieni presente che la posizione degli alimenti può cambiare di tanto in tanto, ma questo non dovrebbe impedirti di disegnare la connessione giusta.
+      Successivamente, dovrai <strong>disegnare il percorso del pipistrello</strong> cliccando su uno dei due alimenti
+      e trascinando il cursore fino all'altro. In questo modo creerai una connessione tra i due elementi. Una linea verde o rossa
+      mostrerà se la connessione è corretta oppure no.
     </p>
     <p>
-      Nota che la direzione in cui vedi muoversi il pipistrello non è importante, perché ogni volta che si sposta da un elemento a un altro, vedrai anche lo stesso movimento nella direzione opposta. Allo stesso modo, non importa in quale direzione disegni la connessione.
+      Potrai passare alla prova successiva solo dopo aver disegnato la connessione corretta oppure dopo più di
+      10 tentativi sbagliati.
+      La posizione degli alimenti può cambiare di tanto in tanto, ma questo non influisce su quali
+      connessioni sono corrette.
+    </p>
+    <p>
+      La direzione del movimento non è importante. Se il pipistrello si sposta tra due alimenti, la stessa
+      connessione è corretta in entrambe le direzioni. Allo stesso modo, non importa in quale direzione
+      disegni la connessione.
     </p>
     <p>
       Di tanto in tanto, riceverai un punteggio di prestazione basato sulla frequenza con cui la tua prima risposta è stata corretta in una serie di prove.
     </p>
     <p>
-      Prima di iniziare con il primo insieme di elementi, avrai la possibilità di completare <strong>due prove di esempio</strong> cliccando su "Continua". Successivamente, completerai ${firstSetBlocks} ${firstSetBlockLabelIt} con il primo insieme di elementi, seguiti da ${secondSetBlocks} ${secondSetBlockLabelIt} con il secondo insieme.
+      Nel corso dell'intero esperimento, lavorerai con due diversi insiemi di elementi.
+    </p>
+    <p>
+      Prima di iniziare con il primo insieme, completerai <strong>due prove di pratica</strong> cliccando su "Continua".
+      Successivamente, completerai ${firstSetBlocks} ${firstSetBlockLabelIt} con il primo insieme di elementi,
+      seguiti da ${secondSetBlocks} ${secondSetBlockLabelIt} con il secondo insieme.
     </p>
   `,
     task1Part1End: `
@@ -168,34 +185,35 @@ const INSTRUCTION_COPY = {
     <h2>Task 1</h2>
     <h3>Instructions</h3>
     <p>
-    In this task, you will see several food items arranged in an environment. Your task is
-    to <strong>find a hidden bat</strong> by clicking on them. Once you find it, observe
-    where it moves from and where it moves to, and remember this connection.
+    In this task, you will see several food items arranged in an environment. Your task is to
+    <strong>find the hidden bat</strong> by clicking on the items. Once you find it, watch
+    which two items it moves between and remember this connection.
     </p>
     <p>
-    Next, we ask you to <strong>draw the path of the bat</strong> by clicking on one food item
-    and dragging the cursor to another. This creates a connection between the two, and
-    a green or red line indicates whether the connection is correct. You can continue to the next trial
-    only after drawing the correct connection or after making more than 10 incorrect attempts. Please
-    note that the positions of the food items may change from time to time, but this should
-    not affect your ability to draw the correct connection.
+    Next, you will <strong>draw the bat's path</strong> by clicking on one of the two items and
+    dragging the cursor to the other. This creates a connection between them. A green or red
+    line will show whether the connection is correct or not.
     </p>
     <p>
-    Note that the direction in which you see the bat move is not important, because whenever it moves from
-    one item to another, you will also see the same movement in the opposite direction. Likewise, it does not matter
-    in which direction you draw the connection.
+    You can continue to the next trial only after drawing the correct connection or after more than
+    10 incorrect attempts.
+    The positions of the food items may change from time to time, but this does not affect which
+    connections are correct.
+    </p>
+    <p>
+    The direction of movement does not matter. If the bat moves between two items, the same
+    connection is correct in both directions. Relatedly, the direction in which you draw
+    the connection also does not matter.
     </p>
     <p>
     From time to time, you will receive a performance score based on your first-attempt accuracy across several trials.
     </p>
     <p>
-    Over the course of the experiment, you will work with two different sets of items, and each set will be associated
-    with a different bat.
+    Over the full experiment, you will work with two different sets of items.
     </p>
     <p>
-    Before starting with the first set of items, you will have the chance to complete <strong>two practice
-    trials</strong> by
-    clicking "Continue." Afterward, you will complete ${firstSetBlocks} ${firstSetBlockLabelEn} with the first set of items,
+    Before starting the first set, you will complete <strong>two practice trials</strong> by clicking "Continue."
+    Afterward, you will complete ${firstSetBlocks} ${firstSetBlockLabelEn} with the first set of items,
     followed by ${secondSetBlocks} ${secondSetBlockLabelEn} with the second set.
     </p>
   `,
