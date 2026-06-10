@@ -40,7 +40,7 @@ const configProfiles = {
     telegram: true,
     quick_run: false,
     randomize: true,
-    nbLearnBlocks: [3, 3],
+    nbLearnBlocks: [4, 4],
     maxAttemptsDraw: 11,
     maxLearnRelations: "max",
     defaultLanguage: "it", // "en" | "it"
@@ -97,4 +97,4 @@ CONFIG.part2 = CONFIG.activePart === 2;
 CONFIG.part3 = CONFIG.activePart === 3;
 
 CONFIG.keyChoice = CONFIG.debug ? "ALL_KEYS" : "NO_KEYS";
-CONFIG.nbLearnPasses = CONFIG.debug ? 1 : 3; // in earlier pilots: 3
+CONFIG.nbLearnPasses = CONFIG.debug ? 1 : 2; // in earlier pilots: 3

@@ -72,4 +72,4 @@ rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri
 
 Check the save_data.php is shipped:
 
-rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/exp_data/
+rsync -e "ssh" -avz exp_data/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/exp_data/

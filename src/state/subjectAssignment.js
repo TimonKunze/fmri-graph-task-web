@@ -1,3 +1,5 @@
+import { CONFIG } from "../config.js";
+
 const IDENTITY_NODE_TO_GRAPH = [0, 1, 2, 3, 4, 5, 6, 7];
 const IDENTITY_OBJECT_TO_NODES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
@@ -79,6 +81,35 @@ function parseNestedNumberArray(value) {
   );
 }
 
+function getLearnLayoutOrderFromConfig() {
+  const rotationalCount = Array.isArray(CONFIG.nbLearnBlocks)
+    ? Number(CONFIG.nbLearnBlocks[0] ?? 0)
+    : Number(CONFIG.nbLearnBlocks || 0);
+  const unconstrainedCount = Array.isArray(CONFIG.nbLearnBlocks)
+    ? Number(CONFIG.nbLearnBlocks[1] ?? 0)
+    : 0;
+  const csvStartsWithUnconstrained = Array.isArray(currentAssignment.part1LayoutOrder)
+    && currentAssignment.part1LayoutOrder.length > 0
+    && Number(currentAssignment.part1LayoutOrder[0]) === 1;
+  const firstLayout = csvStartsWithUnconstrained ? "unconstrained" : "rotational";
+  const secondLayout = firstLayout === "rotational" ? "unconstrained" : "rotational";
+  const counts = {
+    rotational: rotationalCount,
+    unconstrained: unconstrainedCount,
+  };
+  const expandedOrder = [];
+
+  for (let i = 0; i < counts[firstLayout]; i += 1) {
+    expandedOrder.push(firstLayout);
+  }
+
+  for (let i = 0; i < counts[secondLayout]; i += 1) {
+    expandedOrder.push(secondLayout);
+  }
+
+  return expandedOrder;
+}
+
 export function loadRandomizationRows(csvText) {
   const lines = csvText.trim().split(/\r?\n/);
   const [headerLine, ...dataLines] = lines;
@@ -151,9 +182,7 @@ export function getSubjectAssignment() {
       : null,
     experimentNodeToGraphNode: [...currentAssignment.experimentNodeToGraphNode],
     objectToNodes: [...currentAssignment.objectToNodes],
-    learnBlockOrder: currentAssignment.part1LayoutOrder
-      ? [...currentAssignment.part1LayoutOrder]
-      : null,
+    learnBlockOrder: getLearnLayoutOrderFromConfig(),
     part1LayoutOrder: currentAssignment.part1LayoutOrder
       ? [...currentAssignment.part1LayoutOrder]
       : null,
@@ -193,13 +222,8 @@ export function getNodeMappingForStimSet(setName, nbNodes = 8) {
 }
 
 export function getLearnLayoutOrder() {
-  if (!Array.isArray(currentAssignment.part1LayoutOrder)) {
-    return null;
-  }
-
-  return currentAssignment.part1LayoutOrder.map((item) =>
-    Number(item) === 0 ? "rotational" : "unconstrained"
-  );
+  const order = getLearnLayoutOrderFromConfig();
+  return order.length > 0 ? order : null;
 }
 
 export function getTestLayoutOrder() {

@@ -5,8 +5,29 @@ import { getSubjectAssignment } from "../state/subjectAssignment.js";
 
 
 const graphs = {
-
-    // Graph 10248905 used in the experiment {{{
+    // Graph 1024C905 used in the fmri experiment {{{
+    "1024C905": {
+      "adjM": [[0, 0, 0, 0, 0, 0, 0, 1],
+               [0, 0, 0, 0, 1, 0, 0, 1],
+               [0, 0, 0, 1, 0, 0, 1, 0],
+               [0, 0, 1, 0, 0, 1, 0, 0],
+               [0, 1, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 1, 0, 0, 1, 0],
+               [0, 0, 1, 0, 0, 1, 0, 1],
+               [1, 1, 0, 0, 0, 0, 1, 0],
+              ],
+      "constantPos": [ //
+                [[660, 110],
+                [110, 660],
+                [220, 770],
+                [770, 550],
+                [440, 550],
+                [770, 220],
+                [550, 550],
+                [110, 440]],
+                ],
+    },
+    // Graph 10248905 used in the behavioral experiment {{{
     "10248905": {
       "adjM": [ 
          [0, 0, 0, 0, 0, 0, 0, 1],
@@ -81,6 +102,10 @@ function remapPath(path, canonicalToExp) {
 }
 
 function remapPairList(pairList, canonicalToExp) {
+  if (!Array.isArray(pairList)) {
+    return [];
+  }
+
   return pairList.map(([left, right]) => [
     remapPath(left, canonicalToExp),
     remapPath(right, canonicalToExp),
