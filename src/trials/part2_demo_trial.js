@@ -27,7 +27,7 @@ function normalizeArrowResponse(response) {
   return null;
 }
 
-// TODO: dlete?
+// TODO: delete?
 function normalizeButtonResponse(response, choices) {
   const choice = Array.isArray(choices) ? choices[Number(response)] : null;
 
