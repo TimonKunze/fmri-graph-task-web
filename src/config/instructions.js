@@ -91,16 +91,26 @@ const INSTRUCTION_COPY = {
     <br>
     <h3>Istruzioni</h3>
     <p>
-      Nella parte di ieri dell'esperimento, hai imparato che il pipistrello si sposta solo tra alcune coppie di alimenti. Queste sono le <strong>connessioni</strong>.
+      Nella parte di ieri dell'esperimento, hai imparato che il pipistrello si sposta solo
+      tra alcune coppie di alimenti <strong>collegate tra loro</strong>.
     </p>
     <p>
-      Oggi, vedrai prima immagini singole di alimenti, presentate una dopo l'altra. Ti preghiamo di osservare attentamente ciascuna immagine.
+      Oggi vedrai prima immagini singole di alimenti, presentate una dopo
+      l'altra. Ti preghiamo di osservare attentamente ciascuna immagine.
     </p>
     <p>
-      A volte, dopo un'immagine singola, appariranno due immagini. In questi casi, cerca di ricordare l'immagine singola mostrata immediatamente prima. A differenza di ieri, le due immagini non formeranno una connessione diretta. Il tuo compito sarà decidere quale delle due immagini può essere raggiunta a partire dall'immagine precedente usando un numero minore di connessioni, assumendo il ruolo del pipistrello.
+      A volte, dopo un'immagine singola, appariranno <strong>due immagini</strong>.
+      In questi casi, cerca di ricordare l'immagine singola mostrata
+      immediatamente prima.
+      A differenza di ieri, le due immagini non formeranno una connessione diretta.
     </p>
     <p>
-      Usa i tasti freccia sinistra e freccia destra per rispondere.
+      Il tuo compito è decidere quale dei due elementi può essere raggiunto
+      a partire dall'elemento precedente usando <strong>meno connessioni</strong>,
+      assumendo il ruolo del pipistrello.
+    </p>
+    <p>
+      Usa i tasti freccia sinistra e destra per rispondere.
     </p>
     <p>
       Per continuare, premi il tasto freccia destra e ti mostreremo una breve dimostrazione.
@@ -163,6 +173,27 @@ const INSTRUCTION_COPY = {
     </p>
     <p>
       Non c'è alcun limite di tempo. Prenditi tutto il tempo di cui hai bisogno e fai clic su "Continua" quando hai finito.
+    </p>
+    <br>
+  `,
+    part3CongrIntro: `
+    <h3>Istruzioni</h3>
+    <p>
+      Nel compito seguente farai quasi <strong>la stessa cosa della
+      Parte II</strong>.
+    </p>
+    <p>
+      Solo che questa volta vedrai <strong>quattro elementi</strong> sullo schermo
+      contemporaneamente, organizzati come due percorsi tra un elemento iniziale
+      e un elemento finale.
+    </p>
+    <p>
+      Come prima, il tuo compito è decidere quale dei due percorsi
+      richiede <strong>meno connessioni</strong>, assumendo di nuovo
+      il ruolo del pipistrello.
+    </p>
+    <p>
+      Prenditi il tempo necessario e fai clic su "Continua" per iniziare.
     </p>
     <br>
   `,
@@ -256,20 +287,23 @@ const INSTRUCTION_COPY = {
     <br>
     <h3>Instructions</h3>
     <p>
-    In yesterday's part of the experiment, you learned that the bat moved only between certain pairs of food items. These are the <strong>connections</strong>.
+    In yesterday's part of the experiment, you learned that the bat moved only
+    between certain, <strong>connected pairs</strong> of food items.
     </p>
     <p>
-    Today, you will first see single images of food items, presented one after another.
-    Please pay close attention to each image.
+    Today, you will first see single images of food items, presented one after
+    another. Please pay close attention to each image.
     </p>
     <p>
-    Occasionally, <strong>two images</strong> will appear after a single image. In those cases,
-    please remember the single image shown immediately before. Unlike yesterday, the two images
-    will not form a direct connection. 
+    Occasionally, <strong>two images</strong> will appear after a single image.
+    In those cases, please remember the single image shown immediately
+    before.
+    Unlike yesterday, the two images will not form a direct connection. 
     </p>
     <p>
-    Your task is to decide which of the two items can be reached from the previous item using
-    <strong>fewer connections</strong>, while taking the role of the bat.
+    Your task is to decide which of the two items can be reached from the
+    previous item using <strong>fewer connections</strong>, while taking
+    the role of the bat.
     </p>
     <p>
     Use the left and right arrow keys to respond.
@@ -300,7 +334,8 @@ const INSTRUCTION_COPY = {
     <h3>Instructions</h3>
     <br>
     <p>
-    In the next part of the experiment, we ask you to <strong>arrange the food items in the environment</strong> in a way that seems reasonable to you.
+    In this task of the experiment, we ask you to <strong>arrange the food items in the environment</strong>
+    in a way that seems reasonable to you.
     </p>
     <p>
     At the beginning, food items will appear on the right-hand side. To place one in the
@@ -331,6 +366,26 @@ const INSTRUCTION_COPY = {
     </p>
     <p>
     There is no time limit. Take as much time as you need, and click "Continue" once you are done.
+    </p>
+    <br>
+  `,
+    part3CongrIntro: `
+    <h3>Instructions</h3>
+    <p>
+    In the following task, you will do nearly <strong>the same task as in
+    Part II</strong>.
+    </p>
+    <p>
+    Only this time, you will see <strong>four items</strong> on the screen
+    simultanously, arranged as two routes between a start item and an end item.
+    </p>
+    <p>
+    Similar to before, your task is to decide which of the two routes
+    requires <strong>fewer connection</strong>, while
+    taking the role of the bat.
+    </p>
+    <p>
+    Take as much time as you need, and click "Continue" to begin.
     </p>
     <br>
   `,

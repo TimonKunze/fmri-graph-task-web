@@ -18,6 +18,7 @@ import { part2_intro_trial } from "../trials/part2_intro_trial.js";
 import { createPart2DemoTimeline } from "../trials/part2_demo_trial.js";
 import { part2_start_trial } from "../trials/part2_start_trial.js";
 import { part2EvalIntroTrial } from "../trials/part2_eval_intro_trial.js";
+import { createCongrTestTrial } from "../trials/create_congr_test_trial.js";
 import { createFmriPathChoiceTrial } from "../trials/fmri_path_choice_trial.js";
 import { createFmriPictureViewingTrial } from "../trials/fmri_picture_viewing_trial.js";
 import { consent_trial } from "../trials/consent_trial.js";
@@ -27,6 +28,7 @@ import { learnTrialRelQueryInstr } from "../trials/learn_rel_query_instr_trial.j
 import { createRelQueryTrialFeedback } from "../trials/rel_query_feedback_trial.js";
 import { createConditionTransitionTrial } from "../trials/condition_transition_trial.js";
 import { createConfidenceTrial, createFreeEvalTrial } from "../trials/eval_trials.js"; 
+import { part3_congr_intro_trial } from "../trials/part3_congr_intro_trial.js";
 import { spatialPosInstrTrial1, spatialPosInstrTrial2 } from "../trials/spatialpos_instr_trial.js";
 import { 
     createSpatialPosTrial, 
@@ -408,6 +410,15 @@ export function makePart3Timeline() {
     if (!Array.isArray(testLayouts) || testLayouts.length < 2) {
       throw new Error("[makePart3Timeline] Missing randomized Part III layout order.");
     }
+    const congrPairs = [...(G.eCongrPairs ?? []), ...(G.eIncongrPairs ?? [])];
+    const appendCongrTrials = () => {
+      tl.push(part3_congr_intro_trial);
+      testLayouts.forEach((layoutType, layoutIndex) => {
+        congrPairs.forEach((pair, pairIndex) => {
+          tl.push(createCongrTestTrial(layoutIndex * congrPairs.length + pairIndex, pair, layoutType));
+        });
+      });
+    };
 
     if (CONFIG.includeEvalTrials) {
       tl.push(part2EvalIntroTrial);
@@ -435,6 +446,9 @@ export function makePart3Timeline() {
     if (CONFIG.includeEvalTrials) {
       tl.push(createConfidenceTrial("part3"));
       tl.push(createFreeEvalTrial("part3"));
+      appendCongrTrials();
+    } else {
+      appendCongrTrials();
     }
 
     // Cheater & Final

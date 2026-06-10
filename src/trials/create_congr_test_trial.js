@@ -14,9 +14,6 @@ export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.v
   const secondStimSet = useSecondStimSet(layoutType);
   const nodeImagePath = secondStimSet ? PATHS.nodeImages2 : PATHS.nodeImages1;
   const stimSize = secondStimSet ? SIZES.task3Treetop : SIZES.task3Flower;
-  const stimLabel = secondStimSet ? "treetop" : "flower";
-  const agentLabel = secondStimSet ? "bat" : "bee";
-
   // Get Stimuli
   // Define html strings for stimuli
   let stim_width_ft = `${stimSize}px`;
@@ -57,13 +54,12 @@ export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.v
     },
     on_start: function (trial) {
       const isItalian = getCurrentLanguage() === "it";
+      const itemLabel = isItalian ? "elemento" : "item";
+      const agentLabel = isItalian ? "pipistrello" : "bat";
       const startEndLabel = isItalian
-        ? `Quale percorso dal ${stimLabel === "flower" ? "fiore" : "punto"} iniziale al ${stimLabel === "flower" ? "fiore" : "punto"} finale richiede <strong>meno soste</strong> per ${agentLabel === "bee" ? "l'ape" : "il pipistrello"}?`
-        : `Which route from start ${stimLabel} to end ${stimLabel} requires <strong>less stopovers</strong> for the ${agentLabel}?`;
+        ? `Quale percorso dall'${itemLabel} iniziale all'${itemLabel} finale richiede <strong>meno connessioni</strong> per il ${agentLabel}?`
+        : `Which route from the start ${itemLabel} to the end ${itemLabel} requires <strong>fewer connections</strong> for the ${agentLabel}?`;
       trial.stimulus = `
-        <p>
-          ${isItalian ? "Prenditi il tempo necessario e rispondi correttamente:" : "Please take your time and answer correctly:"}
-        </p>
         <p>${startEndLabel}</p>
       `;
     },
