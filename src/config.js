@@ -14,7 +14,7 @@ const baseConfig = {
 
   defaultLanguage: "en", // "en" | "it"
 
-  graphHex: "10248905",  // TODO: change to correct graph
+  graphHex: "1024C905",  // TODO: change to correct graph
 
   feedback: false,
   includeEvalTrials: true,

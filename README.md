@@ -64,10 +64,11 @@ The experiment saves a combination of global metadata and trial-specific fields 
 First deploy with:
 
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-03 npm run build:parts -- "deployment 2026-06-03"
+DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-10 npm run build:parts -- "deployment 2026-06-10"
 
 Then copy to the server with:
-
 rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-03/
+rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10/
 
 Check the save_data.php is shipped:
 
