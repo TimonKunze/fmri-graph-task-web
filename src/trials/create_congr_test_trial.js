@@ -45,7 +45,10 @@ export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.v
     stimulus: "",
     choices: function() {
       const choices = [choice1, choice2];
-      choiceSwitched = false;
+      choiceSwitched = CONFIG.randomize ? Math.random() < 0.5 : false;
+      if (choiceSwitched) {
+        choices.reverse();
+      }
       return choices;
     },
     save_trial_parameters: {

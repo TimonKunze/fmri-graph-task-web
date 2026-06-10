@@ -42,6 +42,7 @@ import { PATHS } from "../config/paths.js";
 import { TIMINGS } from "../config/timings.js";
 import { jsPsych } from "../main.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
+import * as htools from "../utils/helper-tools.js";
 import {
   getPart2ItiTimes,
   getPart2RawNodeBlocks,
@@ -410,13 +411,17 @@ export function makePart3Timeline() {
     if (!Array.isArray(testLayouts) || testLayouts.length < 2) {
       throw new Error("[makePart3Timeline] Missing randomized Part III layout order.");
     }
-    const congrPairs = [...(G.eCongrPairs ?? []), ...(G.eIncongrPairs ?? [])];
+    const congrTrials = testLayouts.flatMap((layoutType) =>
+      [...(G.eCongrPairs ?? []), ...(G.eIncongrPairs ?? [])].map((pair) => ({
+        layoutType,
+        pair,
+      }))
+    );
     const appendCongrTrials = () => {
       tl.push(part3_congr_intro_trial);
-      testLayouts.forEach((layoutType, layoutIndex) => {
-        congrPairs.forEach((pair, pairIndex) => {
-          tl.push(createCongrTestTrial(layoutIndex * congrPairs.length + pairIndex, pair, layoutType));
-        });
+      const orderedCongrTrials = CONFIG.randomize ? htools.shuffleArray([...congrTrials]) : congrTrials;
+      orderedCongrTrials.forEach(({ layoutType, pair }, trialIndex) => {
+        tl.push(createCongrTestTrial(trialIndex, pair, layoutType));
       });
     };
 
@@ -425,7 +430,7 @@ export function makePart3Timeline() {
       tl.push(createConfidenceTrial("part2"));
       tl.push(createFreeEvalTrial("part2"));
     }
-    // Add congruence task here:
+    appendCongrTrials();
 
     // Instruction Arena task (Spatialpos) for both layout conditions
     // ---------------------------------------------------------------
@@ -446,9 +451,6 @@ export function makePart3Timeline() {
     if (CONFIG.includeEvalTrials) {
       tl.push(createConfidenceTrial("part3"));
       tl.push(createFreeEvalTrial("part3"));
-      appendCongrTrials();
-    } else {
-      appendCongrTrials();
     }
 
     // Cheater & Final

@@ -6,8 +6,6 @@ export const SIZES = {
   // Task 1 and 4 (Learning and Arena task): node stimulus sizes
   "task14Bee": 105,
   "task14Bat": 105,
-  // "task14Flower": 60,
-  // "task14Treetop": 75,
   "task14Flower": 80,
   "task14Treetop": 80,
 
@@ -16,6 +14,6 @@ export const SIZES = {
   "task2Treetop": 120,
 
   // Task 3 (congruency test): node stimulus sizes
-  "task3Flower": 100,
+  "task3Flower": 120,
   "task3Treetop": 120,
 };

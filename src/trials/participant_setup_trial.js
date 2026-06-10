@@ -103,7 +103,7 @@ export const participant_setup_trial = {
       </div>
     `;
   },
-  choices: [getCopy().continueLabel],
+  choices: [""],
   data: {
     trial_name: "participant_setup",
   },
@@ -124,6 +124,12 @@ export const participant_setup_trial = {
 
     const submitLabel = getCopy().continueLabel;
     button.textContent = submitLabel;
+
+    languageSelect.addEventListener("change", () => {
+      const selectedLanguage = languageSelect.value;
+      const selectedCopy = COPY[selectedLanguage] ?? getCopy();
+      button.textContent = selectedCopy.continueLabel;
+    });
 
     button.addEventListener(
       "click",

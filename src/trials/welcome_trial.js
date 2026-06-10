@@ -52,7 +52,7 @@ function getCopy() {
 export const welcome_trial = {
   type: jsPsychHtmlButtonResponse,
   stimulus: "",
-  choices: ["Continue"],
+  choices: [""],
 
   data: {
     trial_name: "welcome",
