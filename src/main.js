@@ -8,6 +8,7 @@ import { refreshGraphState, G } from "./config/graphs.js";
 import { PATHS } from "./config/paths.js";
 import { SIZES } from "./config/sizes.js";
 import { STIMULUS_CONDITION_MAP } from "./config/stimulus_assignment.js";
+import { TIMINGS } from "./config/timings.js";
 import { participant_setup_trial } from "./trials/participant_setup_trial.js";
 import { getParticipantSetup } from "./state/participant.js";
 import { runSingleTrialExporter } from "./exporters/singleTrialExporter.js";
@@ -30,6 +31,7 @@ const session_id = "custom_session";
 
 function addExperimentProperties() {
   const assignment = getSubjectAssignment();
+  const part2Timings = CONFIG.behavioral ? TIMINGS.part2.behavioral : TIMINGS.part2.default;
   const totalLearnBlocks = Array.isArray(assignment.learnBlockOrder)
     ? assignment.learnBlockOrder.length
     : Array.isArray(CONFIG.nbLearnBlocks)
@@ -41,6 +43,20 @@ function addExperimentProperties() {
     session_id,
     date: new Date().toDateString(),
     session_timestamp: Date.now(),
+    mode: CONFIG.mode,
+    activePart: CONFIG.activePart,
+    defaultLanguage: CONFIG.defaultLanguage,
+    graphHex: CONFIG.graphHex,
+    includeEvalTrials: CONFIG.includeEvalTrials,
+    behavioral: CONFIG.behavioral,
+    keyChoice: CONFIG.keyChoice,
+    showSingleTrialExport: CONFIG.showSingleTrialExport,
+    telegram: CONFIG.telegram,
+    quick_run: CONFIG.quick_run,
+    randomize: CONFIG.randomize,
+    maxAttemptsDraw: CONFIG.maxAttemptsDraw,
+    maxLearnRelations: CONFIG.maxLearnRelations,
+    randomization_table_row: assignment.randomizationRow,
     subject_assignment: assignment,
     subject_code: assignment.subjectCode,
     experiment_node_to_graph_node: assignment.experimentNodeToGraphNode,
@@ -50,6 +66,7 @@ function addExperimentProperties() {
     part2_raw_node_blocks: assignment.part2RawNodeBlocks,
     part2_iti_times_behav: assignment.part2ItiTimesBehav,
     part2_iti_times_fmri: assignment.part2ItiTimesFmri,
+    part2_imagePresentationMs: part2Timings.imagePresentationMs,
     random_node_positions: DESIGN.randomPoss,
     rotation_node_positions: DESIGN.rotationPos,
     canvas_size: SIZES.env,

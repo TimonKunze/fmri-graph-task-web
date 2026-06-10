@@ -3,6 +3,7 @@ const IDENTITY_OBJECT_TO_NODES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 
 
 const currentAssignment = {
   subjectCode: null,
+  randomizationRow: null,
   experimentNodeToGraphNode: [...IDENTITY_NODE_TO_GRAPH],
   objectToNodes: [...IDENTITY_OBJECT_TO_NODES],
   part1LayoutOrder: null,
@@ -95,6 +96,7 @@ export function loadRandomizationRows(csvText) {
 
       return {
         subjectCode,
+        randomizationRow: row,
         experimentNodeToGraphNode:
           parseNumberArray(row.experiment_node_to_graph_node) ?? [...IDENTITY_NODE_TO_GRAPH],
         objectToNodes: parseNumberArray(row.object_id_by_experiment_node) ?? [...IDENTITY_OBJECT_TO_NODES],
@@ -116,6 +118,9 @@ export function getRandomizationAssignment(subjNb) {
 
 export function setSubjectAssignment(assignment) {
   currentAssignment.subjectCode = assignment?.subjectCode ?? null;
+  currentAssignment.randomizationRow = assignment?.randomizationRow
+    ? { ...assignment.randomizationRow }
+    : null;
   currentAssignment.experimentNodeToGraphNode = [
     ...(assignment?.experimentNodeToGraphNode ?? IDENTITY_NODE_TO_GRAPH),
   ];
@@ -141,6 +146,9 @@ export function getSubjectAssignment() {
   return {
     subjNb: currentAssignment.subjectCode,
     subjectCode: currentAssignment.subjectCode,
+    randomizationRow: currentAssignment.randomizationRow
+      ? { ...currentAssignment.randomizationRow }
+      : null,
     experimentNodeToGraphNode: [...currentAssignment.experimentNodeToGraphNode],
     objectToNodes: [...currentAssignment.objectToNodes],
     learnBlockOrder: currentAssignment.part1LayoutOrder

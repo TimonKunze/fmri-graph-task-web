@@ -9,6 +9,10 @@ const experimentFolder =
   process.env.DEPLOY_EXPERIMENT_FOLDER ||
   basePrefix.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean).at(-1) ||
   "experiment";
+const experimentVersion =
+  process.env.VITE_EXPERIMENT_VERSION ||
+  process.env.DEPLOY_EXPERIMENT_VERSION ||
+  experimentFolder;
 
 function normalizeBasePath(prefix, part) {
   const trimmed = prefix.replace(/^\/+|\/+$/g, "");
@@ -38,6 +42,7 @@ for (const build of builds) {
         VITE_BASE_PATH: build.base,
         VITE_SAVE_DATA_URL: saveDataUrl,
         VITE_EXPERIMENT_FOLDER: experimentFolder,
+        VITE_EXPERIMENT_VERSION: experimentVersion,
         VITE_DEPLOYMENT_DATE: deploymentDate,
         VITE_DEPLOYMENT_COMMENT: deploymentComment,
       },

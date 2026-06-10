@@ -16,11 +16,11 @@ const baseConfig = {
 
   graphHex: "10248905",  // TODO: change to correct graph
 
-  feedback: true,
+  feedback: false,
   includeEvalTrials: true,
   behavioral: true,
-  keyChoice: null,
 
+  keyChoice: null,
   showSingleTrialExport: false,
 };
 
