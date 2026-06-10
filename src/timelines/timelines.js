@@ -414,6 +414,7 @@ export function makePart3Timeline() {
       tl.push(createConfidenceTrial("part2"));
       tl.push(createFreeEvalTrial("part2"));
     }
+    // Add congruence task here:
 
     // Instruction Arena task (Spatialpos) for both layout conditions
     // ---------------------------------------------------------------
