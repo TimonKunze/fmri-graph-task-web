@@ -9,39 +9,6 @@ import { t } from "../state/participant.js";
 import { createFmriPictureViewingTrial } from "./fmri_picture_viewing_trial.js";
 import { createFmriPathChoiceTrial } from "./fmri_path_choice_trial.js";
 
-// TODO: delete?
-function normalizeArrowResponse(response) {
-  if (response === null || response === undefined) {
-    return null;
-  }
-
-  const normalized = String(response).toLowerCase();
-  if (normalized === "arrowleft" || normalized === "left" || normalized === "37") {
-    return "left";
-  }
-
-  if (normalized === "arrowright" || normalized === "right" || normalized === "39") {
-    return "right";
-  }
-
-  return null;
-}
-
-// TODO: delete?
-function normalizeButtonResponse(response, choices) {
-  const choice = Array.isArray(choices) ? choices[Number(response)] : null;
-
-  if (choice === "repeat") {
-    return "left";
-  }
-
-  if (choice === "continue") {
-    return "right";
-  }
-
-  return null;
-}
-
 function createDemoTopHtml() {
   return `
     <div style="max-width: 900px; margin: 0 auto 24px; text-align: center;">
