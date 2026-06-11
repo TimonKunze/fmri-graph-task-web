@@ -137,7 +137,8 @@ const INSTRUCTION_COPY = {
       Quando premi il tasto freccia destra, inizierà l'esperimento vero e proprio.
     </p>
     <p>
-      È prevista una pausa circa ogni 8 minuti, durante la quale potrai riposarti un momento. L'esperimento durerà circa un'ora in totale.
+    Questa parte durerà circa un’ora in totale e includerà due pause programmate,
+    all’incirca ogni 20 minuti, offrendoti alcune opportunità per riposare.
     </p>
   `,
     part3First: `
@@ -326,7 +327,8 @@ const INSTRUCTION_COPY = {
     When you press the right arrow key, the actual experiment will begin.
     </p>
     <p>
-    There will be a scheduled break about every 8 minutes, so you will have regular opportunities to rest briefly. The experiment will take about one hour in total.
+    This part will take about one hour in total and will include two scheduled breaks,
+    roughly every 20 minutes, giving you opportunities to rest.
     </p>
     `,
     part3First: `
