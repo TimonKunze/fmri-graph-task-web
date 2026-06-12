@@ -4,7 +4,7 @@ import { buildTimeline } from "./build/buildTimeline.js";
 import { refreshDesign, DESIGN } from "./build/derivedDesign.js";
 import { makeJsPsych } from "./build/makeJsPsych.js";
 import { CONFIG } from "./config.js";
-import { refreshGraphState, G } from "./config/graphs.js";
+import { refreshGraphState, setActiveGraphHex, setGraphDefinitions, setUnconstrainedPositions, G } from "./config/graphState.js";
 import { PATHS } from "./config/paths.js";
 import { SIZES } from "./config/sizes.js";
 import { STIMULUS_CONDITION_MAP } from "./config/stimulus_assignment.js";
@@ -12,6 +12,7 @@ import { TIMINGS } from "./config/timings.js";
 import { participant_setup_trial } from "./trials/participant_setup_trial.js";
 import { getParticipantSetup } from "./state/participant.js";
 import { runSingleTrialExporter } from "./exporters/singleTrialExporter.js";
+import { loadGraphData } from "./config/randomPositions.js";
 import {
   getRandomizationAssignment,
   getSubjectAssignment,
@@ -167,6 +168,10 @@ async function bootstrap() {
   const csvText = await response.text();
   loadRandomizationRows(csvText);
 
+  const graphData = await loadGraphData();
+  setGraphDefinitions(graphData.graphDefinitions);
+  setUnconstrainedPositions(graphData.positionsByHex);
+
   jsPsych.options.show_progress_bar = false;
   await jsPsych.run([participant_setup_trial]);
 
@@ -178,6 +183,7 @@ async function bootstrap() {
   }
 
   setSubjectAssignment(assignment);
+  setActiveGraphHex(assignment.randomizationRow?.hex_string || assignment.randomizationRow?.graph_hex || CONFIG.graphHex);
   refreshGraphState();
   refreshDesign();
   addExperimentProperties();

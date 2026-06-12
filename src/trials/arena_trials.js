@@ -4,7 +4,7 @@ import makeP5JSPlugin from "../plugins/jspsych-p5js-plugin/plugin-p5js.js";
 import { CONFIG } from "../config.js";
 import { COLORS } from "../config/colors.js";
 import { SIZES } from "../config/sizes.js";
-import { G } from "../config/graphs.js";
+import { G } from "../config/graphState.js";
 import { PATHS } from "../config/paths.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
 import { getSubjectAssignment } from "../state/subjectAssignment.js";

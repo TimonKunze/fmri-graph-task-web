@@ -17,7 +17,7 @@ export const finalPart3Trial = {
         <h3>${isItalian ? "Grazie per la partecipazione. Ti auguriamo una splendida continuazione di giornata!" : "Thank you for participating. We wish you a wonderful rest of the day!"}</h3>
         <p><strong>${isItalian ? "Curiosità:" : "Fun fact:"}</strong>
         ${isItalian
-            ? " Alcuni pipistrelli della famiglia dei Pteropodidi (Pteropodidae) amano così tanto la frutta da essere chiamati “pipistrelli frugivori”, o anche “pipistrelli della frutta. Aiutano le foreste a crescere mangiando i frutti e disperdendone i semi mentre volano. Alcune specie trasportano i semi per molti chilometri, lontano dall'albero da cui hanno mangiato."
+            ? " Alcuni pipistrelli della famiglia dei Pteropodidi (Pteropodidae) amano così tanto la frutta da essere chiamati “pipistrelli frugivori”, o anche “pipistrelli della frutta”. Aiutano le foreste a crescere mangiando i frutti e disperdendone i semi mentre volano. Alcune specie trasportano i semi per molti chilometri, lontano dall'albero da cui hanno mangiato."
           : " Some bats belonging to the megabat family (Pteropodidae) love fruit so much that they are commonly called fruit bats. They help forests grow by eating fruit and spreading seeds as they fly. Some fruit bats carry seeds many kilometers away from the tree they fed from."}</p>
         <p>${isItalian ? "Le verdure, invece, tendono a piacere molto meno." : "Vegetables, however, are usually much less to their taste."}</p>
         <img src="${PATHS.fruitSalad}" alt="Fruit salad" style="max-width: 220px; height: auto; display: block; margin: 20px auto 0 auto;">

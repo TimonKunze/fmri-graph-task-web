@@ -1,5 +1,5 @@
 import { PATHS } from "../config/paths.js";
-import { G } from "../config/graphs.js";
+import { G } from "../config/graphState.js";
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { jsPsych } from "../main.js";
 import { CONFIG } from "../config.js";

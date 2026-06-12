@@ -10,7 +10,7 @@ function parseEnvNumber(value, fallback) {
 const baseConfig = {
   mode: "prod", // "dev" | "prod"
 
-  activePart: 3, // 1 | 2 | 3
+  activePart: 2, // 1 | 2 | 3
 
   defaultLanguage: "en", // "en" | "it"
 

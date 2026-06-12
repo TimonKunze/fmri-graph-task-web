@@ -3,7 +3,7 @@ import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
 import { DESIGN } from "../build/derivedDesign.js";
 import { G_SAMPLE } from "../config/sample_graph.js";
-import { G } from "../config/graphs.js";
+import { G } from "../config/graphState.js";
 import { createLearnTrialAnim } from "../trials/createLearnTrialAnim.js";
 import { createDrawingTrialSummary } from "../trials/createDrawingTrialSummary.js";
 import { createDrawingTrial } from "../trials/createDrawingTrial.js";

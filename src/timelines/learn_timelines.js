@@ -1,5 +1,5 @@
 import { CONFIG } from "../config.js";
-import { G } from "../config/graphs.js";
+import { G } from "../config/graphState.js";
 import { createDrawingTrialSummary } from "../trials/createDrawingTrialSummary.js";
 import { createDrawingTrial } from "../trials/createDrawingTrial.js";
 import { createLearnTrialAnim } from "../trials/createLearnTrialAnim.js";

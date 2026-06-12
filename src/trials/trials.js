@@ -4,7 +4,7 @@ import { createLearnTrialAnim } from "./createLearnTrialAnim.js";
 import { createDrawingTrial } from "./createDrawingTrial.js";
 import { createDrawingTrialSummary } from "./createDrawingTrialSummary.js";
 import { CONFIG } from "../config.js";
-import { G } from "../config/graphs.js"
+import { G } from "../config/graphState.js"
 
 
 export function createLearnTrials({

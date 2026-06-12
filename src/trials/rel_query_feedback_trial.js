@@ -1,5 +1,5 @@
 import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
-import { G } from "../config/graphs.js";
+import { G } from "../config/graphState.js";
 import { jsPsych } from "../main.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
 

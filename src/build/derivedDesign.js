@@ -1,5 +1,5 @@
 import { CONFIG } from "../config";
-import { G } from "../config/graphs";
+import { G } from "../config/graphState.js";
 import { shuffleArray } from "../utils/helper-tools";
 
 export const DESIGN = {};
