@@ -27,6 +27,7 @@ export const preload_trial = {
     trial.error_message = t({
       it: "Impossibile caricare l'esperimento. Invia un'email a: tkunze@sissa.it.",
       en: "The experiment failed to load. Please email: tkunze@sissa.it.",
+      de: "Das Experiment konnte nicht geladen werden. Bitte sende eine E-Mail an: tkunze@sissa.it.",
     });
   },
 

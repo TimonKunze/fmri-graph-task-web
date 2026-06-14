@@ -13,7 +13,7 @@ function createDemoTopHtml() {
   return `
     <div style="max-width: 900px; margin: 0 auto 24px; text-align: center;">
       <div style="font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px;">
-        ${t({ it: "Solo dimostrazione", en: "Demo only" })}
+        ${t({ it: "Solo dimostrazione", en: "Demo only", de: "Nur Demonstration" })}
       </div>
       <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
         <video autoplay muted loop playsinline style="width:220px;max-width:28vw;border-radius:10px;">
@@ -113,6 +113,9 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
         en: index === 0
           ? "You will now see single images."
           : "Please pay close attention to each image.",
+        de: index === 0
+          ? "Du wirst jetzt einzelne Bilder sehen."
+          : "Bitte achte genau auf dieses Bild.",
       }),
       trialName: "part2_demo_single_stimulus",
       dataExtras: { is_demo: true, demo_single_index: index },
@@ -147,6 +150,12 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
         Press the left arrow key for the left image, or the right arrow key for the right image.
         </p>
       `,
+      de: `
+        <p>
+        Wähle jetzt aus, welches der beiden Bilder vom vorherigen Bild aus mit weniger Verbindungen erreicht werden kann.
+        Drucke die linke Pfeiltaste fur das linke Bild oder die rechte Pfeiltaste fur das rechte Bild.
+        </p>
+      `,
     }),
     trialName: "part2_demo_path_choice",
     dataExtras: { is_demo: true },
@@ -164,7 +173,12 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
     on_start: (trial) => {
       const previousTrial = jsPsych.data.get().last(1).values()[0] ?? {};
       const wasCorrect = previousTrial.response_side === "left";
-      trial.choices = wasCorrect ? ["repeat", "continue"] : ["repeat"];
+      trial.choices = wasCorrect
+        ? [
+          t({ it: "Ripeti", en: "Repeat", de: "Wiederholen" }),
+          t({ it: "Continua", en: "Continue", de: "Weiter" }),
+        ]
+        : [t({ it: "Ripeti", en: "Repeat", de: "Wiederholen" })];
 
       trial.stimulus = `
         <div class="instr-screen">
@@ -172,19 +186,23 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
             ? t({
                 it: "<strong>Ben fatto!</strong> Era la risposta corretta.",
                 en: "<strong>Great job!</strong> That was the correct answer.",
+                de: "<strong>Gut gemacht!</strong> Das war die richtige Antwort.",
             })
             : t({
                 it: "<strong>Peccato!</strong> Era la risposta sbagliata.",
                 en: "<strong>Not quite!</strong> That was the incorrect answer.",
+                de: "<strong>Nicht ganz!</strong> Das war die falsche Antwort.",
               })}</p>
           ${wasCorrect
             ? t({
                 it: "<p>Tieni presente che nell'esperimento vero e proprio non verranno mostrati video. Dovrai ricordare e contare da solo/a le connessioni.</p><p>Fai clic su un pulsante qui sotto per ripetere la dimostrazione oppure continuare.</p>",
                 en: "<p>Please note that in the actual experiment, no videos will be shown and no feedback will be given. You will need to remember and count the connections on your own.</p><p>Click a button below to repeat the demo or continue.</p>",
+                de: "<p>Bitte beachte, dass im eigentlichen Experiment keine Videos gezeigt und keine Ruckmeldungen gegeben werden. Du musst dir die Verbindungen selbst merken und selbst zahlen.</p><p>Klicke unten auf eine Schaltflache, um die Demonstration zu wiederholen oder fortzufahren.</p>",
               })
             : t({
                 it: "<p>Fai clic sul pulsante qui sotto per ripetere la dimostrazione.</p>",
                 en: "<p>Click the button below to repeat the demo.</p>",
+                de: "<p>Klicke auf die Schaltflache unten, um die Demonstration zu wiederholen.</p>",
               })}
         </div>
       `;

@@ -9,7 +9,7 @@ export const learnTrialRelQueryInstr = {
   choices: [""],
   on_start: (trial) => {
     trial.stimulus = getInstructions().task2Part1;
-    trial.choices = [t({ it: "Continua", en: "Continue" })];
+    trial.choices = [t({ it: "Continua", en: "Continue", de: "Weiter" })];
   },
   data: {
     trial_name: "learn_trial_relquest_instr",

@@ -4,12 +4,35 @@ import { jsPsych } from "../main.js";
 import { getCurrentLanguage, t } from "../state/participant.js";
 
 function getCheerUpText(acc) {
-  const isItalian = getCurrentLanguage() === "it";
-  if (acc > 0.97) return isItalian ? "Ottimo lavoro!" : "Excellent job!";
-  if (acc > 0.85) return isItalian ? "Davvero un buon lavoro!" : "Really good job!";
-  if (acc > 0.70) return isItalian ? "Abbastanza bene!" : "Quite good!";
-  if (acc > 0.60) return isItalian ? "Va bene, ma puoi fare meglio!" : "Okay! But you can do better!";
-  return isItalian ? "Sono sicuro/a che puoi fare meglio!" : "I'm sure you can do better!";
+  return t({
+    it: acc > 0.97
+      ? "Ottimo lavoro!"
+      : acc > 0.85
+        ? "Davvero un buon lavoro!"
+        : acc > 0.70
+          ? "Abbastanza bene!"
+          : acc > 0.60
+            ? "Va bene, ma puoi fare meglio!"
+            : "Sono sicuro/a che puoi fare meglio!",
+    en: acc > 0.97
+      ? "Excellent job!"
+      : acc > 0.85
+        ? "Really good job!"
+        : acc > 0.70
+          ? "Quite good!"
+          : acc > 0.60
+            ? "Okay! But you can do better!"
+            : "I'm sure you can do better!",
+    de: acc > 0.97
+      ? "Ausgezeichnet!"
+      : acc > 0.85
+        ? "Wirklich gute Arbeit!"
+        : acc > 0.70
+          ? "Ziemlich gut!"
+          : acc > 0.60
+            ? "Okay, aber du kannst es noch besser!"
+            : "Ich bin sicher, dass du es besser kannst!",
+  });
 }
 
 export function createRelQueryTrialFeedback(testPasses) {
@@ -37,7 +60,11 @@ export function createRelQueryTrialFeedback(testPasses) {
       return `
         <div class="instr-screen">
           <p>
-            ${getCurrentLanguage() === "it" ? `Hai risposto correttamente al <strong>${pct}%</strong> delle domande.` : `You answered <strong>${pct}%</strong> of questions correctly.`}
+            ${t({
+              it: `Hai risposto correttamente al <strong>${pct}%</strong> delle domande.`,
+              en: `You answered <strong>${pct}%</strong> of questions correctly.`,
+              de: `Du hast <strong>${pct}%</strong> der Fragen richtig beantwortet.`,
+            })}
           </p>
           <p>${cheerUp}</p>
         </div>
@@ -45,7 +72,7 @@ export function createRelQueryTrialFeedback(testPasses) {
     },
 
     on_start: function(trial) {
-      trial.choices = [t({ it: "Continua", en: "Continue" })];
+      trial.choices = [t({ it: "Continua", en: "Continue", de: "Weiter" })];
     },
 
     data: function() {

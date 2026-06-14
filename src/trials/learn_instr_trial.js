@@ -8,7 +8,7 @@ export const learnInstrTrial = {
   choices: [""],
   on_start: (trial) => {
     trial.stimulus = getInstructions().task1Part1;
-    trial.choices = [t({ it: "Continua", en: "Continue" })];
+    trial.choices = [t({ it: "Continua", en: "Continue", de: "Weiter" })];
   },
   data: {
     trial_name: "learn_instructions",

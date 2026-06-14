@@ -11,6 +11,7 @@ const participantSetup = {
 export const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
   { value: "it", label: "Italiano" },
+  { value: "de", label: "Deutsch" },
 ];
 
 export function getParticipantSetup() {
@@ -37,5 +38,5 @@ export function getCurrentLanguage() {
 
 export function t(copy) {
   const language = getCurrentLanguage();
-  return copy?.[language] ?? copy?.it ?? copy?.en;
+  return copy?.[language] ?? copy?.en ?? copy?.it;
 }

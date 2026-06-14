@@ -14,7 +14,7 @@ export const spatialPosInstrTrial1 = {
   choices: [""],
   on_start: (trial) => {
     trial.stimulus = getInstructions().part3First;
-    trial.choices = [t({ it: "Continua", en: "Continue" })];
+    trial.choices = [t({ it: "Continua", en: "Continue", de: "Weiter" })];
   },
 
   data: {
@@ -34,7 +34,7 @@ export const spatialPosInstrTrial2 = {
   choices: [""],
   on_start: (trial) => {
     trial.stimulus = getInstructions().part3Second;
-    trial.choices = [t({ it: "Continua", en: "Continue" })];
+    trial.choices = [t({ it: "Continua", en: "Continue", de: "Weiter" })];
   },
   data: {
     trial_name: "test_spatialpos_instr",

@@ -5,7 +5,7 @@ import { jsPsych } from "../main.js";
 import { SIZES } from "../config/sizes.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
 import { getNodeMappingForStimSet } from "../state/subjectAssignment.js";
-import { getCurrentLanguage } from "../state/participant.js";
+import { t } from "../state/participant.js";
 
 
 export function createLearnTrialRelQuery(rel, known, trialInd, type) {
@@ -57,20 +57,21 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
       raw_experiment_nodes: nodeMapping.rawExperimentNodes,
     },
     on_start: function (trial) {
-      const isItalian = getCurrentLanguage() === "it";
-      const knownLabel = isItalian ? "Connessa" : "Connected";
-      const unknownLabel = isItalian ? "Non connessa" : "Not connected";
-      const prompt = isItalian
-        ? `Indica se il pipistrello ha volato lungo una connessione tra i due alimenti mostrati.`
-        : `Please indicate whether the bat flew along a connection between the two shown food items.`;
-      const nodeAlt = isItalian ? "elemento" : "item";
+      const knownLabel = t({ it: "Connessa", en: "Connected", de: "Verbunden" });
+      const unknownLabel = t({ it: "Non connessa", en: "Not connected", de: "Nicht verbunden" });
+      const prompt = t({
+        it: "Indica se il pipistrello ha volato lungo una connessione tra i due alimenti mostrati.",
+        en: "Please indicate whether the bat flew along a connection between the two shown food items.",
+        de: "Bitte gib an, ob die Fledermaus entlang einer Verbindung zwischen den beiden gezeigten Elementen geflogen ist.",
+      });
+      const nodeAlt = t({ it: "elemento", en: "item", de: "Element" });
       trial.stimulus = `
         <div style="${wrapStyle}">
           <p>${prompt}</p>
 
           <div style="${rowStyle}">
           <img alt="${nodeAlt} A" src="${nodeImagePath(startNode)}" style="${imgStyle}">
-          <img alt="${isItalian ? "Punto" : "Dot"}" src="${PATHS.dotPath}" style="${imgStyle}">
+          <img alt="${t({ it: "Punto", en: "Dot", de: "Punkt" })}" src="${PATHS.dotPath}" style="${imgStyle}">
             <img alt="${nodeAlt} B" src="${nodeImagePath(endNode)}" style="${imgStyle}">
           </div>
         </div>

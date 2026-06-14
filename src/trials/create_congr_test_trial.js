@@ -5,7 +5,7 @@ import { jsPsych } from "../main.js";
 import { CONFIG } from "../config.js";
 import { SIZES } from "../config/sizes.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
-import { getCurrentLanguage } from "../state/participant.js";
+import { t } from "../state/participant.js";
 
 
 export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.varType) {
@@ -56,12 +56,13 @@ export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.v
       stimulus: true, // Save stimulus
     },
     on_start: function (trial) {
-      const isItalian = getCurrentLanguage() === "it";
-      const itemLabel = isItalian ? "elemento" : "item";
-      const agentLabel = isItalian ? "pipistrello" : "bat";
-      const startEndLabel = isItalian
-        ? `Quale percorso dall'${itemLabel} iniziale all'${itemLabel} finale richiede <strong>meno connessioni</strong> per il ${agentLabel}?`
-        : `Which route from the start ${itemLabel} to the end ${itemLabel} requires <strong>fewer connections</strong> for the ${agentLabel}?`;
+      const itemLabel = t({ it: "elemento", en: "item", de: "Element" });
+      const agentLabel = t({ it: "pipistrello", en: "bat", de: "Fledermaus" });
+      const startEndLabel = t({
+        it: `Quale percorso dall'${itemLabel} iniziale all'${itemLabel} finale richiede <strong>meno connessioni</strong> per il ${agentLabel}?`,
+        en: `Which route from the start ${itemLabel} to the end ${itemLabel} requires <strong>fewer connections</strong> for the ${agentLabel}?`,
+        de: `Welche Route vom ${itemLabel} am Anfang zum ${itemLabel} am Ende erfordert fur die ${agentLabel} <strong>weniger Verbindungen</strong>?`,
+      });
       trial.stimulus = `
         <p>${startEndLabel}</p>
       `;

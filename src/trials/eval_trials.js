@@ -84,6 +84,23 @@ export function createConfidenceTrial(taskName, type = "") {
           confidenceOptions: ["Confident", "Rather confident", "Rather unconfident", "Unconfident"],
           button: "Continue",
         },
+        de: {
+          preamble: "<h3>Aufgabenbewertung</h3>",
+          clarityPrompt: "Waren die Anweisungen fur dich klar oder unklar?",
+          clarityOptions: ["Vollig klar", "Eher klar", "Eher unklar", "Vollig unklar"],
+          consciousnessPrompt: "Hast du die Aufgabe bewusst und uberlegt gelost oder eher unbewusst und intuitiv?",
+          consciousnessOptions: [
+            "Vollig bewusst/uberlegt",
+            "Ziemlich bewusst/uberlegt",
+            "Ziemlich intuitiv/unbewusst",
+            "Vollig intuitiv/unbewusst",
+          ],
+          difficultyPrompt: "Fandest du es leicht oder schwierig, die Aufgabe zu losen?",
+          difficultyOptions: ["Leicht", "Ziemlich leicht", "Ziemlich schwierig", "Schwierig"],
+          confidencePrompt: "Wie sicher bist du, dass du die Aufgabe richtig gelost hast?",
+          confidenceOptions: ["Sicher", "Eher sicher", "Eher unsicher", "Unsicher"],
+          button: "Weiter",
+        },
       });
       trial.preamble = copy.preamble;
       trial.questions[0].prompt = copy.clarityPrompt;
@@ -141,6 +158,13 @@ export function createFreeEvalTrial(taskName, type = "") {
             `<p>Please take a minute and describe the strategy you used to solve the last task.</p>
              <p>Additionally, as we are still in the pilot phase, we would be glad if you used this field to tell us about anything that was unclear or possibly misleading.</p>`,
           placeholder: "Type your strategy here...",
+        },
+        de: {
+          preamble: "<h3>Aufgabenstrategie</h3>",
+          prompt:
+            `<p>Bitte nimm dir eine Minute Zeit und beschreibe die Strategie, mit der du die letzte Aufgabe gelost hast.</p>
+             <p>Da wir uns noch in der Pilotphase befinden, freuen wir uns ausserdem, wenn du dieses Feld nutzt, um uns auf alles hinzuweisen, was unklar oder moglicherweise irrefuhrend war.</p>`,
+          placeholder: "Beschreibe hier deine Strategie...",
         },
       });
       trial.preamble = copy.preamble;

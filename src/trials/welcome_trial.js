@@ -2,7 +2,7 @@ import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { CONFIG } from "../config";
 import { PATHS } from "../config/paths.js";
 import { jsPsych } from "../main.js";
-import { getCurrentLanguage } from "../state/participant.js";
+import { getCurrentLanguage, t } from "../state/participant.js";
 
 function getPartString() {
   const language = getCurrentLanguage();
@@ -19,9 +19,11 @@ function getPartString() {
 
   if (activeParts.length === 1) {
     const romanPart = romanNumerals[activeParts[0]] ?? String(activeParts[0]);
-    return language === "it"
-      ? `Parte ${romanPart} del `
-      : `Part ${romanPart} of `;
+    return t({
+      it: `Parte ${romanPart} del `,
+      en: `Part ${romanPart} of `,
+      de: `Teil ${romanPart} unseres `,
+    });
   }
 
   return "";
@@ -37,6 +39,16 @@ function getCopy() {
         ? "Premi il tasto freccia destra quando sei pronto/a per iniziare."
         : "Fai clic sul pulsante qui sotto quando sei pronto/a per iniziare.",
       continueLabel: "Continua",
+    };
+  }
+
+  if (getCurrentLanguage() === "de") {
+    return {
+      welcome: "Willkommen zu unserem Experiment!",
+      prompt: isPart2Only
+        ? "Drucke die rechte Pfeiltaste, wenn du bereit bist zu beginnen."
+        : "Klicke auf die Schaltflache unten, wenn du bereit bist zu beginnen.",
+      continueLabel: "Weiter",
     };
   }
 
@@ -60,15 +72,14 @@ export const welcome_trial = {
   on_start: (trial) => {
     const isPart2Only = CONFIG.part2 && !CONFIG.part1 && !CONFIG.part3;
     const copy = getCopy();
-    const isItalian = getCurrentLanguage() === "it";
     const partString = getPartString();
     const heading = partString
-      ? isItalian
-        ? `Benvenuto/a alla ${partString}nostro esperimento!`
-        : `Welcome to ${partString}our experiment!`
-      : isItalian
-        ? "Benvenuto/a al nostro esperimento!"
-        : "Welcome to our experiment!";
+      ? t({
+        it: `Benvenuto/a alla ${partString}nostro esperimento!`,
+        en: `Welcome to ${partString}our experiment!`,
+        de: `Willkommen zu ${partString}Experiments!`,
+      })
+      : copy.welcome;
     trial.stimulus = `
       <div style="max-width: 700px; margin: 0 auto; font-size: 18px; line-height: 1.6;">
       <img 

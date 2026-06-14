@@ -332,7 +332,7 @@ export function createSpatialPosTrial(layoutType) {
     },
     on_start: function(data) {
       startTimeRT = performance.now();
-      data.button_choices = [t({ it: "Continua", en: "Continue" })];
+      data.button_choices = [t({ it: "Continua", en: "Continue", de: "Weiter" })];
     },
     on_finish: function(data) {
       trialEnded = true;
@@ -553,7 +553,7 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
       trialEnded = false;
       nodeStarted = -1;
       nodeEnded = -1;
-      trial.button_choices = [t({ it: "Continua", en: "Continue" })];
+      trial.button_choices = [t({ it: "Continua", en: "Continue", de: "Weiter" })];
     },
 
     setup_func: function (p) {
@@ -692,14 +692,17 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
     key_choices: CONFIG.keyChoice,
 
     prompt: function () {
-      const isItalian = getCurrentLanguage() === "it";
       return c_type === "first"
-        ? isItalian
-          ? `Assicurati che il pipistrello possa raggiungere ogni alimento, cioè che nessun elemento sia scollegato.`
-          : `Make sure the bat can reach every food item, i.e. no item is disconnected.`
-        : isItalian
-          ? `Non tutti gli alimenti sono raggiungibili per il pipistrello. Aggiungi una o più connessioni.`
-          : `Not all food items are reachable for the bat. Please add one or more connections.`;
+        ? t({
+          it: "Assicurati che il pipistrello possa raggiungere ogni alimento, cioe che nessun elemento sia scollegato.",
+          en: "Make sure the bat can reach every food item, i.e. no item is disconnected.",
+          de: "Stelle sicher, dass die Fledermaus jedes Element erreichen kann, also dass kein Element getrennt ist.",
+        })
+        : t({
+          it: "Non tutti gli alimenti sono raggiungibili per il pipistrello. Aggiungi una o piu connessioni.",
+          en: "Not all food items are reachable for the bat. Please add one or more connections.",
+          de: "Nicht alle Elemente sind fur die Fledermaus erreichbar. Bitte fuge eine oder mehrere Verbindungen hinzu.",
+        });
     },
   };
 }

@@ -35,6 +35,19 @@ const COPY = {
     invalidSubject: "Inserisci un codice identificativo valido sotto forma di numero intero.",
     missingLanguage: "Seleziona una lingua.",
   },
+  de: {
+    title: "Teilnehmer-Einstellungen",
+    intro: "Bitte fülle die folgenden Felder aus, bevor du mit dem Experiment beginnst.",
+    subjectLabel: "Identifikationscode der Versuchsperson",
+    subjectHint: "Gib eine ganze Zahl ein",
+    experimenterNoteLabel: "Optionale Notiz fur die Versuchsleitung",
+    experimenterNoteHint: "Gib eine optionale Notiz ein",
+    languageLabel: "Sprache",
+    languagePlaceholder: "Sprache auswahlen",
+    continueLabel: "Weiter",
+    invalidSubject: "Bitte gib einen gultigen Identifikationscode als ganze Zahl ein.",
+    missingLanguage: "Bitte wahle eine Sprache aus.",
+  },
 };
 
 function getCopy() {
@@ -48,7 +61,11 @@ function getPartHeading() {
     3: "III",
   };
   const romanPart = romanNumerals[CONFIG.activePart] ?? String(CONFIG.activePart);
-  return getCurrentLanguage() === "it" ? `Parte ${romanPart}` : `Part ${romanPart}`;
+  return t({
+    it: `Parte ${romanPart}`,
+    en: `Part ${romanPart}`,
+    de: `Teil ${romanPart}`,
+  });
 }
 
 let latestParticipantSetup = {

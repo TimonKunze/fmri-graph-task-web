@@ -17,6 +17,7 @@ export const age_trial = {
     const copy = t({
       it: { prompt: "Inserisci la tua età:", placeholder: "es. 25" },
       en: { prompt: "Please enter your age:", placeholder: "e.g., 25" },
+      de: { prompt: "Bitte gib dein Alter ein:", placeholder: "z. B. 25" },
     });
     trial.questions[0].prompt = copy.prompt;
     trial.questions[0].placeholder = copy.placeholder;

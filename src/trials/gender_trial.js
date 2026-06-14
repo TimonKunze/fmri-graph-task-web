@@ -22,6 +22,10 @@ export const gender_trial = {
         prompt: "Please indicate your gender:",
         options: ["female", "male", "other"],
       },
+      de: {
+        prompt: "Bitte gib dein Geschlecht an:",
+        options: ["weiblich", "männlich", "andere"],
+      },
     });
     trial.questions[0].prompt = copy.prompt;
     trial.questions[0].options = copy.options;

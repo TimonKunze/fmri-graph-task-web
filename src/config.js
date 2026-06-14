@@ -12,7 +12,7 @@ const baseConfig = {
 
   activePart: 2, // 1 | 2 | 3
 
-  defaultLanguage: "en", // "en" | "it"
+  defaultLanguage: "en", // "en" | "it" | "de"
 
   feedback: false,
   includeEvalTrials: true,
@@ -31,7 +31,7 @@ const configProfiles = {
     nbLearnBlocks: [1, 1],
     maxAttemptsDraw: 2,
     maxLearnRelations: 2,
-    defaultLanguage: "en", // "en" | "it"
+    defaultLanguage: "en", // "en" | "it" | "de"
   },
   prod: {
     debug: false,
@@ -41,7 +41,7 @@ const configProfiles = {
     nbLearnBlocks: [4, 4],
     maxAttemptsDraw: 11,
     maxLearnRelations: "max",
-    defaultLanguage: "it", // "en" | "it"
+    defaultLanguage: "it", // "en" | "it" | "de"
   },
 };
 

@@ -8,7 +8,7 @@ export const part3_congr_intro_trial = {
   choices: [""],
   on_start: (trial) => {
     trial.stimulus = getInstructions().part3CongrIntro;
-    trial.choices = [t({ it: "Continua", en: "Continue" })];
+    trial.choices = [t({ it: "Continua", en: "Continue", de: "Weiter" })];
   },
   data: {
     trial_name: "part3_congr_intro",

@@ -12,6 +12,8 @@ const firstSetBlockLabelEn = firstSetBlocks === 1 ? "block" : "blocks";
 const secondSetBlockLabelEn = secondSetBlocks === 1 ? "block" : "blocks";
 const firstSetBlockLabelIt = firstSetBlocks === 1 ? "blocco" : "blocchi";
 const secondSetBlockLabelIt = secondSetBlocks === 1 ? "blocco" : "blocchi";
+const firstSetBlockLabelDe = firstSetBlocks === 1 ? "Block" : "Blocke";
+const secondSetBlockLabelDe = secondSetBlocks === 1 ? "Block" : "Blocke";
 
 const INSTRUCTION_COPY = {
   it: {
@@ -207,6 +209,201 @@ const INSTRUCTION_COPY = {
     </p>
     <p>
       (Per favore, rispondi onestamente. La tua risposta a questa domanda non influenzerà in alcun modo il tuo compenso.)
+    </p>
+  `,
+  },
+  de: {
+    task1Part1: `
+    <h1>Teil I</h1>
+    <br>
+    <h2>Aufgabe 1</h2>
+    <h3>Anweisungen</h3>
+    <p>
+      In dieser Aufgabe siehst du mehrere Lebensmittel, die in einer Umgebung angeordnet sind. Deine Aufgabe ist es,
+      <strong>die versteckte Fledermaus zu finden</strong>, indem du auf die Lebensmittel klickst. Sobald du sie gefunden hast, achte darauf,
+      zwischen welchen zwei Lebensmitteln sie sich bewegt, und merke dir diese Verbindung.
+    </p>
+    <p>
+      Anschließend wirst du <strong>den Weg der Fledermaus einzeichnen</strong>, indem du auf eines der beiden Lebensmittel klickst
+      und den Cursor zum anderen ziehst. So erzeugst du eine Verbindung zwischen den beiden Elementen. Eine grune oder rote Linie
+      zeigt dir, ob die Verbindung richtig ist oder nicht.
+    </p>
+    <p>
+      Du kannst erst dann mit dem nachsten Durchgang fortfahren, wenn du die richtige Verbindung eingezeichnet hast oder mehr als
+      10 falsche Versuche gemacht hast.
+      Die Positionen der Lebensmittel konnen sich von Zeit zu Zeit andern, aber das beeinflusst nicht,
+      welche Verbindungen richtig sind.
+    </p>
+    <p>
+      Die Bewegungsrichtung ist nicht wichtig. Wenn sich die Fledermaus zwischen zwei Lebensmitteln bewegt, ist dieselbe
+      Verbindung in beide Richtungen richtig. Ebenso spielt es keine Rolle, in welche Richtung du
+      die Verbindung zeichnest.
+    </p>
+    <p>
+      Von Zeit zu Zeit erhaltst du eine Leistungsruckmeldung, die darauf basiert, wie oft deine erste Antwort in einer Reihe von Durchgangen richtig war.
+    </p>
+    <p>
+      Im Verlauf des gesamten Experiments arbeitest du mit zwei verschiedenen Satzen von Elementen.
+    </p>
+    <p>
+      Bevor du mit dem ersten Satz beginnst, absolvierst du <strong>zwei Ubungsdurchgange</strong>, indem du auf "Weiter" klickst.
+      Danach bearbeitest du ${firstSetBlocks} ${firstSetBlockLabelDe} mit dem ersten Satz von Elementen,
+      gefolgt von ${secondSetBlocks} ${secondSetBlockLabelDe} mit dem zweiten Satz.
+    </p>
+  `,
+    task1Part1End: `
+    <h3>Bist du bereit?</h3>
+    <br>
+    <p>
+      Die Ubungsphase ist nun beendet. Wie bereits erklart, besteht deine Aufgabe darin, dir zu merken, wo die Fledermaus in jedem Durchgang gestartet ist und wo sie geendet hat.
+    </p>
+    <p>
+      Wenn du bereit bist, klicke auf die Schaltflache "Weiter", um das Experiment zu beginnen.
+    </p>
+  `,
+    task1SetTransition: `
+    <p>Du hast den ersten Satz von Elementen abgeschlossen.</p>
+    <p>Wenn du mogst, kannst du eine kurze Pause machen.</p>
+    <p>Wenn du auf "Weiter" klickst, beginnt der zweite Satz von Elementen.</p>
+  `,
+    task2Part1: `
+    <h2>Aufgabe 2</h2>
+    <h3>Anweisungen</h3>
+    <p>
+      Hast du bemerkt, dass sich die Fledermaus nur zwischen bestimmten Paaren von Lebensmitteln bewegt hat?
+    </p>
+    <p>
+      Diese Paare nennen wir <strong>Verbindungen</strong>. Vielleicht ist dir auch aufgefallen, dass sich die Fledermaus immer gleich gut in beide Richtungen bewegen konnte, wenn sie einer Verbindung folgte. Das bedeutet, dass die Richtung keine Rolle spielt.
+    </p>
+    <p>
+      Im Folgenden siehst du mehrere Paare von Lebensmitteln. Versuche dich aus der vorherigen Aufgabe daran zu erinnern,
+      <strong>ob zwischen den beiden gezeigten Elementen eine Verbindung bestand oder nicht</strong>. Gib deine Antwort
+      durch Klicken auf eine der Schaltflachen an.
+    </p>
+    <p>
+      Dieses Mal gibt es keinen Ubungsdurchgang, du kannst also direkt beginnen.
+    </p>
+  `,
+    part2Intro: `
+    <h1>Teil II</h1>
+    <br>
+    <h3>Anweisungen</h3>
+    <p>
+      Im gestrigen Teil des Experiments hast du gelernt, dass sich die Fledermaus nur
+      zwischen bestimmten <strong>miteinander verbundenen Paaren</strong> von Lebensmitteln bewegt.
+    </p>
+    <p>
+      Heute siehst du zunachst einzelne Bilder von Lebensmitteln, die nacheinander prasentiert werden.
+      Bitte achte genau auf jedes Bild.
+    </p>
+    <p>
+      Manchmal erscheinen nach einem einzelnen Bild <strong>zwei Bilder</strong>.
+      In diesen Fallen versuche dich bitte an das einzelne Bild zu erinnern, das
+      unmittelbar davor gezeigt wurde.
+      Anders als gestern bilden die beiden Bilder keine direkte Verbindung.
+    </p>
+    <p>
+      Deine Aufgabe ist es zu entscheiden, welches der beiden Elemente vom
+      vorherigen Element aus mit <strong>weniger Verbindungen</strong> erreicht werden kann,
+      wenn du die Rolle der Fledermaus ubernimmst.
+    </p>
+    <p>
+      Benutze zum Antworten die linke und rechte Pfeiltaste.
+    </p>
+    <p>
+      Drucke jetzt die rechte Pfeiltaste, und wir zeigen dir eine kurze Demonstration.
+    </p>
+  `,
+    part2Demo: `
+    <h3>Demonstration</h3>
+    <p>
+      Dies ist nur eine <strong>Demonstration</strong> und gehort <strong>nicht</strong> zur eigentlichen Aufgabe.
+    </p>
+    <p>
+      Oben siehst du drei kurze Beispielvideos. In der Mitte des Bildschirms siehst du zuerst einzelne Bilder und danach einen Test zur Routenwahl.
+    </p>
+    <p>
+      Nach der Demonstration kannst du sie so oft wiederholen, wie du mochtest, oder mit der eigentlichen Aufgabe fortfahren.
+    </p>
+  `,
+    part2Start: `
+    <h3>Beginn des Experiments</h3>
+    <p>
+      Gut. Du hast jetzt gelernt, wie die Aufgabe funktioniert.
+    </p>
+    <p>
+      Wenn du die rechte Pfeiltaste druckst, beginnt das eigentliche Experiment.
+    </p>
+    <p>
+    Dieser Teil dauert insgesamt etwa eine Stunde und enthalt zwei geplante Pausen,
+    ungefahr alle 20 Minuten, sodass du dich kurz erholen kannst.
+    </p>
+  `,
+    part3First: `
+    <h2>Teil III</h2>
+    <h3>Anweisungen</h3>
+    <br>
+    <p>
+      Im nachsten Teil des Experiments bitten wir dich, <strong>die Lebensmittel in der Umgebung anzuordnen</strong>, und zwar auf eine Weise, die dir sinnvoll erscheint.
+    </p>
+    <p>
+      Zu Beginn erscheinen die Lebensmittel auf der rechten Seite. Um eines davon in der Umgebung zu platzieren, klicke darauf und ziehe es an die Position, die dir am passendsten erscheint. Du kannst die Anordnung so oft andern, wie du mochtest, indem du die Elemente erneut verschiebst.
+    </p>
+    <p>
+      Fur diesen Teil gibt es keinen Ubungsdurchgang. Nimm dir so viel Zeit, wie du brauchst.
+    </p>
+    <p>
+      Nachdem du auf "Weiter" geklickt hast, beginnt der nachste Durchgang mit dem ersten Satz von Elementen.
+    </p>
+    <br>
+  `,
+    part3Second: `
+    <h3>Anweisungen</h3>
+    <p>
+      Anschließend zeigen wir dir die Umgebung mit den Lebensmitteln so, wie du sie zuvor angeordnet hast. Dieses Mal bitten wir dich, <strong>die Verbindungen</strong> so einzuzeichnen, wie du sie in Erinnerung hast.
+    </p>
+    <p>Wie in der gestrigen Aufgabe kannst du Verbindungen <strong>einzeichnen, indem du den Cursor ziehst</strong> von einem Lebensmittel
+    zum anderen. Wenn du eine Verbindung entfernen mochtest, die du bereits eingezeichnet hast, kannst du
+    darauf <strong>doppelklicken</strong> oder die <strong>Reset-Schaltflache</strong> verwenden, mit der
+    alle eingezeichneten Verbindungen auf einmal geloscht werden.
+    </p>
+    <p>
+      Achte darauf, dass die Fledermaus jedes Lebensmittel uber mindestens eine Verbindung erreichen kann.
+    </p>
+    <p>
+      Es gibt kein Zeitlimit. Nimm dir so viel Zeit, wie du brauchst, und klicke auf "Weiter", wenn du fertig bist.
+    </p>
+    <br>
+  `,
+    part3CongrIntro: `
+    <h3>Anweisungen</h3>
+    <p>
+      In der folgenden Aufgabe wirst du fast <strong>dasselbe wie in
+      Teil II</strong> tun.
+    </p>
+    <p>
+      Dieses Mal siehst du jedoch <strong>vier Elemente</strong> gleichzeitig auf dem Bildschirm,
+      angeordnet als zwei Routen zwischen einem Start- und einem Endelement.
+    </p>
+    <p>
+      Wie zuvor ist es deine Aufgabe zu entscheiden, welche der beiden Routen
+      <strong>weniger Verbindungen</strong> erfordert, wahrend du wieder
+      die Rolle der Fledermaus ubernimmst.
+    </p>
+    <p>
+      Nimm dir so viel Zeit, wie du brauchst, und klicke auf "Weiter", um zu beginnen.
+    </p>
+    <br>
+  `,
+    cheater: `
+    <h3>Herzlichen Gluckwunsch, du bist fast fertig. Eine allerletzte Frage:</h3>
+    <br>
+    <p>
+    Hast du irgendeine Form externer Hilfe verwendet, um die Verbindungen der Fledermaus in Teil I zu lernen
+    oder um die Aufgaben in Teil II oder III zu losen (zum Beispiel, indem du die Verbindungen aufgeschrieben hast)?
+    </p>
+    <p>
+      (Bitte antworte ehrlich. Deine Antwort auf diese Frage hat keinerlei Einfluss auf deine Vergutung.)
     </p>
   `,
   },

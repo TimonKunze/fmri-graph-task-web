@@ -2,18 +2,25 @@ import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { CONFIG } from "../config";
 import { sendMessage } from "../utils/telegram";
 import { jsPsych } from "../main";
-import { getCurrentLanguage } from "../state/participant.js";
+import { t } from "../state/participant.js";
 
 export const finalPart2Trial = {
   type: jsPsychHtmlButtonResponse,
   button_layout: "flex",
   stimulus: () => {
-    const isItalian = getCurrentLanguage() === "it";
     return `
       <div style="max-width: 800px; margin: 0 auto; line-height: 1.6; text-align: left;">
-        <h2>${isItalian ? "Congratulazioni!" : "Congratulations!"}</h2>
-        <p>${isItalian ? "Hai completato l'ultimo compito della Parte II." : "You've finished the last task of Part II."}</p>
-        <h3>${isItalian ? "Ci vediamo per la Parte III, che sarà molto breve. Grazie per la partecipazione!" : "See you for Part III, which will be very short. Thank you for participating!"}</h3>
+        <h2>${t({ it: "Congratulazioni!", en: "Congratulations!", de: "Herzlichen Gluckwunsch!" })}</h2>
+        <p>${t({
+          it: "Hai completato l'ultimo compito della Parte II.",
+          en: "You've finished the last task of Part II.",
+          de: "Du hast die letzte Aufgabe von Teil II abgeschlossen.",
+        })}</p>
+        <h3>${t({
+          it: "Ci vediamo per la Parte III, che sara molto breve. Grazie per la partecipazione!",
+          en: "See you for Part III, which will be very short. Thank you for participating!",
+          de: "Wir sehen uns fur Teil III wieder, der sehr kurz sein wird. Vielen Dank fur deine Teilnahme!",
+        })}</h3>
       </div>
     `;
   },

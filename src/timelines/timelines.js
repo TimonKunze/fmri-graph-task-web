@@ -239,13 +239,21 @@ export function makePart2Timeline() {
     stimulus: "",
     choices: ["arrowright"],
     on_start: (trial) => {
-      const isItalian = getCurrentLanguage() === "it";
-      trial.stimulus = isItalian
+      trial.stimulus = getCurrentLanguage() === "it"
         ? `
           <div class="instr-screen">
             <p>Hai completato il blocco ${blockIndex} di ${totalFmriBlocks}.</p>
             <p>Per favore, prenditi un <strong>momento di riposo</strong>.</p>
             <p>Quando sei pronto/a, premi la freccia destra per iniziare il blocco successivo.</p>
+            <div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>
+          </div>
+        `
+        : getCurrentLanguage() === "de"
+          ? `
+          <div class="instr-screen">
+            <p>Du hast Block ${blockIndex} von ${totalFmriBlocks} abgeschlossen.</p>
+            <p>Bitte nimm dir einen <strong>kurzen Moment zur Erholung</strong>.</p>
+            <p>Wenn du bereit bist, drucke die rechte Pfeiltaste, um den nachsten Block zu starten.</p>
             <div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>
           </div>
         `
