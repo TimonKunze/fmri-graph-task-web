@@ -5,7 +5,7 @@ import { getSubjectAssignment } from "../state/subjectAssignment.js";
 
 let graphDefinitions = {};
 let unconstrainedPositionsByHex = {};
-let activeGraphHex = CONFIG.graphHex;
+let activeGraphHex = null;
 
 function remapAdjacencyMatrix(adjM, expToCanonical) {
   return expToCanonical.map((rowCan) =>
@@ -63,7 +63,11 @@ export function setUnconstrainedPositions(positionSetsByHex) {
 }
 
 export function setActiveGraphHex(hex) {
-  activeGraphHex = hex || CONFIG.graphHex;
+  if (!hex) {
+    throw new Error("[graphState] Missing graph hex from CSV.");
+  }
+
+  activeGraphHex = hex;
 }
 
 export function refreshGraphState() {

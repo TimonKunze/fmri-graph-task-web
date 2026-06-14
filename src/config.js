@@ -14,8 +14,6 @@ const baseConfig = {
 
   defaultLanguage: "en", // "en" | "it"
 
-  graphHex: "1024C905",
-
   feedback: false,
   includeEvalTrials: true,
   behavioral: true,

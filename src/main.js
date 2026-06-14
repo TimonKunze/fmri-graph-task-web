@@ -47,7 +47,7 @@ function addExperimentProperties() {
     mode: CONFIG.mode,
     activePart: CONFIG.activePart,
     defaultLanguage: CONFIG.defaultLanguage,
-    graphHex: CONFIG.graphHex,
+    graphHex: G.hex,
     includeEvalTrials: CONFIG.includeEvalTrials,
     behavioral: CONFIG.behavioral,
     keyChoice: CONFIG.keyChoice,
@@ -183,7 +183,7 @@ async function bootstrap() {
   }
 
   setSubjectAssignment(assignment);
-  setActiveGraphHex(assignment.randomizationRow?.hex_string || assignment.randomizationRow?.graph_hex || CONFIG.graphHex);
+  setActiveGraphHex(assignment.randomizationRow?.hex_string || assignment.randomizationRow?.graph_hex);
   refreshGraphState();
   refreshDesign();
   addExperimentProperties();
