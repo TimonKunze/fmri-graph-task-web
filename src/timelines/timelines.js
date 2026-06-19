@@ -130,7 +130,6 @@ export function makeCoreTimeline() {
   if (CONFIG.part1) {
     tl.push(consent_trial);
   }
-  tl.push(fullscreen_trial);
 
   return tl;
 }

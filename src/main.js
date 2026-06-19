@@ -9,6 +9,7 @@ import { PATHS } from "./config/paths.js";
 import { SIZES } from "./config/sizes.js";
 import { STIMULUS_CONDITION_MAP } from "./config/stimulus_assignment.js";
 import { TIMINGS } from "./config/timings.js";
+import { fullscreen_trial } from "./trials/fullscreen_trial.js";
 import { participant_setup_trial } from "./trials/participant_setup_trial.js";
 import { getParticipantSetup } from "./state/participant.js";
 import { runSingleTrialExporter } from "./exporters/singleTrialExporter.js";
@@ -173,7 +174,7 @@ async function bootstrap() {
   setUnconstrainedPositions(graphData.positionsByHex);
 
   jsPsych.options.show_progress_bar = false;
-  await jsPsych.run([participant_setup_trial]);
+  await jsPsych.run([participant_setup_trial, fullscreen_trial]);
 
   const setup = getParticipantSetup();
   const assignment = getRandomizationAssignment(setup.subjectCode);

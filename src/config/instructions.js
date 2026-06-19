@@ -124,7 +124,7 @@ const INSTRUCTION_COPY = {
       Questa è solo una <strong>dimostrazione</strong> e <strong>non</strong> fa parte del compito reale.
     </p>
     <p>
-      In alto vedrai tre brevi video di esempio. Al centro dello schermo vedrai prima immagini singole e poi una prova di scelta del percorso.
+      In alto vedrai tre immagini di esempio. Cerca di ricordare queste tre connessioni. Al centro dello schermo vedrai prima immagini singole e poi una prova di scelta del percorso.
     </p>
     <p>
       Dopo la dimostrazione, potrai ripeterla tutte le volte che vuoi oppure continuare con il compito reale.
@@ -320,7 +320,7 @@ const INSTRUCTION_COPY = {
       Dies ist nur eine <strong>Demonstration</strong> und gehort <strong>nicht</strong> zur eigentlichen Aufgabe.
     </p>
     <p>
-      Oben siehst du drei kurze Beispielvideos. In der Mitte des Bildschirms siehst du zuerst einzelne Bilder und danach einen Test zur Routenwahl.
+      Oben siehst du drei Beispielbilder. Versuche dir diese drei Verbindungen zu merken. In der Mitte des Bildschirms siehst du zuerst einzelne Bilder und danach einen Test zur Routenwahl.
     </p>
     <p>
       Nach der Demonstration kannst du sie so oft wiederholen, wie du mochtest, oder mit der eigentlichen Aufgabe fortfahren.
@@ -512,7 +512,7 @@ const INSTRUCTION_COPY = {
     `,
     part2Demo: `
     <p>
-    Imagine that, yesterday, you learned these three connections.
+    Imagine that, yesterday, you learned these three connections. Please try to remember them for the demo that follows.
     </p>
     `,
     part2Start: `

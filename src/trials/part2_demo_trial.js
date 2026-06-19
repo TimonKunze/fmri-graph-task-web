@@ -16,15 +16,9 @@ function createDemoTopHtml() {
         ${t({ it: "Solo dimostrazione", en: "Demo only", de: "Nur Demonstration" })}
       </div>
       <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
-        <video autoplay muted loop playsinline style="width:220px;max-width:28vw;border-radius:10px;">
-          <source src="${PATHS.part2DemoVideo1}" type="video/mp4">
-        </video>
-        <video autoplay muted loop playsinline style="width:220px;max-width:28vw;border-radius:10px;">
-          <source src="${PATHS.part2DemoVideo2}" type="video/mp4">
-        </video>
-        <video autoplay muted loop playsinline style="width:220px;max-width:28vw;border-radius:10px;">
-          <source src="${PATHS.part2DemoVideo3}" type="video/mp4">
-        </video>
+        <img src="${PATHS.part2DemoImage1}" alt="" style="width:220px;max-width:28vw;border-radius:10px;">
+        <img src="${PATHS.part2DemoImage2}" alt="" style="width:220px;max-width:28vw;border-radius:10px;">
+        <img src="${PATHS.part2DemoImage3}" alt="" style="width:220px;max-width:28vw;border-radius:10px;">
       </div>
     </div>
   `;
@@ -56,6 +50,8 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
   const topHtml = createDemoTopHtml();
   const demoExample = getDemoExample(shortestPathDistanceMatrix);
   const part2Timings = CONFIG.behavioral ? TIMINGS.part2.behavioral : TIMINGS.part2.default;
+  const trialTopHtml = "";
+  const demoImageDuration = part2Timings.imagePresentationMs + 400;
 
   const introTrial = {
     type: jsPsychHtmlKeyboardResponse,
@@ -81,7 +77,7 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: `
       <div style="max-width: 800px; margin: 0 auto; text-align: center;">
-        ${topHtml}
+        ${trialTopHtml}
         <p style="min-height: 24px;">&nbsp;</p>
         <div style="width:320px;height:320px;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:48px;line-height:1;">
           +
@@ -104,8 +100,8 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
     pictureTrials.push(createFmriPictureViewingTrial({
       imageSrc: PATHS.nodeExport(nodeIndex + 1),
       nodeIndex,
-      duration: part2Timings.imagePresentationMs,
-      topHtml,
+      duration: demoImageDuration,
+      topHtml: trialTopHtml,
       prompt: t({
         it: index === 0
           ? "Ora vedrai immagini singole"
@@ -136,7 +132,7 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
     rightPathLength: demoExample.rightPathLength,
     correctChoice: demoExample.correctChoice,
     stimSet: "set1",
-    topHtml,
+    topHtml: trialTopHtml,
     promptOverride: t({
       it: `
         <p>
@@ -195,9 +191,9 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
               })}</p>
           ${wasCorrect
             ? t({
-                it: "<p>Tieni presente che nell'esperimento vero e proprio non verranno mostrati video. Dovrai ricordare e contare da solo/a le connessioni.</p><p>Fai clic su un pulsante qui sotto per ripetere la dimostrazione oppure continuare.</p>",
-                en: "<p>Please note that in the actual experiment, no videos will be shown and no feedback will be given. You will need to remember and count the connections on your own.</p><p>Click a button below to repeat the demo or continue.</p>",
-                de: "<p>Bitte beachte, dass im eigentlichen Experiment keine Videos gezeigt und keine Ruckmeldungen gegeben werden. Du musst dir die Verbindungen selbst merken und selbst zahlen.</p><p>Klicke unten auf eine Schaltflache, um die Demonstration zu wiederholen oder fortzufahren.</p>",
+                it: "<p>Tieni presente che nell'esperimento vero e proprio non verranno mostrate queste immagini di esempio e non verranno dati feedback. Dovrai ricordare e contare da solo/a le connessioni.</p><p>Fai clic su un pulsante qui sotto per ripetere la dimostrazione oppure continuare.</p>",
+                en: "<p>Please note that in the actual experiment, these example images will not be shown and no feedback will be given. You will need to remember and count the connections on your own.</p><p>Click a button below to repeat the demo or continue.</p>",
+                de: "<p>Bitte beachte, dass diese Beispielbilder im eigentlichen Experiment nicht gezeigt werden und keine Ruckmeldungen gegeben werden. Du musst dir die Verbindungen selbst merken und selbst zahlen.</p><p>Klicke unten auf eine Schaltflache, um die Demonstration zu wiederholen oder fortzufahren.</p>",
               })
             : t({
                 it: "<p>Fai clic sul pulsante qui sotto per ripetere la dimostrazione.</p>",

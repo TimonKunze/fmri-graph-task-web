@@ -48,6 +48,10 @@ function createFrameFileName(baseName, frameIndex) {
   return `${baseName}_${String(frameIndex).padStart(4, "0")}.png`;
 }
 
+function createMidpointFileName(baseName) {
+  return `${baseName}_midpoint.png`;
+}
+
 function buildCrc32Table() {
   const table = new Uint32Array(256);
 
@@ -253,6 +257,20 @@ async function exportCanvasFrames(canvas, renderFrame, totalFrames, outputBaseNa
   createDownload(zipBlob, zipFileName);
 }
 
+async function exportCanvasImage(canvas, fileName) {
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob((nextBlob) => {
+      if (nextBlob) {
+        resolve(nextBlob);
+      } else {
+        reject(new Error("Failed to export the PNG image."));
+      }
+    }, "image/png");
+  });
+
+  createDownload(blob, fileName);
+}
+
 export async function runSingleTrialExporter() {
   const exportConfig = CONFIG.singleTrialExport;
   const root = document.querySelector("#app") ?? document.body;
@@ -275,6 +293,7 @@ export async function runSingleTrialExporter() {
       <div style="display:flex; flex-direction:column; gap:12px; min-width:220px;">
         <button id="single-trial-preview" type="button">Preview animation</button>
         <button id="single-trial-export" type="button">Export ZIP of PNG frames</button>
+        <button id="single-trial-export-midpoint" type="button">Export midpoint PNG</button>
       </div>
     </div>
   `;
@@ -283,6 +302,7 @@ export async function runSingleTrialExporter() {
   const statusEl = container.querySelector("#single-trial-export-status");
   const previewBtn = container.querySelector("#single-trial-preview");
   const exportBtn = container.querySelector("#single-trial-export");
+  const exportMidpointBtn = container.querySelector("#single-trial-export-midpoint");
   const canvas = container.querySelector("#single-trial-export-canvas");
   const ctx = canvas.getContext("2d");
 
@@ -325,11 +345,21 @@ export async function runSingleTrialExporter() {
     drawFrame(ctx, state);
   };
 
+  const renderMidpoint = () => {
+    state.currentPos = [
+      (exportConfig.startPos[0] + exportConfig.endPos[0]) / 2,
+      (exportConfig.startPos[1] + exportConfig.endPos[1]) / 2,
+    ];
+    state.flapIndex = 2;
+    drawFrame(ctx, state);
+  };
+
   renderFrame(0);
 
   previewBtn.addEventListener("click", async () => {
     previewBtn.disabled = true;
     exportBtn.disabled = true;
+    exportMidpointBtn.disabled = true;
     statusEl.textContent = "Previewing animation…";
 
     for (let frameIndex = 0; frameIndex < totalFrames; frameIndex += 1) {
@@ -341,11 +371,13 @@ export async function runSingleTrialExporter() {
     statusEl.textContent = "Preview finished.";
     previewBtn.disabled = false;
     exportBtn.disabled = false;
+    exportMidpointBtn.disabled = false;
   });
 
   exportBtn.addEventListener("click", async () => {
     previewBtn.disabled = true;
     exportBtn.disabled = true;
+    exportMidpointBtn.disabled = true;
     statusEl.textContent = "Building ZIP of PNG frames…";
 
     try {
@@ -365,6 +397,30 @@ export async function runSingleTrialExporter() {
     } finally {
       previewBtn.disabled = false;
       exportBtn.disabled = false;
+      exportMidpointBtn.disabled = false;
+    }
+  });
+
+  exportMidpointBtn.addEventListener("click", async () => {
+    previewBtn.disabled = true;
+    exportBtn.disabled = true;
+    exportMidpointBtn.disabled = true;
+    statusEl.textContent = "Exporting midpoint PNG…";
+
+    try {
+      renderMidpoint();
+      await exportCanvasImage(
+        canvas,
+        exportConfig.midpointFileName ?? createMidpointFileName(exportConfig.outputBaseName ?? "single-trial-export")
+      );
+      renderFrame(0);
+      statusEl.textContent = `Midpoint PNG exported as ${exportConfig.midpointFileName ?? createMidpointFileName(exportConfig.outputBaseName ?? "single-trial-export")}.`;
+    } catch (error) {
+      statusEl.textContent = error instanceof Error ? error.message : String(error);
+    } finally {
+      previewBtn.disabled = false;
+      exportBtn.disabled = false;
+      exportMidpointBtn.disabled = false;
     }
   });
 }

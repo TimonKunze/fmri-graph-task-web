@@ -30,8 +30,12 @@ export const PATHS = {
     part2DemoVideo1: withBase("/practice_trials/videos/link_2_1.mp4"),
     part2DemoVideo2: withBase("/practice_trials/videos/link_1_3.mp4"),
     part2DemoVideo3: withBase("/practice_trials/videos/link_3_4.mp4"),
+    part2DemoImage1: withBase("/practice_trials/images/link_2_1.png"),
+    part2DemoImage2: withBase("/practice_trials/images/link_1_3.png"),
+    part2DemoImage3: withBase("/practice_trials/images/link_3_4.png"),
 
-    movingObjExport: withBase("/practice_trials/stimuli/moving_obj.png"),
+
+    movingObjExport: withBase("/stimuli/bats2/moving_obj.png"),
     nodeExport: (i) => withBase(`/practice_trials/stimuli/node${i}.png`),
     randomizationTable: withBase("/config/randomization_table.csv"),
     randomPositionsTable: withBase("/config/random_positions.csv"),

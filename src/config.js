@@ -59,15 +59,15 @@ const singleTrialExport = {
     movingFigureSize: SIZES.task14Bee,
     startPos: [80, 100],
     endPos: [220, 100],
-    // Link 1_2
-    startStimulusPath: PATHS.nodeExport(2),
-    endStimulusPath: PATHS.nodeExport(1),
+    // Link 2_1
+    // startStimulusPath: PATHS.nodeExport(2),
+    // endStimulusPath: PATHS.nodeExport(1),
     // Link 3_4
     // startStimulusPath: PATHS.nodeExport(3),
     // endStimulusPath: PATHS.nodeExport(4),
     // Link 1_3
-    // startStimulusPath: PATHS.nodeExport(1),
-    // endStimulusPath: PATHS.nodeExport(3),
+    startStimulusPath: PATHS.nodeExport(1),
+    endStimulusPath: PATHS.nodeExport(3),
     movingFigurePath: PATHS.movingObjExport,
     movingFigureMirroredPath: PATHS.movingObjExport,
 };

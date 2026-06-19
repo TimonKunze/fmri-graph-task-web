@@ -1,50 +1,5 @@
 import { PATHS } from "./paths.js";
-
-function splitCsvLine(line) {
-  const cells = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i += 1) {
-    const char = line[i];
-
-    if (char === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-      continue;
-    }
-
-    if (char === "," && !inQuotes) {
-      cells.push(current);
-      current = "";
-      continue;
-    }
-
-    current += char;
-  }
-
-  cells.push(current);
-  return cells;
-}
-
-function rowsFromCsv(csvText) {
-  const lines = csvText.trim().split(/\r?\n/);
-  const [headerLine, ...dataLines] = lines;
-
-  if (!headerLine || dataLines.length === 0) {
-    return [];
-  }
-
-  const headers = splitCsvLine(headerLine);
-  return dataLines.map((line) => {
-    const values = splitCsvLine(line);
-    return Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]));
-  });
-}
+import { parseCsvRows } from "../utils/csv.js";
 
 function getFirstPresent(row, keys) {
   for (const key of keys) {
@@ -161,8 +116,8 @@ export async function loadGraphData() {
     fetchCsv(PATHS.randomizationTable),
   ]);
 
-  const positionRows = rowsFromCsv(await positionsCsvText);
-  const randomizationRows = rowsFromCsv(await randomizationCsvText);
+  const positionRows = parseCsvRows(await positionsCsvText);
+  const randomizationRows = parseCsvRows(await randomizationCsvText);
 
   const positionsByHex = parsePositionSetsByHex(positionRows);
   const graphDefinitions = parseGraphDefinitions(randomizationRows);

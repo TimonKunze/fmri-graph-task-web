@@ -1,4 +1,5 @@
 import { CONFIG } from "../config.js";
+import { parseCsvRows } from "../utils/csv.js";
 
 const IDENTITY_NODE_TO_GRAPH = [0, 1, 2, 3, 4, 5, 6, 7];
 const IDENTITY_OBJECT_TO_NODES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
@@ -16,37 +17,6 @@ const currentAssignment = {
 };
 
 let randomizationRows = [];
-
-function splitCsvLine(line) {
-  const cells = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-
-    if (char === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-      continue;
-    }
-
-    if (char === "," && !inQuotes) {
-      cells.push(current);
-      current = "";
-      continue;
-    }
-
-    current += char;
-  }
-
-  cells.push(current);
-  return cells;
-}
 
 function parseNumberArray(value) {
   if (!value) return null;
@@ -111,14 +81,8 @@ function getLearnLayoutOrderFromConfig() {
 }
 
 export function loadRandomizationRows(csvText) {
-  const lines = csvText.trim().split(/\r?\n/);
-  const [headerLine, ...dataLines] = lines;
-  const headers = splitCsvLine(headerLine);
-
-  randomizationRows = dataLines
-    .map((line) => {
-      const values = splitCsvLine(line);
-      const row = Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]));
+  randomizationRows = parseCsvRows(csvText)
+    .map((row) => {
       const subjectCode = Number(row.subject_code);
 
       if (!Number.isInteger(subjectCode)) {
