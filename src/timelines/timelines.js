@@ -33,7 +33,7 @@ import { spatialPosInstrTrial1, spatialPosInstrTrial2 } from "../trials/spatialp
 import { 
     createSpatialPosTrial, 
     createPosDrawTrial, 
-    createCondPosDrawTrial } from "../trials/arena_trials.js";
+    createLoopedPosDrawTrial } from "../trials/arena_trials.js";
 import { cheater_trial } from "../trials/cheater_trial.js";
 import { finalPart1Trial } from "../trials/final_part1_trial.js";
 import { finalPart2Trial } from "../trials/final_part2_trial.js";
@@ -445,15 +445,11 @@ export function makePart3Timeline() {
     tl.push(createSpatialPosTrial(testLayouts[0]));
     tl.push(spatialPosInstrTrial2);
     tl.push(createPosDrawTrial("first", testLayouts[0]));
-    for (let i=0; i<5; i++) {
-        tl.push(createCondPosDrawTrial(testLayouts[0]));
-    }
+    tl.push(createLoopedPosDrawTrial(testLayouts[0]));
     tl.push(createConditionTransitionTrial("test4_condition_transition"));
     tl.push(createSpatialPosTrial(testLayouts[1]));
     tl.push(createPosDrawTrial("first", testLayouts[1]));
-    for (let i=0; i<5; i++) {
-        tl.push(createCondPosDrawTrial(testLayouts[1]));
-    }
+    tl.push(createLoopedPosDrawTrial(testLayouts[1]));
     // }
     if (CONFIG.includeEvalTrials) {
       tl.push(createConfidenceTrial("part3"));

@@ -67,17 +67,19 @@ DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-03 npm run build:parts -- "deplo
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-10 npm run build:parts -- "deployment 2026-06-10"
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-10_2 npm run build:parts -- "deployment 2026-06-10_2"
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-17 npm run build:parts -- "deployment 2026-06-17"
+DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-19 npm run build:parts -- "deployment 2026-06-19"
 
 Then copy to the server with:
 rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-03/
 rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10/
 rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10_2/
 rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-17/
+rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-19/
 
 Check the save_data.php is shipped:
 rsync -e "ssh" -avz exp_data/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/exp_data/
 
 Retrieve data with:
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral_data/raw_data/pilot_1/
-rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10_2/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral_data/raw_data/pilot_2/
+rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10_2/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot_2/
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-17/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot_3/

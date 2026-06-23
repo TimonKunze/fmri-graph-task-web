@@ -716,3 +716,21 @@ export function createCondPosDrawTrial(layoutType) {
     },
   };
 }
+
+export function createLoopedPosDrawTrial(layoutType) {
+  return {
+    timeline: [createPosDrawTrial("conditional", layoutType)],
+    conditional_function: function () {
+      const graphConnected = jsPsych.data.get().last(1).values()[0]?.connected_spatialpos_rel;
+      return !graphConnected;
+    },
+    loop_function: function (data) {
+      const lastTrial = data
+        .filter({ trial_name: "test_spatialpos_rel", layout_type: layoutType })
+        .last(1)
+        .values()[0];
+
+      return !lastTrial?.connected_spatialpos_rel;
+    },
+  };
+}

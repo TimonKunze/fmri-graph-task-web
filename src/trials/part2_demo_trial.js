@@ -212,9 +212,8 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
 
   return {
     timeline: [
-      introTrial,
       {
-        timeline: [...pictureTrials, choiceTrial, repeatTrial],
+        timeline: [introTrial, ...pictureTrials, choiceTrial, repeatTrial],
         loop_function: (data) => data.values().at(-1)?.repeat_demo === true,
       },
     ],
