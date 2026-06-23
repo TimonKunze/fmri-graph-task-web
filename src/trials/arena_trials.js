@@ -707,16 +707,6 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
   };
 }
 
-export function createCondPosDrawTrial(layoutType) {
-  return {
-    timeline: [createPosDrawTrial("conditional", layoutType)],
-    conditional_function: function () {
-      const graphConnected = jsPsych.data.get().last(1).values()[0]?.connected_spatialpos_rel;
-      return !graphConnected; // show again if NOT connected
-    },
-  };
-}
-
 export function createLoopedPosDrawTrial(layoutType) {
   return {
     timeline: [createPosDrawTrial("conditional", layoutType)],
