@@ -83,3 +83,4 @@ Retrieve data with:
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral_data/raw_data/pilot_1/
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10_2/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot_2/
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-17/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot_3/
+rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-19/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot/

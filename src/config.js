@@ -15,7 +15,7 @@ const baseConfig = {
   defaultLanguage: "en", // "en" | "it" | "de"
 
   feedback: false,
-  includeEvalTrials: true,
+  includeEvalTrials: false,
   behavioral: true,
 
   keyChoice: null,

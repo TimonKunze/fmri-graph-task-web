@@ -35,6 +35,8 @@ import {
     createPosDrawTrial, 
     createLoopedPosDrawTrial } from "../trials/arena_trials.js";
 import { cheater_trial } from "../trials/cheater_trial.js";
+import { postCheaterQuestionnaireTrial } from "../trials/post_cheater_questionnaire_trial.js";
+import { sbsod_trial } from "../trials/sbsod_trial.js";
 import { finalPart1Trial } from "../trials/final_part1_trial.js";
 import { finalPart2Trial } from "../trials/final_part2_trial.js";
 import { finalPart3Trial } from "../trials/final_part3_trial.js";
@@ -459,6 +461,8 @@ export function makePart3Timeline() {
     // Cheater & Final
     // ---------------
     tl.push(cheater_trial);
+    tl.push(postCheaterQuestionnaireTrial);
+    tl.push(sbsod_trial);
     tl.push(finalPart3Trial);
 
     return tl;

@@ -194,8 +194,11 @@ const INSTRUCTION_COPY = {
     <br>
   `,
     cheater: `
-    <h3>Congratulazioni, hai quasi finito. Un'ultima domanda:</h3>
+    <h3>Congratulazioni, hai quasi finito.</h3>
     <br>
+    <p>
+    Nelle domande seguenti, soltanto alcune ultime domande.
+    </p>
     <p>
     Hai utilizzato qualche forma di aiuto esterno per imparare le connessioni del pipistrello nella Parte I
     o per risolvere il compito nelle Parti II o III (per esempio scrivendo le connessioni)?
@@ -382,8 +385,11 @@ const INSTRUCTION_COPY = {
     <br>
   `,
     cheater: `
-    <h3>Herzlichen Gluckwunsch, du bist fast fertig. Eine allerletzte Frage:</h3>
+    <h3>Herzlichen Gluckwunsch, du bist fast fertig.</h3>
     <br>
+    <p>
+    Im Folgenden nur noch einige letzte Fragen.
+    </p>
     <p>
     Hast du irgendeine Form externer Hilfe verwendet, um die Verbindungen der Fledermaus in Teil I zu lernen
     oder um die Aufgaben in Teil II oder III zu losen (zum Beispiel, indem du die Verbindungen aufgeschrieben hast)?
@@ -575,8 +581,11 @@ const INSTRUCTION_COPY = {
     <br>
   `,
     cheater: `
-    <h3>Congratulations, you are nearly done. One very last question:</h3>
+    <h3>Congratulations, you are nearly done.</h3>
     <br>
+    <p>
+    In the following, only some last questions.
+    </p>
     <p>
     Did you use any form of external aid to learn the bat's connections in Part I, or to
     solve the tasks in Part II and III (for example, by writing the connections down)?
