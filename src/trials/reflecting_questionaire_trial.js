@@ -48,19 +48,19 @@ function renderRadioQuestion({ name, prompt, options, horizontal = false }) {
   `;
 }
 
-export const postCheaterQuestionnaireTrial = {
+export const reflecting_questionaire_trial = {
   type: jsPsychHtmlButtonResponse,
   stimulus: "",
   choices: [],
   data: {
-    trial_name: "post_cheater_questionnaire",
+    trial_name: "reflecting_questionaire_trial",
     part: 3,
   },
   on_start: (trial) => {
     const copy = t({
       it: {
         preamble:
-          "<h3>Domande finali</h3><p>Infine, ecco alcune domande finali per riflettere sull'esperimento.</p>",
+          "<h3>Domande di riflessione</h3><p>Di seguito, alcune domande di riflessione sull'esperimento.</p>",
         systematic: "Hai notato qualcosa di sistematico nel modo in cui gli oggetti erano disposti sullo schermo?",
         systematicHint: "Descrivi separatamente il primo e il secondo insieme.",
         firstSet: "Primo insieme",
@@ -77,7 +77,7 @@ export const postCheaterQuestionnaireTrial = {
       },
       en: {
         preamble:
-          "<h3>Final Questions</h3><p>At last, a few final questions reflecting upon the experiment.</p>",
+          "<h3>Reflection Questions</h3><p>Please answer a few questions reflecting on the experiment.</p>",
         systematic: "Did you notice anything systematic about how the objects were arranged on the screen?",
         systematicHint: "Please describe the first and second sets separately.",
         firstSet: "First set",
@@ -94,7 +94,7 @@ export const postCheaterQuestionnaireTrial = {
       },
       de: {
         preamble:
-          "<h3>Abschlussfragen</h3><p>Zum Schluss noch einige Fragen, die zum Nachdenken über das Experiment anregen sollen.</p>",
+          "<h3>Reflexionsfragen</h3><p>Bitte beantworte im Folgenden einige Reflexionsfragen zum Experiment.</p>",
         systematic: "Ist dir etwas Systematisches daran aufgefallen, wie die Objekte auf dem Bildschirm angeordnet waren?",
         systematicHint: "Bitte beschreibe das erste und das zweite Set getrennt.",
         firstSet: "Erstes Set",

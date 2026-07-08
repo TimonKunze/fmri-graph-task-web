@@ -22,7 +22,6 @@ import { createCongrTestTrial } from "../trials/create_congr_test_trial.js";
 import { createFmriPathChoiceTrial } from "../trials/fmri_path_choice_trial.js";
 import { createFmriPictureViewingTrial } from "../trials/fmri_picture_viewing_trial.js";
 import { consent_trial } from "../trials/consent_trial.js";
-import { fullscreen_trial } from "../trials/fullscreen_trial.js";
 import { createLearnTrials, createRelQueryTrials } from "./learn_timelines.js";
 import { learnTrialRelQueryInstr } from "../trials/learn_rel_query_instr_trial.js";
 import { createRelQueryTrialFeedback } from "../trials/rel_query_feedback_trial.js";
@@ -35,7 +34,7 @@ import {
     createPosDrawTrial, 
     createLoopedPosDrawTrial } from "../trials/arena_trials.js";
 import { cheater_trial } from "../trials/cheater_trial.js";
-import { postCheaterQuestionnaireTrial } from "../trials/post_cheater_questionnaire_trial.js";
+import { reflecting_questionaire_trial } from "../trials/reflecting_questionaire_trial.js";
 import { sbsod_trial } from "../trials/sbsod_trial.js";
 import { finalPart1Trial } from "../trials/final_part1_trial.js";
 import { finalPart2Trial } from "../trials/final_part2_trial.js";
@@ -461,7 +460,7 @@ export function makePart3Timeline() {
     // Cheater & Final
     // ---------------
     tl.push(cheater_trial);
-    tl.push(postCheaterQuestionnaireTrial);
+    tl.push(reflecting_questionaire_trial);
     tl.push(sbsod_trial);
     tl.push(finalPart3Trial);
 
