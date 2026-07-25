@@ -1,0 +1,241 @@
+import { CONFIG } from "../config.js";
+import { G } from "../config/graphState.js";
+import { PATHS } from "../config/paths.js";
+import { TIMINGS } from "../config/timings.js";
+import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
+import { createPart2DemoTimeline } from "../trials/part2_demo_trial.js";
+import { part2_intro_trial } from "../trials/part2_intro_trial.js";
+import { part2_start_trial } from "../trials/part2_start_trial.js";
+import { part2EvalIntroTrial } from "../trials/part2_eval_intro_trial.js";
+import { createFmriPathChoiceTrial } from "../trials/fmri_path_choice_trial.js";
+import { createFmriPictureViewingTrial } from "../trials/fmri_picture_viewing_trial.js";
+import { finalPart2Trial } from "../trials/final_part2_trial.js";
+import { getCurrentLanguage } from "../state/participant.js";
+import { createShortestPathDistanceMatrix } from "../utils/graph-tools.js";
+import {
+  getPart2ItiTimes,
+  getPart2RawNodeBlocks,
+  getSubjectAssignment,
+} from "../state/subjectAssignment.js";
+
+export function makePart2Timeline() {
+  const tl = [];
+  const part2Timings = CONFIG.behavioral ? TIMINGS.part2.behavioral : TIMINGS.part2.default;
+  const fmriBlocks = (getPart2RawNodeBlocks() ?? []).filter(Array.isArray);
+  const part2ItiBlocks = (getPart2ItiTimes(CONFIG.behavioral) ?? []).filter(Array.isArray);
+  const totalFmriBlocks = fmriBlocks.length;
+  const shortestPathDistanceMatrix = createShortestPathDistanceMatrix(G.adjM);
+  const assignment = getSubjectAssignment();
+  const expToCanonical = (assignment.experimentNodeToGraphNode ?? []).map((value) => Number(value));
+  const canonicalToExp = new Array(expToCanonical.length);
+  expToCanonical.forEach((canonicalIndex, experimentIndex) => {
+    canonicalToExp[canonicalIndex] = experimentIndex;
+  });
+  const decodeFmriNode = (rawNode) => {
+    if (!Number.isInteger(rawNode) || rawNode < 0 || rawNode >= G.nbNodes * 2) {
+      throw new Error(`[makePart2Timeline] Invalid fMRI node index: ${rawNode}`);
+    }
+
+    const graphNodeIndex = rawNode % G.nbNodes;
+    const stimSet = rawNode < G.nbNodes ? "set1" : "set2";
+    const layoutType = stimSet === "set1" ? "rotational" : "unconstrained";
+    const experimentNodeIndex = canonicalToExp[graphNodeIndex];
+
+    if (!Number.isInteger(experimentNodeIndex)) {
+      throw new Error(
+        `[makePart2Timeline] Could not map graph node ${graphNodeIndex} to experiment node for raw fMRI node ${rawNode}.`
+      );
+    }
+
+    return {
+      rawNode,
+      stimSet,
+      layoutType,
+      graphNodeIndex,
+      experimentNodeIndex,
+      imageSrc: stimSet === "set2"
+        ? PATHS.nodeImages2(experimentNodeIndex)
+        : PATHS.nodeImages1(experimentNodeIndex),
+    };
+  };
+  tl.push(part2_intro_trial);
+  if (!CONFIG.debug) {
+    tl.push(createPart2DemoTimeline(shortestPathDistanceMatrix));
+    tl.push(part2_start_trial);
+  }
+
+  const createPart2BlockBreakTrial = (blockIndex) => ({
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "",
+    choices: ["arrowright"],
+    on_start: (trial) => {
+      trial.stimulus = getCurrentLanguage() === "it"
+        ? `
+          <div class="instr-screen">
+            <p>Hai completato il blocco ${blockIndex} di ${totalFmriBlocks}.</p>
+            <p>Per favore, prenditi un <strong>momento di riposo</strong>.</p>
+            <p>Quando sei pronto/a, premi la freccia destra per iniziare il blocco successivo.</p>
+            <div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>
+          </div>
+        `
+        : getCurrentLanguage() === "de"
+          ? `
+          <div class="instr-screen">
+            <p>Du hast Block ${blockIndex} von ${totalFmriBlocks} abgeschlossen.</p>
+            <p>Bitte nimm dir einen <strong>kurzen Moment zur Erholung</strong>.</p>
+            <p>Wenn du bereit bist, drucke die rechte Pfeiltaste, um den nachsten Block zu starten.</p>
+            <div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>
+          </div>
+        `
+        : `
+          <div class="instr-screen">
+            <p>You have completed block ${blockIndex} of ${totalFmriBlocks}.</p>
+            <p>Please take a <strong>moment of rest</strong>.</p>
+            <p>When you are ready, press the right arrow key to start the next block.</p>
+            <div style="text-align:center;font-size:28px;font-weight:700;margin-top:20px;">&#8594;</div>
+          </div>
+        `;
+    },
+    data: {
+      trial_name: "part2_block_break",
+      part: 2,
+      block_index: blockIndex,
+    },
+  });
+
+  const createPictureViewingItiTrial = (blockIndex, trialIndex, itiSeconds) => {
+    return {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <div style="height: 70vh; display: flex; align-items: center; justify-content: center;">
+          <div style="font-size: 48px; line-height: 1;">+</div>
+        </div>
+      `,
+      choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
+      response_ends_trial: CONFIG.debug,
+      trial_duration: Math.round(itiSeconds * 1000),
+      data: {
+        trial_name: "part2_fmri_iti",
+        part: 2,
+        block_index: blockIndex,
+        trial_index: trialIndex,
+        iti_seconds: itiSeconds,
+      },
+    };
+  };
+
+  const getItiSecondsForPosition = (blockIndex, itiIndex) => {
+    const itiSeconds = Number(part2ItiBlocks?.[blockIndex]?.[itiIndex]);
+    if (Number.isFinite(itiSeconds)) {
+      return itiSeconds;
+    }
+
+    throw new Error(
+      `[makePart2Timeline] Missing ITI value for block ${blockIndex}, iti index ${itiIndex}, subject ${assignment.subjectCode}.`
+    );
+  };
+
+  fmriBlocks.forEach((block, blockIndex) => {
+    let previousNodeIndex = null;
+    let previousStimSet = null;
+    let previousItiSeconds = null;
+    let itiIndex = 0;
+    const blockItems = CONFIG.debug ? block.slice(0, 8) : block;
+
+    blockItems.forEach((item, trialIndex) => {
+      if (Number.isInteger(item)) {
+        const decodedNode = decodeFmriNode(item);
+        tl.push(
+          createFmriPictureViewingTrial({
+            imageSrc: decodedNode.imageSrc,
+            nodeIndex: decodedNode.experimentNodeIndex,
+            blockIndex,
+            duration: part2Timings.imagePresentationMs,
+            trialIndex,
+            dataExtras: {
+              raw_node_index: decodedNode.rawNode,
+              graph_node_index: decodedNode.graphNodeIndex,
+              stim_set: decodedNode.stimSet,
+              layout_type: decodedNode.layoutType,
+            },
+          })
+        );
+        previousNodeIndex = decodedNode.experimentNodeIndex;
+        previousStimSet = decodedNode.stimSet;
+        if (trialIndex < blockItems.length - 1) {
+          const itiSeconds = getItiSecondsForPosition(blockIndex, itiIndex);
+          tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
+          previousItiSeconds = itiSeconds;
+          itiIndex += 1;
+        }
+        return;
+      }
+
+      if (Array.isArray(item) && item.length === 2) {
+        const leftNode = decodeFmriNode(item[0]);
+        const rightNode = decodeFmriNode(item[1]);
+        if (leftNode.stimSet !== rightNode.stimSet) {
+          throw new Error(
+            `[makePart2Timeline] fMRI choice pair spans two stimulus sets: ${item[0]} (${leftNode.stimSet}) vs ${item[1]} (${rightNode.stimSet}).`
+          );
+        }
+        if (previousStimSet !== null && previousStimSet !== leftNode.stimSet) {
+          throw new Error(
+            `[makePart2Timeline] fMRI choice pair stimulus set ${leftNode.stimSet} does not match previous stimulus set ${previousStimSet}.`
+          );
+        }
+        const leftPathLength = Number.isInteger(previousNodeIndex)
+          ? shortestPathDistanceMatrix[previousNodeIndex]?.[leftNode.experimentNodeIndex] ?? null
+          : null;
+        const rightPathLength = Number.isInteger(previousNodeIndex)
+          ? shortestPathDistanceMatrix[previousNodeIndex]?.[rightNode.experimentNodeIndex] ?? null
+          : null;
+        const correctChoice = leftPathLength === null || rightPathLength === null
+          ? null
+          : leftPathLength === rightPathLength
+            ? null
+            : leftPathLength < rightPathLength ? 0 : 1;
+
+        tl.push(
+          createFmriPathChoiceTrial({
+            leftImageSrc: leftNode.imageSrc,
+            rightImageSrc: rightNode.imageSrc,
+            leftNodeIndex: leftNode.experimentNodeIndex,
+            rightNodeIndex: rightNode.experimentNodeIndex,
+            referenceNodeIndex: previousNodeIndex,
+            itiSecondsPrevious: previousItiSeconds,
+            leftPathLength,
+            rightPathLength,
+            correctChoice,
+            stimSet: leftNode.stimSet,
+            blockIndex,
+            trialIndex,
+            dataExtras: {
+              left_raw_node_index: leftNode.rawNode,
+              right_raw_node_index: rightNode.rawNode,
+              left_graph_node_index: leftNode.graphNodeIndex,
+              right_graph_node_index: rightNode.graphNodeIndex,
+              layout_type: leftNode.layoutType,
+            },
+          })
+        );
+        previousNodeIndex = null;
+        previousStimSet = null;
+        if (trialIndex < blockItems.length - 1) {
+          const itiSeconds = getItiSecondsForPosition(blockIndex, itiIndex);
+          tl.push(createPictureViewingItiTrial(blockIndex, trialIndex, itiSeconds));
+          previousItiSeconds = itiSeconds;
+          itiIndex += 1;
+        }
+      }
+    });
+
+    if (blockIndex < totalFmriBlocks - 1) {
+      tl.push(createPart2BlockBreakTrial(blockIndex + 1));
+    }
+  });
+
+  tl.push(finalPart2Trial);
+
+  return tl;
+}
