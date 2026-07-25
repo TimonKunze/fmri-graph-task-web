@@ -21,7 +21,8 @@ function normalizeBasePath(prefix, part) {
 
 const builds = [
   { part: "1", outDir: "dist/part1" },
-  { part: "2", outDir: "dist/part2" },
+  { part: "2a", outDir: "dist/part2a" },
+  { part: "2b", outDir: "dist/part2b" },
   { part: "3", outDir: "dist/part3" },
 ].map((build) => ({
   ...build,
