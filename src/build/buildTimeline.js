@@ -1,11 +1,11 @@
 import { CONFIG } from "../config.js";
-import { 
-    makeCoreTimeline, 
-    makeLearnIntroTimeline,
-    makeLearnTimeline,
-    makePart2Timeline,
-    makePart3Timeline,  
-} from "../timelines/timelines.js";
+import {
+  makeCoreTimeline,
+  makeLearnIntroTimeline,
+  makeLearnTimeline,
+} from "../timelines/part1_timeline.js";
+import { makePart2Timeline } from "../timelines/part2_timeline.js";
+import { makePart3Timeline } from "../timelines/part3_timeline.js";
 
 export function buildTimeline() {
   const tl = [];
