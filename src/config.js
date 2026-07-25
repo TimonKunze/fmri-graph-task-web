@@ -2,15 +2,33 @@ import { COLORS } from "./config/colors.js";
 import { PATHS } from "./config/paths.js";
 import { SIZES } from "./config/sizes.js";
 
-function parseEnvNumber(value, fallback) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
+function parseActivePart(value, fallback) {
+  if (value === undefined || value === null || String(value).trim() === "") {
+    return fallback;
+  }
+
+  const normalized = String(value).trim().toLowerCase();
+  const allowedParts = new Set(["1", "2a", "2b", "3"]);
+
+  if (allowedParts.has(normalized)) {
+    return normalized;
+  }
+
+  const numericValue = Number(normalized);
+  if (Number.isInteger(numericValue)) {
+    const numericPart = String(numericValue);
+    if (allowedParts.has(numericPart)) {
+      return numericPart;
+    }
+  }
+
+  throw new Error(`CONFIG.activePart must be 1, 2a, 2b, or 3. Received: ${value}`);
 }
 
 const baseConfig = {
   mode: "prod", // "dev" | "prod"
 
-  activePart: 3, // 1 | 2 | 3
+  activePart: "2b", // 1 | 2a | 2b | 3
 
   defaultLanguage: "en", // "en" | "it" | "de"
 
@@ -73,7 +91,7 @@ const singleTrialExport = {
 };
 
 const selectedProfile = configProfiles[baseConfig.mode] || {};
-const resolvedActivePart = parseEnvNumber(import.meta.env?.VITE_ACTIVE_PART, baseConfig.activePart);
+const resolvedActivePart = parseActivePart(import.meta.env?.VITE_ACTIVE_PART, baseConfig.activePart);
 const deploymentDate = import.meta.env?.VITE_DEPLOYMENT_DATE ?? null;
 const deploymentComment = import.meta.env?.VITE_DEPLOYMENT_COMMENT ?? "";
 
@@ -86,13 +104,15 @@ export const CONFIG = {
   singleTrialExport,
 };
 
-if (![1, 2, 3].includes(CONFIG.activePart)) {
-  throw new Error(`CONFIG.activePart must be 1, 2, or 3. Received: ${CONFIG.activePart}`);
+if (!["1", "2a", "2b", "3"].includes(CONFIG.activePart)) {
+  throw new Error(`CONFIG.activePart must be 1, 2a, 2b, or 3. Received: ${CONFIG.activePart}`);
 }
 
-CONFIG.part1 = CONFIG.activePart === 1;
-CONFIG.part2 = CONFIG.activePart === 2;
-CONFIG.part3 = CONFIG.activePart === 3;
+CONFIG.part1 = CONFIG.activePart === "1";
+CONFIG.part2a = CONFIG.activePart === "2a";
+CONFIG.part2b = CONFIG.activePart === "2b";
+CONFIG.part2 = CONFIG.part2a || CONFIG.part2b;
+CONFIG.part3 = CONFIG.activePart === "3";
 
 CONFIG.keyChoice = CONFIG.debug ? "ALL_KEYS" : "NO_KEYS";
 CONFIG.nbLearnPasses = CONFIG.debug ? 1 : 2; // in earlier pilots: 3

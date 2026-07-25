@@ -55,12 +55,13 @@ function getCopy() {
 }
 
 function getPartHeading() {
-  const romanNumerals = {
-    1: "I",
-    2: "II",
-    3: "III",
+  const partLabels = {
+    "1": "I",
+    "2a": "IIa",
+    "2b": "IIb",
+    "3": "III",
   };
-  const romanPart = romanNumerals[CONFIG.activePart] ?? String(CONFIG.activePart);
+  const romanPart = partLabels[CONFIG.activePart] ?? String(CONFIG.activePart);
   return t({
     it: `Parte ${romanPart}`,
     en: `Part ${romanPart}`,

@@ -3,10 +3,6 @@ import { G } from "../config/graphState.js";
 import { PATHS } from "../config/paths.js";
 import { TIMINGS } from "../config/timings.js";
 import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
-import { createPart2DemoTimeline } from "../trials/part2_demo_trial.js";
-import { part2_intro_trial } from "../trials/part2_intro_trial.js";
-import { part2_start_trial } from "../trials/part2_start_trial.js";
-import { part2EvalIntroTrial } from "../trials/part2_eval_intro_trial.js";
 import { createFmriPathChoiceTrial } from "../trials/fmri_path_choice_trial.js";
 import { createFmriPictureViewingTrial } from "../trials/fmri_picture_viewing_trial.js";
 import { finalPart2Trial } from "../trials/final_part2_trial.js";
@@ -18,7 +14,7 @@ import {
   getSubjectAssignment,
 } from "../state/subjectAssignment.js";
 
-export function makePart2Timeline() {
+export function makePart2bTimeline() {
   const tl = [];
   const part2Timings = CONFIG.behavioral ? TIMINGS.part2.behavioral : TIMINGS.part2.default;
   const fmriBlocks = (getPart2RawNodeBlocks() ?? []).filter(Array.isArray);
@@ -31,9 +27,10 @@ export function makePart2Timeline() {
   expToCanonical.forEach((canonicalIndex, experimentIndex) => {
     canonicalToExp[canonicalIndex] = experimentIndex;
   });
+
   const decodeFmriNode = (rawNode) => {
     if (!Number.isInteger(rawNode) || rawNode < 0 || rawNode >= G.nbNodes * 2) {
-      throw new Error(`[makePart2Timeline] Invalid fMRI node index: ${rawNode}`);
+      throw new Error(`[makePart2bTimeline] Invalid fMRI node index: ${rawNode}`);
     }
 
     const graphNodeIndex = rawNode % G.nbNodes;
@@ -43,7 +40,7 @@ export function makePart2Timeline() {
 
     if (!Number.isInteger(experimentNodeIndex)) {
       throw new Error(
-        `[makePart2Timeline] Could not map graph node ${graphNodeIndex} to experiment node for raw fMRI node ${rawNode}.`
+        `[makePart2bTimeline] Could not map graph node ${graphNodeIndex} to experiment node for raw fMRI node ${rawNode}.`
       );
     }
 
@@ -58,11 +55,6 @@ export function makePart2Timeline() {
         : PATHS.nodeImages1(experimentNodeIndex),
     };
   };
-  tl.push(part2_intro_trial);
-  if (!CONFIG.debug) {
-    tl.push(createPart2DemoTimeline(shortestPathDistanceMatrix));
-    tl.push(part2_start_trial);
-  }
 
   const createPart2BlockBreakTrial = (blockIndex) => ({
     type: jsPsychHtmlKeyboardResponse,
@@ -103,26 +95,24 @@ export function makePart2Timeline() {
     },
   });
 
-  const createPictureViewingItiTrial = (blockIndex, trialIndex, itiSeconds) => {
-    return {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: `
-        <div style="height: 70vh; display: flex; align-items: center; justify-content: center;">
-          <div style="font-size: 48px; line-height: 1;">+</div>
-        </div>
-      `,
-      choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
-      response_ends_trial: CONFIG.debug,
-      trial_duration: Math.round(itiSeconds * 1000),
-      data: {
-        trial_name: "part2_fmri_iti",
-        part: 2,
-        block_index: blockIndex,
-        trial_index: trialIndex,
-        iti_seconds: itiSeconds,
-      },
-    };
-  };
+  const createPictureViewingItiTrial = (blockIndex, trialIndex, itiSeconds) => ({
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: `
+      <div style="height: 70vh; display: flex; align-items: center; justify-content: center;">
+        <div style="font-size: 48px; line-height: 1;">+</div>
+      </div>
+    `,
+    choices: CONFIG.debug ? "ALL_KEYS" : "NO_KEYS",
+    response_ends_trial: CONFIG.debug,
+    trial_duration: Math.round(itiSeconds * 1000),
+    data: {
+      trial_name: "part2_fmri_iti",
+      part: 2,
+      block_index: blockIndex,
+      trial_index: trialIndex,
+      iti_seconds: itiSeconds,
+    },
+  });
 
   const getItiSecondsForPosition = (blockIndex, itiIndex) => {
     const itiSeconds = Number(part2ItiBlocks?.[blockIndex]?.[itiIndex]);
@@ -131,7 +121,7 @@ export function makePart2Timeline() {
     }
 
     throw new Error(
-      `[makePart2Timeline] Missing ITI value for block ${blockIndex}, iti index ${itiIndex}, subject ${assignment.subjectCode}.`
+      `[makePart2bTimeline] Missing ITI value for block ${blockIndex}, iti index ${itiIndex}, subject ${assignment.subjectCode}.`
     );
   };
 
@@ -176,12 +166,12 @@ export function makePart2Timeline() {
         const rightNode = decodeFmriNode(item[1]);
         if (leftNode.stimSet !== rightNode.stimSet) {
           throw new Error(
-            `[makePart2Timeline] fMRI choice pair spans two stimulus sets: ${item[0]} (${leftNode.stimSet}) vs ${item[1]} (${rightNode.stimSet}).`
+            `[makePart2bTimeline] fMRI choice pair spans two stimulus sets: ${item[0]} (${leftNode.stimSet}) vs ${item[1]} (${rightNode.stimSet}).`
           );
         }
         if (previousStimSet !== null && previousStimSet !== leftNode.stimSet) {
           throw new Error(
-            `[makePart2Timeline] fMRI choice pair stimulus set ${leftNode.stimSet} does not match previous stimulus set ${previousStimSet}.`
+            `[makePart2bTimeline] fMRI choice pair stimulus set ${leftNode.stimSet} does not match previous stimulus set ${previousStimSet}.`
           );
         }
         const leftPathLength = Number.isInteger(previousNodeIndex)

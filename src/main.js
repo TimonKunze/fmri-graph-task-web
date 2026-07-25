@@ -90,6 +90,8 @@ function addExperimentProperties() {
     debug_flag: CONFIG.debug,
     part1_flag: CONFIG.part1,
     part2_flag: CONFIG.part2,
+    part2a_flag: CONFIG.part2a,
+    part2b_flag: CONFIG.part2b,
     part3_flag: CONFIG.part3,
     feedback_flag: CONFIG.feedback,
     stimulus_condition_map: STIMULUS_CONDITION_MAP,
