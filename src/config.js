@@ -38,7 +38,7 @@ const configProfiles = {
     telegram: true,
     quick_run: false,
     randomize: true,
-    nbLearnBlocks: [4, 4],
+    nbLearnBlocks: [5, 5],
     maxAttemptsDraw: 11,
     maxLearnRelations: "max",
     defaultLanguage: "it", // "en" | "it" | "de"

@@ -1,5 +1,4 @@
 import { CONFIG } from "../config.js";
-import jsPsychHtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
 import { DESIGN } from "../build/derivedDesign.js";
 import { G_SAMPLE } from "../config/sample_graph.js";
