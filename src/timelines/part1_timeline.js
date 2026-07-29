@@ -1,7 +1,7 @@
 import { CONFIG } from "../config.js";
 import { DESIGN } from "../build/derivedDesign.js";
 import { G_SAMPLE } from "../config/sample_graph.js";
-import { G } from "../config/graphState.js";
+import { PATHS } from "../config/paths.js";
 import { createLearnTrialAnim } from "../trials/createLearnTrialAnim.js";
 import { createDrawingTrialSummary } from "../trials/createDrawingTrialSummary.js";
 import { createDrawingTrial } from "../trials/createDrawingTrial.js";
@@ -18,9 +18,9 @@ import { learnTrialRelQueryInstr } from "../trials/learn_rel_query_instr_trial.j
 import { createRelQueryTrialFeedback } from "../trials/rel_query_feedback_trial.js";
 import { createConfidenceTrial, createFreeEvalTrial } from "../trials/eval_trials.js";
 import { finalPart1Trial } from "../trials/final_part1_trial.js";
-import { PATHS } from "../config/paths.js";
 import { jsPsych } from "../main.js";
 import { getLearnLayoutOrder } from "../state/subjectAssignment.js";
+import { getPart2LearningStimulusOrder } from "../utils/part.js";
 
 // ------------------------------------
 // Learn Intro Timeline
@@ -41,13 +41,8 @@ export function makeLearnIntroTimeline(config = CONFIG) {
   }
   const firstLayoutType = orderedLayouts[0];
   const sampleType = firstLayoutType;
-  const sampleNodePathFn = firstLayoutType === "unconstrained"
-    ? PATHS.nodeImages2Small
-    : PATHS.nodeImages1Small;
-  const firstSetIndices = Array.from({ length: G.nbNodes }, (_, i) => i)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, G_SAMPLE.nodepos.length);
-  const sampleNodeImagePath = (index) => sampleNodePathFn(firstSetIndices[index]);
+  const sampleNodeOrder = getPart2LearningStimulusOrder();
+  const sampleNodeImagePath = (index) => PATHS.nodeExport(sampleNodeOrder[index % sampleNodeOrder.length] + 1);
 
   for (let trialI = 0; trialI < sampleRels.length; trialI++) {
     tl.push(

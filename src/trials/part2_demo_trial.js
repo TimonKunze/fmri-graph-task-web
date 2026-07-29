@@ -8,6 +8,7 @@ import { jsPsych } from "../main.js";
 import { t } from "../state/participant.js";
 import { createFmriPictureViewingTrial } from "./fmri_picture_viewing_trial.js";
 import { createFmriPathChoiceTrial } from "./fmri_path_choice_trial.js";
+import { getPart2LearningStimulusOrder, getPart2LearningStimulusPaths } from "../utils/part.js";
 
 function createDemoTopHtml() {
   return `
@@ -25,7 +26,7 @@ function createDemoTopHtml() {
 }
 
 function getDemoExample(shortestPathDistanceMatrix) {
-  const singleNodeIndices = [2, 0, 1];
+  const singleNodeIndices = getPart2LearningStimulusOrder();
   const referenceNodeIndex = 1;
   const leftNodeIndex = 2;
   const rightNodeIndex = 3;
@@ -72,6 +73,8 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
   };
 
   const singleNodeIndices = demoExample.singleNodeIndices;
+  const singleNodeOrder = getPart2LearningStimulusOrder();
+  const singleNodeImagePaths = getPart2LearningStimulusPaths();
 
   const createDemoGapTrial = (index) => ({
     type: jsPsychHtmlKeyboardResponse,
@@ -98,8 +101,8 @@ export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
   const pictureTrials = [];
   singleNodeIndices.forEach((nodeIndex, index) => {
     pictureTrials.push(createFmriPictureViewingTrial({
-      imageSrc: PATHS.nodeExport(nodeIndex + 1),
-      nodeIndex,
+      imageSrc: singleNodeImagePaths[index],
+      nodeIndex: singleNodeOrder[index],
       duration: demoImageDuration,
       topHtml: trialTopHtml,
       prompt: t({

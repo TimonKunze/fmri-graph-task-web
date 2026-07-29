@@ -1,34 +1,12 @@
 import { COLORS } from "./config/colors.js";
 import { PATHS } from "./config/paths.js";
 import { SIZES } from "./config/sizes.js";
-
-function parseActivePart(value, fallback) {
-  if (value === undefined || value === null || String(value).trim() === "") {
-    return fallback;
-  }
-
-  const normalized = String(value).trim().toLowerCase();
-  const allowedParts = new Set(["1", "2a", "2b", "3"]);
-
-  if (allowedParts.has(normalized)) {
-    return normalized;
-  }
-
-  const numericValue = Number(normalized);
-  if (Number.isInteger(numericValue)) {
-    const numericPart = String(numericValue);
-    if (allowedParts.has(numericPart)) {
-      return numericPart;
-    }
-  }
-
-  throw new Error(`CONFIG.activePart must be 1, 2a, 2b, or 3. Received: ${value}`);
-}
+import { parseActivePart } from "./utils/part.js";
 
 const baseConfig = {
   mode: "prod", // "dev" | "prod"
 
-  activePart: "2b", // 1 | 2a | 2b | 3
+  activePart: "1", // 1 | 2a | 2b | 3
 
   defaultLanguage: "en", // "en" | "it" | "de"
 
