@@ -1,8 +1,8 @@
 function E = TheMainScript_Part2b()
 %THEMAINSCRIPT_PART2B Standalone MATLAB entry point for Part 2b.
 
-E.exp_name = 'Part2bScanner - MATLAB';
 E = GetSubInfo_Part2b();
+E.exp_name = 'Part2bScanner - MATLAB';
 
 E.paths.scriptDir = fileparts(mfilename('fullpath'));
 E.paths.repoRoot = fileparts(E.paths.scriptDir);
