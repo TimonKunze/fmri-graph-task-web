@@ -2,7 +2,7 @@ function E = TheMainScript_Part2b()
 %THEMAINSCRIPT_PART2B Standalone MATLAB entry point for Part 2b.
 
 E.exp_name = 'Part2bScanner - MATLAB';
-GetSubInfo_Part2b;
+E = GetSubInfo_Part2b();
 
 E.paths.scriptDir = fileparts(mfilename('fullpath'));
 E.paths.repoRoot = fileparts(E.paths.scriptDir);
@@ -14,25 +14,22 @@ E.filename = sprintf('%s-%s-B%s-%s', ...
 E.filenameCSV = [E.filename '_ResultsOutput.csv'];
 
 try
-    rng('shuffle');
-    LoadLists_Part2b;
-    SetupTiming_Part2b;
-    SetupHardware_Part2b;
-    IniHardware_Part2b;
-    PreLoadText_Part2b;
-    PreLoadStim_Part2b;
+    E = LoadLists_Part2b(E);
+    E = SetupTiming_Part2b(E);
+    E = SetupHardware_Part2b(E);
+    E = IniHardware_Part2b(E);
+    E = PreLoadText_Part2b(E);
+    E = PreLoadStim_Part2b(E);
 
-    ExperimentScript_Part2b;
+    E = ExperimentScript_Part2b(E);
 
     if ~exist(E.paths.dataDir, 'dir')
         mkdir(E.paths.dataDir);
     end
     save(fullfile(E.paths.dataDir, E.filename), 'E');
 
-    if isfield(E, 'part2') && isfield(E.part2, 'trials') && ~isempty(E.part2.trials)
-        E.part2.resultsTable = BuildResultsTable(E);
-        writetable(E.part2.resultsTable, fullfile(E.paths.dataDir, E.filenameCSV));
-    end
+    E.part2.resultsTable = BuildResultsTable(E);
+    writetable(E.part2.resultsTable, fullfile(E.paths.dataDir, E.filenameCSV));
 
     ThankYou_Part2b(E);
     Screen('CloseAll');
@@ -70,16 +67,16 @@ CorrectChoice = nan(n, 1);
 
 for i = 1:n
     t = trials{i};
-    if isfield(t, 'block_index'), Block(i) = t.block_index; end
-    if isfield(t, 'trial_index'), TrialIndex(i) = t.trial_index; end
-    if isfield(t, 'trial_name'), TrialName(i) = string(t.trial_name); end
-    if isfield(t, 'response') && ~isempty(t.response), Response(i) = t.response; end
-    if isfield(t, 'rt_seconds') && ~isempty(t.rt_seconds), RT(i) = t.rt_seconds; end
-    if isfield(t, 'raw_node_index') && ~isempty(t.raw_node_index), RawNode(i) = t.raw_node_index; end
-    if isfield(t, 'graph_node_index') && ~isempty(t.graph_node_index), GraphNode(i) = t.graph_node_index; end
-    if isfield(t, 'stim_set') && ~isempty(t.stim_set), StimSet(i) = string(t.stim_set); end
-    if isfield(t, 'layout_type') && ~isempty(t.layout_type), LayoutType(i) = string(t.layout_type); end
-    if isfield(t, 'correct_choice') && ~isempty(t.correct_choice), CorrectChoice(i) = t.correct_choice; end
+    Block(i) = t.block_index;
+    TrialIndex(i) = t.trial_index;
+    TrialName(i) = string(t.trial_name);
+    Response(i) = t.response;
+    RT(i) = t.rt_seconds;
+    RawNode(i) = t.raw_node_index;
+    GraphNode(i) = t.graph_node_index;
+    StimSet(i) = string(t.stim_set);
+    LayoutType(i) = string(t.layout_type);
+    CorrectChoice(i) = t.correct_choice;
 end
 
 T = table(Subject, Block, TrialIndex, TrialName, Response, RT, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice);

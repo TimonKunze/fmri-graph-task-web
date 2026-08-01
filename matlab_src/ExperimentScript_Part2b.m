@@ -12,6 +12,7 @@ waitForSpecificKey(E.keys.trigger);
 
 Screen('Flip', E.screen.theWindow);
 E.begintime = GetSecs;
+E.part2.trials = {};
 WaitSecs(E.times.scannerOffsetSec);
 
 for b = 1:numel(E.assignment.part2RawNodeBlocks)

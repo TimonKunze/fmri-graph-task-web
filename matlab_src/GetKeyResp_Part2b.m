@@ -28,7 +28,7 @@ while true
             Screen('CloseAll');
             ShowCursor;
             ListenChar;
-            error('RunPart2bScanner:Aborted', 'Escape was pressed.');
+            error('Part2b:Aborted', 'Escape was pressed.');
         end
     end
     WaitSecs(0.001);

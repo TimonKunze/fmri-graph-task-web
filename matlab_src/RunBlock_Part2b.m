@@ -1,31 +1,21 @@
 function E = RunBlock_Part2b(E, blockIndex)
-blockItems = normalizeBlockItems(E.assignment.part2RawNodeBlocks{blockIndex});
-if E.debugmode
-    blockItems = blockItems(1:min(8, numel(blockItems)));
-end
-
-if ~isfield(E, 'part2') || ~isfield(E.part2, 'trials') || isempty(E.part2.trials)
-    E.part2.trials = {};
-end
-
+blockItems = E.assignment.part2RawNodeBlocks{blockIndex};
 adjM = E.G.adjM;
 shortestPathDistanceMatrix = createShortestPathDistanceMatrix(adjM);
 canonicalToExp = invertPermutation(E.assignment.experimentNodeToGraphNode);
 
 previousNodeIndex = [];
-previousStimSet = '';
 previousItiSeconds = [];
 itiIndex = 1;
 
 for trialIndex = 1:numel(blockItems)
     item = blockItems{trialIndex};
 
-    if isScalarNode(item)
-        rawNode = double(extractScalar(item));
-        decoded = decodeFmriNode(rawNode, size(adjM, 1), canonicalToExp, E);
+    if isnumeric(item) && isscalar(item)
+        decoded = decodeFmriNode(item, size(adjM, 1), canonicalToExp, E);
         drawSingleImageTrial(E, decoded.imageTex);
         WaitSecs(E.times.imagePresentationMs / 1000);
-        logEntry = struct( ...
+        E.part2.trials{end + 1} = struct( ...
             'trial_name', 'part2_fmri_picture_viewing', ...
             'part', 2, ...
             'block_index', blockIndex, ...
@@ -36,10 +26,8 @@ for trialIndex = 1:numel(blockItems)
             'stim_set', decoded.stimSet, ...
             'image_src', decoded.imageSrc, ...
             'duration_ms', E.times.imagePresentationMs);
-        E.part2.trials{end + 1} = logEntry;
 
         previousNodeIndex = decoded.experimentNodeIndex;
-        previousStimSet = decoded.stimSet;
 
         if trialIndex < numel(blockItems)
             itiSeconds = getItiSeconds(E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
@@ -57,22 +45,9 @@ for trialIndex = 1:numel(blockItems)
         continue;
     end
 
-    if isChoicePair(item)
-        [leftRawNode, rightRawNode] = extractPair(item);
-        leftNode = decodeFmriNode(leftRawNode, size(adjM, 1), canonicalToExp, E);
-        rightNode = decodeFmriNode(rightRawNode, size(adjM, 1), canonicalToExp, E);
-
-        if ~strcmp(leftNode.stimSet, rightNode.stimSet)
-            error('RunBlock_Part2b:CrossStimSetChoicePair', ...
-                'Choice pair spans two stimulus sets: %d (%s) vs %d (%s).', ...
-                leftRawNode, leftNode.stimSet, rightRawNode, rightNode.stimSet);
-        end
-
-        if ~isempty(previousStimSet) && ~strcmp(previousStimSet, leftNode.stimSet)
-            error('RunBlock_Part2b:StimSetMismatch', ...
-                'Choice pair stimulus set %s does not match previous stimulus set %s.', ...
-                leftNode.stimSet, previousStimSet);
-        end
+    if isnumeric(item) && numel(item) == 2
+        leftNode = decodeFmriNode(item(1), size(adjM, 1), canonicalToExp, E);
+        rightNode = decodeFmriNode(item(2), size(adjM, 1), canonicalToExp, E);
 
         if isempty(previousNodeIndex)
             leftPathLength = NaN;
@@ -81,7 +56,7 @@ for trialIndex = 1:numel(blockItems)
         else
             leftPathLength = shortestPathDistanceMatrix(previousNodeIndex + 1, leftNode.experimentNodeIndex + 1);
             rightPathLength = shortestPathDistanceMatrix(previousNodeIndex + 1, rightNode.experimentNodeIndex + 1);
-            if isinf(leftPathLength) || isinf(rightPathLength) || leftPathLength == rightPathLength
+            if leftPathLength == rightPathLength
                 correctChoice = NaN;
             elseif leftPathLength < rightPathLength
                 correctChoice = 0;
@@ -96,8 +71,8 @@ for trialIndex = 1:numel(blockItems)
             'part', 2, ...
             'block_index', blockIndex, ...
             'trial_index', trialIndex, ...
-            'left_raw_node_index', leftRawNode, ...
-            'right_raw_node_index', rightRawNode, ...
+            'left_raw_node_index', item(1), ...
+            'right_raw_node_index', item(2), ...
             'left_graph_node_index', leftNode.graphNodeIndex, ...
             'right_graph_node_index', rightNode.graphNodeIndex, ...
             'left_node_index', leftNode.experimentNodeIndex, ...
@@ -116,7 +91,6 @@ for trialIndex = 1:numel(blockItems)
             'rt_seconds', rtSecs);
 
         previousNodeIndex = [];
-        previousStimSet = '';
 
         if trialIndex < numel(blockItems)
             itiSeconds = getItiSeconds(E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
@@ -136,42 +110,7 @@ end
 
 end
 
-function blocks = normalizeBlockItems(block)
-if iscell(block)
-    blocks = block;
-elseif isnumeric(block)
-    if isvector(block)
-        blocks = num2cell(block(:)');
-    else
-        blocks = num2cell(block, 2);
-    end
-else
-    error('RunBlock_Part2b:UnsupportedBlockType', 'Unsupported block type: %s', class(block));
-end
-end
-
-function flag = isScalarNode(item)
-flag = isnumeric(item) && isscalar(item);
-end
-
-function flag = isChoicePair(item)
-flag = isnumeric(item) && numel(item) == 2;
-end
-
-function value = extractScalar(item)
-value = item;
-end
-
-function [leftRawNode, rightRawNode] = extractPair(item)
-leftRawNode = item(1);
-rightRawNode = item(2);
-end
-
 function decoded = decodeFmriNode(rawNode, nbNodes, canonicalToExp, E)
-if ~isscalar(rawNode) || ~isfinite(rawNode) || rawNode < 0 || rawNode >= nbNodes * 2 || floor(rawNode) ~= rawNode
-    error('RunBlock_Part2b:InvalidNode', 'Invalid fMRI node index: %g', rawNode);
-end
-
 graphNodeIndex = mod(rawNode, nbNodes);
 if rawNode < nbNodes
     stimSet = 'set1';
