@@ -6,6 +6,14 @@ Screen('DrawTexture', E.screen.theWindow, leftTex, [], leftRect);
 Screen('DrawTexture', E.screen.theWindow, rightTex, [], rightRect);
 Screen('Flip', E.screen.theWindow);
 
+if isfield(E, 'debugmode') && E.debugmode
+    WaitSecs(0.1);
+    response = 1;
+    responseSide = 'right';
+    rtSecs = 0.1;
+    return;
+end
+
 startTime = GetSecs;
 response = NaN;
 responseSide = '';
