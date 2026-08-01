@@ -8,7 +8,7 @@ E.screen.rec = [0 0 E.screen.res(1) E.screen.res(2)];
 E.screen.clrdepth = 32;
 E.screen.textsize = 20;
 E.screen.textcolor = 0;
-E.screen.bckgrnd = repmat(100, 1, 3);
+E.screen.bckgrnd = [255 255 255];
 
 KbName('UnifyKeyNames');
 E.keys.trigger = KbName('5%');
