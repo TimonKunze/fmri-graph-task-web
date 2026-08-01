@@ -75,7 +75,7 @@ if isempty(raw)
 end
 
 normalized = regexprep(raw, '\r?\n', ' ');
-normalized = strrep(normalized, '] [', '], [');
+normalized = regexprep(normalized, '\]\s+\[', '], [');
 normalized = regexprep(normalized, '\s+', ' ');
 normalized = regexprep(normalized, '(?<=\d)\s+(?=\d)', ', ');
 value = jsondecode(normalized);
