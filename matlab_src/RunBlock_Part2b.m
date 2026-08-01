@@ -166,10 +166,7 @@ Screen('Flip', E.screen.theWindow);
 end
 
 function itiSeconds = getItiSeconds(part2ItiBlocks, blockIndex, itiIndex, subjectCode)
-if numel(part2ItiBlocks) < blockIndex || isempty(part2ItiBlocks{blockIndex})
-    error('RunBlock_Part2b:MissingITI', 'Missing ITI values for block %d, subject %s.', blockIndex, num2str(subjectCode));
-end
-blockIti = part2ItiBlocks{blockIndex};
+blockIti = getBlockItiValues(part2ItiBlocks, blockIndex, subjectCode);
 if itiIndex < 1 || itiIndex > numel(blockIti)
     error('RunBlock_Part2b:MissingITI', 'Missing ITI value for block %d, iti index %d, subject %s.', blockIndex, itiIndex, num2str(subjectCode));
 end
@@ -177,6 +174,36 @@ itiSeconds = double(blockIti(itiIndex));
 if ~isfinite(itiSeconds)
     error('RunBlock_Part2b:InvalidITI', 'Missing ITI value for block %d, iti index %d, subject %s.', blockIndex, itiIndex, num2str(subjectCode));
 end
+end
+
+function blockIti = getBlockItiValues(part2ItiBlocks, blockIndex, subjectCode)
+if iscell(part2ItiBlocks)
+    if numel(part2ItiBlocks) < blockIndex || isempty(part2ItiBlocks{blockIndex})
+        error('RunBlock_Part2b:MissingITI', 'Missing ITI values for block %d, subject %s.', blockIndex, num2str(subjectCode));
+    end
+    blockIti = part2ItiBlocks{blockIndex};
+    return;
+end
+
+if isnumeric(part2ItiBlocks)
+    if ndims(part2ItiBlocks) == 2
+        if size(part2ItiBlocks, 1) < blockIndex
+            error('RunBlock_Part2b:MissingITI', 'Missing ITI values for block %d, subject %s.', blockIndex, num2str(subjectCode));
+        end
+        blockIti = part2ItiBlocks(blockIndex, :);
+        return;
+    end
+    if ndims(part2ItiBlocks) == 3
+        if size(part2ItiBlocks, 1) < blockIndex
+            error('RunBlock_Part2b:MissingITI', 'Missing ITI values for block %d, subject %s.', blockIndex, num2str(subjectCode));
+        end
+        blockIti = squeeze(part2ItiBlocks(blockIndex, :, :));
+        blockIti = blockIti(:).';
+        return;
+    end
+end
+
+error('RunBlock_Part2b:InvalidITIContainer', 'Unsupported ITI container for block %d, subject %s.', blockIndex, num2str(subjectCode));
 end
 
 function matrix = createShortestPathDistanceMatrix(adjM)
