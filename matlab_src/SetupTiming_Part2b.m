@@ -1,4 +1,5 @@
 function E = SetupTiming_Part2b(E)
+KbName('UnifyKeyNames');
 E.times.imagePresentationMs = 2000;
 if E.debugmode
     E.times.imagePresentationMs = 600;
