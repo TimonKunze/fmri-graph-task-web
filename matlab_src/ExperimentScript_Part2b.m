@@ -4,7 +4,7 @@ Screen(E.screen.theWindow, 'TextSize', E.screen.textsize * 2);
 
 DrawFormattedText(E.screen.theWindow, E.text.part2Intro, 'center', 'center', E.screen.textcolor);
 Screen('Flip', E.screen.theWindow);
-waitForSpecificKey(E.keys.continue);
+waitForSpecificKey(E.times.continueKey);
 
 DrawFormattedText(E.screen.theWindow, E.text.part2Start, 'center', 'center', E.screen.textcolor);
 Screen('Flip', E.screen.theWindow);
