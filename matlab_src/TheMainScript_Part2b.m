@@ -9,9 +9,8 @@ E.paths.repoRoot = fileparts(E.paths.scriptDir);
 E.paths.dataDir = fullfile(E.paths.scriptDir, 'Data');
 E.paths.crashedDir = fullfile(E.paths.scriptDir, 'Crashed');
 
-fileTag = regexprep(E.exp_name, '[^A-Za-z0-9_-]', '_');
-timestampTag = datestr(now, 'yyyymmdd-HHMMSS');
-E.filename = sprintf('%s-N%d-B%d-%s', fileTag, E.sbj.n, E.sbj.block, timestampTag);
+dateTag = datestr(now, 'yyyymmdd');
+E.filename = sprintf('subj%d_p2b_%s', E.sbj.n, dateTag);
 E.filenameCSV = [E.filename '_ResultsOutput.csv'];
 
 try
@@ -27,7 +26,7 @@ try
     if ~exist(E.paths.dataDir, 'dir')
         mkdir(E.paths.dataDir);
     end
-    save(fullfile(E.paths.dataDir, E.filename), 'E');
+    save(fullfile(E.paths.dataDir, [E.filename '.mat']), 'E');
 
     E.part2.resultsTable = BuildResultsTable(E);
     writetable(E.part2.resultsTable, fullfile(E.paths.dataDir, E.filenameCSV));
