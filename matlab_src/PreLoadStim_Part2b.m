@@ -1,4 +1,4 @@
-function E = PreLoadStim_Part2b()
+function E = PreLoadStim_Part2b(E)
 E.Stim.nodePaths.set1 = cell(8, 1);
 E.Stim.nodePaths.set2 = cell(8, 1);
 E.Stim.nodeTextures.set1 = cell(8, 1);

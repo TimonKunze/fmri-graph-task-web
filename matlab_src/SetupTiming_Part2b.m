@@ -1,4 +1,4 @@
-function E = SetupTiming_Part2b()
+function E = SetupTiming_Part2b(E)
 E.times.imagePresentationMs = 2000;
 if E.debugmode
     E.times.imagePresentationMs = 600;

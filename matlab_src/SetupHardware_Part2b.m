@@ -1,4 +1,4 @@
-function E = SetupHardware_Part2b()
+function E = SetupHardware_Part2b(E)
 Screen('Preference', 'SkipSyncTests', 1);
 E.screen.screenN = max(Screen('Screens'));
 res = Screen('Resolution', E.screen.screenN);

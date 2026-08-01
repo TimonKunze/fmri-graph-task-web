@@ -1,4 +1,4 @@
-function E = IniHardware_Part2b()
+function E = IniHardware_Part2b(E)
 PsychImaging('PrepareConfiguration');
 [E.screen.theWindow] = Screen('OpenWindow', E.screen.screenN, E.screen.bckgrnd, [], E.screen.clrdepth);
 Screen('BlendFunction', E.screen.theWindow, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
