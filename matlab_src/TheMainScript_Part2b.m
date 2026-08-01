@@ -9,8 +9,9 @@ E.paths.repoRoot = fileparts(E.paths.scriptDir);
 E.paths.dataDir = fullfile(E.paths.scriptDir, 'Data');
 E.paths.crashedDir = fullfile(E.paths.scriptDir, 'Crashed');
 
-E.filename = sprintf('%s-%s-B%s-%s', ...
-    E.exp_name, E.sbj.n, num2str(E.sbj.block), datestr(now, 'dd-mmm-yyyy HH-MM-SS'));
+fileTag = regexprep(E.exp_name, '[^A-Za-z0-9_-]', '_');
+timestampTag = datestr(now, 'yyyymmdd-HHMMSS');
+E.filename = sprintf('%s-N%d-B%d-%s', fileTag, E.sbj.n, E.sbj.block, timestampTag);
 E.filenameCSV = [E.filename '_ResultsOutput.csv'];
 
 try
