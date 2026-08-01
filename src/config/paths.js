@@ -37,7 +37,7 @@ export const PATHS = {
 
     movingObjExport: withBase("/stimuli/bats2/moving_obj.png"),
     nodeExport: (i) => withBase(`/practice_trials/stimuli/node${i}.png`),
-    randomizationTable: withBase("/config/random_positions_hex1024C905_grid110_planarTrue_n1000_seed1.csv"),
+    randomizationTable: withBase("/config/random_positions_hex1024C905_grid110_seed1.csv"),
     randomPositionsTable: withBase("/config/random_positions.csv"),
     fruitSalad: withBase("/stimuli/collected_pic/fruit_salad.png"),
 
