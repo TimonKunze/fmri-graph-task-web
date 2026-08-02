@@ -1,5 +1,10 @@
 function E = SetupHardware_Part2b(E)
-Screen('Preference', 'SkipSyncTests', 1);
+if isfield(E, 'debugmode') && E.debugmode
+    Screen('Preference', 'SkipSyncTests', 1);
+else
+    Screen('Preference', 'SkipSyncTests', 0);
+end
+Screen('Preference', 'TextRenderer', 0);
 E.screen.screenN = max(Screen('Screens'));
 res = Screen('Resolution', E.screen.screenN);
 E.screen.res = [res.width res.height];

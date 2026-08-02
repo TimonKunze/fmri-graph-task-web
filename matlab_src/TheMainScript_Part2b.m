@@ -9,8 +9,11 @@ E.paths.dataDir = fullfile(E.paths.scriptDir, 'Data');
 E.paths.crashedDir = fullfile(E.paths.scriptDir, 'Crashed');
 
 dateTag = datestr(now, 'yyyymmdd');
-E.filename = sprintf('subj%d_p2b_%s', E.sbj.n, dateTag);
-E.filenameCSV = [E.filename '_ResultsOutput.csv'];
+E.fileStem = sprintf('part2b_subj%d_%s', E.sbj.n, dateTag);
+E.filenameFullStateMat = [E.fileStem '_fullstate.mat'];
+E.filenameResultsCSV = [E.fileStem '_results.csv'];
+E.filenameResultsMat = [E.fileStem '_results.mat'];
+E.filenameCrashMat = [E.fileStem '_crash.mat'];
 
 try
     E = LoadLists_Part2b(E);
@@ -25,24 +28,24 @@ try
     if ~exist(E.paths.dataDir, 'dir')
         mkdir(E.paths.dataDir);
     end
-    save(fullfile(E.paths.dataDir, [E.filename '.mat']), 'E');
+    save(fullfile(E.paths.dataDir, E.filenameFullStateMat), 'E');
 
     E.part2.resultsTable = BuildResultsTable(E);
-    writetable(E.part2.resultsTable, fullfile(E.paths.dataDir, E.filenameCSV));
+    writetable(E.part2.resultsTable, fullfile(E.paths.dataDir, E.filenameResultsCSV));
+    resultsTable = E.part2.resultsTable;
+    save(fullfile(E.paths.dataDir, E.filenameResultsMat), 'resultsTable');
 
     ThankYou_Part2b(E);
+    CleanupPart2b(E);
     Screen('CloseAll');
-    ShowCursor;
-    ListenChar;
 catch err
     E.err = err;
     if ~exist(E.paths.crashedDir, 'dir')
         mkdir(E.paths.crashedDir);
     end
-    save(fullfile(E.paths.crashedDir, [E.filename '_crash.mat']), 'E');
+    save(fullfile(E.paths.crashedDir, E.filenameCrashMat), 'E');
+    CleanupPart2b(E);
     Screen('CloseAll');
-    ShowCursor;
-    ListenChar;
     rethrow(err);
 end
 

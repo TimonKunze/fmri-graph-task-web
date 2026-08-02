@@ -33,9 +33,8 @@ while true
             rtSecs = secs - startTime;
             break;
         elseif keyCode(E.keys.escape)
+            CleanupPart2b(E);
             Screen('CloseAll');
-            ShowCursor;
-            ListenChar;
             error('Part2b:Aborted', 'Escape was pressed.');
         end
     end
