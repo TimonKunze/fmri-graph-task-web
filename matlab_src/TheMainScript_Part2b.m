@@ -2,7 +2,6 @@ function E = TheMainScript_Part2b()
 %THEMAINSCRIPT_PART2B Standalone MATLAB entry point for Part 2b.
 
 E = GetSubInfo_Part2b();
-E.exp_name = 'Part2bScanner - MATLAB';
 
 E.paths.scriptDir = fileparts(mfilename('fullpath'));
 E.paths.repoRoot = fileparts(E.paths.scriptDir);
@@ -67,17 +66,25 @@ CorrectChoice = nan(n, 1);
 
 for i = 1:n
     t = trials{i};
-    Block(i) = t.block_index;
-    TrialIndex(i) = t.trial_index;
-    TrialName(i) = string(t.trial_name);
-    Response(i) = t.response;
-    RT(i) = t.rt_seconds;
-    RawNode(i) = t.raw_node_index;
-    GraphNode(i) = t.graph_node_index;
-    StimSet(i) = string(t.stim_set);
-    LayoutType(i) = string(t.layout_type);
-    CorrectChoice(i) = t.correct_choice;
+    Block(i) = trialField(t, 'block_index', NaN);
+    TrialIndex(i) = trialField(t, 'trial_index', NaN);
+    TrialName(i) = string(trialField(t, 'trial_name', ""));
+    Response(i) = trialField(t, 'response', NaN);
+    RT(i) = trialField(t, 'rt_seconds', NaN);
+    RawNode(i) = trialField(t, 'raw_node_index', NaN);
+    GraphNode(i) = trialField(t, 'graph_node_index', NaN);
+    StimSet(i) = string(trialField(t, 'stim_set', ""));
+    LayoutType(i) = string(trialField(t, 'layout_type', ""));
+    CorrectChoice(i) = trialField(t, 'correct_choice', NaN);
 end
 
 T = table(Subject, Block, TrialIndex, TrialName, Response, RT, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice);
+end
+
+function value = trialField(t, fieldName, defaultValue)
+if isfield(t, fieldName) && ~isempty(t.(fieldName))
+    value = t.(fieldName);
+else
+    value = defaultValue;
+end
 end
