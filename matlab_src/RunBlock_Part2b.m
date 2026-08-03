@@ -1,12 +1,26 @@
-function E = RunBlock_Part2b(E, blockIndex)
+function E = RunBlock_Part2b(E, blockIndex, startTrialIndex)
+if nargin < 3 || isempty(startTrialIndex)
+    startTrialIndex = 1;
+end
+
 blockItems = E.assignment.part2RawNodeBlocks{blockIndex};
+if startTrialIndex < 1 || startTrialIndex > numel(blockItems)
+    error('RunBlock_Part2b:InvalidStartTrial', ...
+        'Start trial %d is outside the valid range for block %d.', startTrialIndex, blockIndex);
+end
+
 adjM = E.G.adjM;
 shortestPathDistanceMatrix = createShortestPathDistanceMatrix(adjM);
 canonicalToExp = invertPermutation(E.assignment.experimentNodeToGraphNode);
 
-previousNodeIndex = [];
-previousItiSeconds = [];
-itiIndex = 1;
+if startTrialIndex > 1
+    [previousNodeIndex, previousItiSeconds, itiIndex] = primeResumeState( ...
+        E, blockItems, blockIndex, startTrialIndex, adjM, canonicalToExp);
+else
+    previousNodeIndex = [];
+    previousItiSeconds = [];
+    itiIndex = 1;
+end
 
 SendEyeLinkMessage_Part2b(E, 'BLOCK_START %d', blockIndex);
 
@@ -175,6 +189,29 @@ canonicalToExp = nan(1, nb);
 for experimentIndex = 1:nb
     canonicalIndex = double(expToCanonical(experimentIndex));
     canonicalToExp(canonicalIndex + 1) = experimentIndex - 1;
+end
+end
+
+function [previousNodeIndex, previousItiSeconds, itiIndex] = primeResumeState(E, blockItems, blockIndex, startTrialIndex, adjM, canonicalToExp)
+previousNodeIndex = [];
+previousItiSeconds = [];
+itiIndex = 1;
+
+for trialIndex = 1:(startTrialIndex - 1)
+    item = blockItems{trialIndex};
+
+    if isnumeric(item) && isscalar(item)
+        decoded = decodeFmriNode(item, size(adjM, 1), canonicalToExp, E);
+        previousNodeIndex = decoded.experimentNodeIndex;
+    elseif isnumeric(item) && numel(item) == 2
+        previousNodeIndex = [];
+    end
+
+    if trialIndex < numel(blockItems)
+        itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
+        previousItiSeconds = itiSeconds;
+        itiIndex = itiIndex + 1;
+    end
 end
 end
 

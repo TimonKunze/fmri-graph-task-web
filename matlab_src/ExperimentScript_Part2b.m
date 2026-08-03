@@ -16,8 +16,28 @@ E = StartEyeLinkRecording_Part2b(E);
 E.part2.trials = {};
 WaitSecs(E.times.scannerOffsetSec);
 
-for b = 1:numel(E.assignment.part2RawNodeBlocks)
-    E = RunBlock_Part2b(E, b);
+startBlock = 1;
+startTrial = 1;
+if isfield(E, 'part2')
+    if isfield(E.part2, 'startBlock') && isfinite(E.part2.startBlock)
+        startBlock = max(1, floor(E.part2.startBlock));
+    end
+    if isfield(E.part2, 'startTrial') && isfinite(E.part2.startTrial)
+        startTrial = max(1, floor(E.part2.startTrial));
+    end
+end
+
+if startBlock > numel(E.assignment.part2RawNodeBlocks)
+    error('ExperimentScript_Part2b:InvalidStartBlock', ...
+        'Start block %d is outside the valid range.', startBlock);
+end
+
+for b = startBlock:numel(E.assignment.part2RawNodeBlocks)
+    if b == startBlock
+        E = RunBlock_Part2b(E, b, startTrial);
+    else
+        E = RunBlock_Part2b(E, b, 1);
+    end
     if b < numel(E.assignment.part2RawNodeBlocks)
         showBlockBreak(E, b, numel(E.assignment.part2RawNodeBlocks));
         waitForSpecificKey(E.keys.right);
