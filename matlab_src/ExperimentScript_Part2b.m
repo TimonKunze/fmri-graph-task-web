@@ -21,7 +21,7 @@ for b = 1:numel(E.assignment.part2RawNodeBlocks)
     if b < numel(E.assignment.part2RawNodeBlocks)
         showBlockBreak(E, b, numel(E.assignment.part2RawNodeBlocks));
         waitForSpecificKey(E.keys.right);
-        E = DoEyeLinkDriftCorrection_Part2b(E, b);
+        E = RecalibrateAndValidateEyeLink_Part2b(E, b);
     end
 end
 
