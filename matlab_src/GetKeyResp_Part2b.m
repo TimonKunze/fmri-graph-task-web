@@ -1,10 +1,14 @@
-function [response, responseSide, rtSecs] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo)
+function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo)
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 leftRect = CenterRectOnPointd([0 0 220 220], E.screen.cx - 160, E.screen.cy);
 rightRect = CenterRectOnPointd([0 0 220 220], E.screen.cx + 160, E.screen.cy);
 Screen('DrawTexture', E.screen.theWindow, leftTex, [], leftRect);
 Screen('DrawTexture', E.screen.theWindow, rightTex, [], rightRect);
-Screen('Flip', E.screen.theWindow);
+choiceOnsetSecs = Screen('Flip', E.screen.theWindow);
+if ~isfinite(choiceOnsetSecs)
+    choiceOnsetSecs = GetSecs;
+end
+choiceOnsetClock = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
 SendEyeLinkMessage_Part2b(E, 'CHOICE_ONSET %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1));
 
 if isfield(E, 'debugmode') && E.debugmode

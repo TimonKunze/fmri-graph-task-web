@@ -15,7 +15,7 @@ for trialIndex = 1:numel(blockItems)
 
     if isnumeric(item) && isscalar(item)
         decoded = decodeFmriNode(item, size(adjM, 1), canonicalToExp, E);
-        drawSingleImageTrial(E, decoded.imageTex);
+        [imageOnsetSecs, imageOnsetClock] = drawSingleImageTrial(E, decoded.imageTex);
         SendEyeLinkMessage_Part2b(E, 'IMAGE_ONSET %d %d %d %d', blockIndex, trialIndex, decoded.rawNode, decoded.graphNodeIndex);
         WaitSecs(E.times.imagePresentationMs / 1000);
         E.part2.trials{end + 1} = struct( ...
@@ -28,13 +28,16 @@ for trialIndex = 1:numel(blockItems)
             'layout_type', decoded.layoutType, ...
             'stim_set', decoded.stimSet, ...
             'image_src', decoded.imageSrc, ...
-            'duration_ms', E.times.imagePresentationMs);
+            'duration_ms', E.times.imagePresentationMs, ...
+            'timestamp_sec', imageOnsetSecs, ...
+            'timestamp_rel_sec', imageOnsetSecs - E.begintime, ...
+            'timestamp_clock', imageOnsetClock);
 
         previousNodeIndex = decoded.experimentNodeIndex;
 
         if trialIndex < numel(blockItems)
             itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
-            drawFixationTrial(E);
+            [itiOnsetSecs, itiOnsetClock] = drawFixationTrial(E);
             SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', blockIndex, trialIndex, round(itiSeconds * 1000));
             WaitSecs(itiSeconds);
             E.part2.trials{end + 1} = struct( ...
@@ -42,7 +45,10 @@ for trialIndex = 1:numel(blockItems)
                 'part', 2, ...
                 'block_index', blockIndex, ...
                 'trial_index', trialIndex, ...
-                'iti_seconds', itiSeconds);
+                'iti_seconds', itiSeconds, ...
+                'timestamp_sec', itiOnsetSecs, ...
+                'timestamp_rel_sec', itiOnsetSecs - E.begintime, ...
+                'timestamp_clock', itiOnsetClock);
             previousItiSeconds = itiSeconds;
             itiIndex = itiIndex + 1;
         end
@@ -79,7 +85,7 @@ for trialIndex = 1:numel(blockItems)
             'rightPathLength', rightPathLength, ...
             'correctChoice', correctChoice);
 
-        [response, responseSide, rtSecs] = GetKeyResp_Part2b(E, leftNode.imageTex, rightNode.imageTex, trialInfo);
+        [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock] = GetKeyResp_Part2b(E, leftNode.imageTex, rightNode.imageTex, trialInfo);
         E.part2.trials{end + 1} = struct( ...
             'trial_name', 'part2_dual_stimulus_choice', ...
             'part', 2, ...
@@ -102,13 +108,16 @@ for trialIndex = 1:numel(blockItems)
             'right_image_src', rightNode.imageSrc, ...
             'response', response, ...
             'response_side', responseSide, ...
-            'rt_seconds', rtSecs);
+            'rt_seconds', rtSecs, ...
+            'timestamp_sec', choiceOnsetSecs, ...
+            'timestamp_rel_sec', choiceOnsetSecs - E.begintime, ...
+            'timestamp_clock', choiceOnsetClock);
 
         previousNodeIndex = [];
 
         if trialIndex < numel(blockItems)
             itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
-            drawFixationTrial(E);
+            [itiOnsetSecs, itiOnsetClock] = drawFixationTrial(E);
             SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', blockIndex, trialIndex, round(itiSeconds * 1000));
             WaitSecs(itiSeconds);
             E.part2.trials{end + 1} = struct( ...
@@ -116,7 +125,10 @@ for trialIndex = 1:numel(blockItems)
                 'part', 2, ...
                 'block_index', blockIndex, ...
                 'trial_index', trialIndex, ...
-                'iti_seconds', itiSeconds);
+                'iti_seconds', itiSeconds, ...
+                'timestamp_sec', itiOnsetSecs, ...
+                'timestamp_rel_sec', itiOnsetSecs - E.begintime, ...
+                'timestamp_clock', itiOnsetClock);
             previousItiSeconds = itiSeconds;
             itiIndex = itiIndex + 1;
         end
@@ -166,20 +178,28 @@ for experimentIndex = 1:nb
 end
 end
 
-function drawSingleImageTrial(E, imageTex)
+function [vbl, clockStamp] = drawSingleImageTrial(E, imageTex)
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 imageWidth = 320;
 imageHeight = 320;
 rect = CenterRectOnPointd([0 0 imageWidth imageHeight], E.screen.cx, E.screen.cy);
 Screen('DrawTexture', E.screen.theWindow, imageTex, [], rect);
-Screen('Flip', E.screen.theWindow);
+vbl = Screen('Flip', E.screen.theWindow);
+if ~isfinite(vbl)
+    vbl = GetSecs;
+end
+clockStamp = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
 end
 
-function drawFixationTrial(E)
+function [vbl, clockStamp] = drawFixationTrial(E)
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 Screen('TextSize', E.screen.theWindow, E.screen.textsize * 2);
 DrawFormattedText(E.screen.theWindow, '+', 'center', E.screen.cy, E.screen.textcolor);
-Screen('Flip', E.screen.theWindow);
+vbl = Screen('Flip', E.screen.theWindow);
+if ~isfinite(vbl)
+    vbl = GetSecs;
+end
+clockStamp = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
 end
 
 function itiSeconds = getItiSeconds(E, part2ItiBlocks, blockIndex, itiIndex, subjectCode)
