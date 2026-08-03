@@ -1,6 +1,6 @@
 function E = GetSubInfo_Part2b()
-prompt = {'N:'; 'Gender:'; 'Name'; 'Age:'; 'Handness:'; 'Languages:'; 'Debug'; 'EyeLink Dummy:'};
-defans = {'99'; 'f'; ' '; '25'; 'r'; 'n'; '0'; '0'};
+prompt = {'N:'; 'Gender:'; 'Name'; 'Age:'; 'Handness:'; 'Language (it/en):'; 'Debug'; 'EyeLink Dummy:'};
+defans = {'99'; 'f'; ' '; '25'; 'r'; 'it'; '0'; '0'};
 
 answer = inputdlg(prompt, 'Subject Info', 1, defans);
 
