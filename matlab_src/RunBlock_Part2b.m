@@ -30,7 +30,7 @@ for trialIndex = 1:numel(blockItems)
         previousNodeIndex = decoded.experimentNodeIndex;
 
         if trialIndex < numel(blockItems)
-            itiSeconds = getItiSeconds(E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
+            itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
             drawFixationTrial(E);
             WaitSecs(itiSeconds);
             E.part2.trials{end + 1} = struct( ...
@@ -93,7 +93,7 @@ for trialIndex = 1:numel(blockItems)
         previousNodeIndex = [];
 
         if trialIndex < numel(blockItems)
-            itiSeconds = getItiSeconds(E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
+            itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
             drawFixationTrial(E);
             WaitSecs(itiSeconds);
             E.part2.trials{end + 1} = struct( ...
@@ -165,7 +165,7 @@ DrawFormattedText(E.screen.theWindow, '+', 'center', E.screen.cy, E.screen.textc
 Screen('Flip', E.screen.theWindow);
 end
 
-function itiSeconds = getItiSeconds(part2ItiBlocks, blockIndex, itiIndex, subjectCode)
+function itiSeconds = getItiSeconds(E, part2ItiBlocks, blockIndex, itiIndex, subjectCode)
 blockIti = getBlockItiValues(part2ItiBlocks, blockIndex, subjectCode);
 if itiIndex < 1 || itiIndex > numel(blockIti)
     error('RunBlock_Part2b:MissingITI', 'Missing ITI value for block %d, iti index %d, subject %s.', blockIndex, itiIndex, num2str(subjectCode));
@@ -173,6 +173,9 @@ end
 itiSeconds = double(blockIti(itiIndex));
 if ~isfinite(itiSeconds)
     error('RunBlock_Part2b:InvalidITI', 'Missing ITI value for block %d, iti index %d, subject %s.', blockIndex, itiIndex, num2str(subjectCode));
+end
+if isfield(E, 'debugmode') && E.debugmode
+    itiSeconds = itiSeconds / 2;
 end
 end
 
