@@ -12,6 +12,7 @@ waitForSpecificKey(E.keys.trigger);
 
 Screen('Flip', E.screen.theWindow);
 E.begintime = GetSecs;
+E = StartEyeLinkRecording_Part2b(E);
 E.part2.trials = {};
 WaitSecs(E.times.scannerOffsetSec);
 
@@ -20,9 +21,11 @@ for b = 1:numel(E.assignment.part2RawNodeBlocks)
     if b < numel(E.assignment.part2RawNodeBlocks)
         showBlockBreak(E, b, numel(E.assignment.part2RawNodeBlocks));
         waitForSpecificKey(E.keys.right);
+        E = DoEyeLinkDriftCorrection_Part2b(E, b);
     end
 end
 
+E = StopEyeLinkRecording_Part2b(E);
 DrawFormattedText(E.screen.theWindow, E.text.part2Final, 'center', 'center', E.screen.textcolor);
 Screen('Flip', E.screen.theWindow);
 waitForAnyKey();

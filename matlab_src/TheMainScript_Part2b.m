@@ -15,6 +15,13 @@ E.filenameResultsCSV = [E.fileStem '_results.csv'];
 E.filenameResultsMat = [E.fileStem '_results.mat'];
 E.filenameCrashMat = [E.fileStem '_crash.mat'];
 
+if ~exist(E.paths.dataDir, 'dir')
+    mkdir(E.paths.dataDir);
+end
+if ~exist(E.paths.crashedDir, 'dir')
+    mkdir(E.paths.crashedDir);
+end
+
 try
     E = LoadLists_Part2b(E);
     E = SetupTiming_Part2b(E);
@@ -22,12 +29,10 @@ try
     E = IniHardware_Part2b(E);
     E = PreLoadText_Part2b(E);
     E = PreLoadStim_Part2b(E);
+    E = SetupEyeLink_Part2b(E);
 
     E = ExperimentScript_Part2b(E);
 
-    if ~exist(E.paths.dataDir, 'dir')
-        mkdir(E.paths.dataDir);
-    end
     save(fullfile(E.paths.dataDir, E.filenameFullStateMat), 'E');
 
     E.part2.resultsTable = BuildResultsTable(E);
@@ -40,9 +45,6 @@ try
     Screen('CloseAll');
 catch err
     E.err = err;
-    if ~exist(E.paths.crashedDir, 'dir')
-        mkdir(E.paths.crashedDir);
-    end
     save(fullfile(E.paths.crashedDir, E.filenameCrashMat), 'E');
     CleanupPart2b(E);
     Screen('CloseAll');

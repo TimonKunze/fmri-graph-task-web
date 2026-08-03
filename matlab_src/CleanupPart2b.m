@@ -1,6 +1,7 @@
 function CleanupPart2b(E)
 %CLEANUPPART2B Release Psychtoolbox resources used by Part 2b.
 
+ShutdownEyeLink_Part2b(E);
 closeTextureGroup(E, 'Stim', 'nodeTextures');
 
 try
