@@ -4,6 +4,7 @@ if isfield(E, 'debugmode') && E.debugmode
 else
     Screen('Preference', 'SkipSyncTests', 0);
 end
+Screen('Preference', 'ConserveVRAM', 4096);
 Screen('Preference', 'TextRenderer', 0);
 E.screen.screenN = max(Screen('Screens'));
 res = Screen('Resolution', E.screen.screenN);
