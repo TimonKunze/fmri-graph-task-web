@@ -1,5 +1,5 @@
 function E = StopEyeLinkRecording_Part2b(E)
-if ~isfield(E, 'eye') || ~isfield(E.eye, 'enabled') || ~E.eye.enabled
+if ~isfield(E, 'eye') || ~isfield(E.eye, 'enabled') || ~E.eye.enabled || (isfield(E.eye, 'dummy') && E.eye.dummy)
     return;
 end
 

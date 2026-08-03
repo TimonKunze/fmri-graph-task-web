@@ -1,11 +1,7 @@
 function E = DoEyeLinkDriftCorrection_Part2b(E, blockIndex)
 %DOEYELINKDRIFTCORRECTION_PART2B Run a between-block drift correction.
 
-if ~isfield(E, 'eye') || ~isfield(E.eye, 'enabled') || ~E.eye.enabled
-    return;
-end
-
-if isfield(E.eye, 'dummy') && E.eye.dummy
+if ~isfield(E, 'eye') || ~isfield(E.eye, 'enabled') || ~E.eye.enabled || (isfield(E.eye, 'dummy') && E.eye.dummy)
     return;
 end
 

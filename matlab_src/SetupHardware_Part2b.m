@@ -1,5 +1,5 @@
 function E = SetupHardware_Part2b(E)
-if isfield(E, 'debugmode') && E.debugmode
+if (isfield(E, 'debugmode') && E.debugmode) || (isfield(E, 'eye') && isfield(E.eye, 'dummy') && E.eye.dummy)
     Screen('Preference', 'SkipSyncTests', 1);
 else
     Screen('Preference', 'SkipSyncTests', 0);

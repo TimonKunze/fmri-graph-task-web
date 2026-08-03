@@ -5,7 +5,7 @@ if ~exist('EyelinkInit', 'file') && ~exist('Eyelink', 'file')
     error('SetupEyeLink_Part2b:MissingToolbox', 'The EyeLink toolbox is not available on the MATLAB path.');
 end
 
-dummyMode = isfield(E, 'debugmode') && E.debugmode;
+dummyMode = isfield(E, 'eye') && isfield(E.eye, 'dummy') && E.eye.dummy;
 [initOk, dummyUsed] = EyelinkInit(double(dummyMode), 1);
 if ~initOk
     error('SetupEyeLink_Part2b:InitFailed', 'EyeLink initialization failed.');
@@ -21,6 +21,11 @@ E.eye.shutdown = false;
 E.eye.edfBaseName = makeEdfBaseName(E);
 E.eye.localEdfPath = fullfile(E.paths.dataDir, [E.eye.edfBaseName '.edf']);
 E.eye.defaults = EyelinkInitDefaults(E.screen.theWindow);
+
+if E.eye.dummy
+    E.eye.setupComplete = false;
+    return;
+end
 
 Eyelink('Command', 'screen_pixel_coords = 0 0 %d %d', E.screen.res(1) - 1, E.screen.res(2) - 1);
 Eyelink('Message', 'DISPLAY_COORDS 0 0 %d %d', E.screen.res(1) - 1, E.screen.res(2) - 1);
