@@ -39,7 +39,7 @@ while true
 
     [keyIsDown, secs, keyCode] = KbCheck;
     if keyIsDown
-        if keyCode(E.keys.space) && any(keyCode(E.keys.shift))
+        if keyCode(E.keys.enter) && any(keyCode(E.keys.shift))
             skipRun = true;
             responseSide = 'skip';
             SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1));

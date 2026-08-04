@@ -268,7 +268,7 @@ while true
         break;
     end
     [keyIsDown, ~, keyCode] = KbCheck;
-    if keyIsDown && keyCode(E.keys.space) && any(keyCode(E.keys.shift))
+    if keyIsDown && keyCode(E.keys.enter) && any(keyCode(E.keys.shift))
         skipped = true;
         break;
     end
