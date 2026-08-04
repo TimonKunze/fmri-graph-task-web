@@ -14,16 +14,31 @@ if isempty(subjectCol)
 end
 
 matchingRows = [];
+availableSubjects = [];
 for i = 2:numel(rows)
     row = rows{i};
     subjectValue = getCell(row, subjectCol);
-    if str2double(strtrim(subjectValue)) == E.sbj.n
+    subjectNumber = str2double(strtrim(subjectValue));
+    if isfinite(subjectNumber)
+        availableSubjects(end + 1) = subjectNumber; %#ok<AGROW>
+    end
+    if subjectNumber == E.sbj.n
         matchingRows(end + 1) = i; %#ok<AGROW>
     end
 end
 
 if isempty(matchingRows)
-    error('LoadLists_Part2b:MissingSubject', 'No randomization row found for subject %d.', E.sbj.n);
+    availableSubjects = unique(availableSubjects);
+    if isempty(availableSubjects)
+        availableText = 'none';
+    else
+        availableText = sprintf('%d ', availableSubjects);
+        availableText = strtrim(availableText);
+    end
+    error('LoadLists_Part2b:MissingSubject', ...
+        ['No randomization row found for subject %d in %s.\n' ...
+         'Valid subject_code values are: %s.'], ...
+        E.sbj.n, csvFile, availableText);
 end
 if numel(matchingRows) ~= 1
     error('LoadLists_Part2b:DuplicateSubject', 'Expected exactly one randomization row for subject %d.', E.sbj.n);
