@@ -1,4 +1,4 @@
-function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo)
+function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRun] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo)
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 leftRect = CenterRectOnPointd([0 0 220 220], E.screen.cx - 160, E.screen.cy);
 rightRect = CenterRectOnPointd([0 0 220 220], E.screen.cx + 160, E.screen.cy);
@@ -16,6 +16,7 @@ if isfield(E, 'debugmode') && E.debugmode
     response = 1;
     responseSide = 'right';
     rtSecs = 0.1;
+    skipRun = false;
     SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
     return;
 end
@@ -24,13 +25,12 @@ startTime = GetSecs;
 response = NaN;
 responseSide = '';
 rtSecs = NaN;
-timedOut = false;
+skipRun = false;
 timeoutAt = startTime + E.times.choiceTimeoutSec;
 
 while true
     nowSecs = GetSecs;
     if nowSecs >= timeoutAt
-        timedOut = true;
         responseSide = 'timeout';
         rtSecs = E.times.choiceTimeoutSec;
         SendEyeLinkMessage_Part2b(E, 'TIMEOUT %d %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), round(rtSecs * 1000));
@@ -39,6 +39,12 @@ while true
 
     [keyIsDown, secs, keyCode] = KbCheck;
     if keyIsDown
+        if keyCode(E.keys.space) && any(keyCode(E.keys.shift))
+            skipRun = true;
+            responseSide = 'skip';
+            SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1));
+            break;
+        end
         if keyCode(E.keys.left)
             response = 0;
             responseSide = 'left';

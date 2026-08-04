@@ -23,15 +23,19 @@ else
 end
 
 SendEyeLinkMessage_Part2b(E, 'BLOCK_START %d', blockIndex);
+runSkipped = false;
 
 for trialIndex = 1:numel(blockItems)
+    if runSkipped
+        break;
+    end
     item = blockItems{trialIndex};
 
     if isnumeric(item) && isscalar(item)
         decoded = decodeFmriNode(item, size(adjM, 1), canonicalToExp, E);
         [imageOnsetSecs, imageOnsetClock] = drawSingleImageTrial(E, decoded.imageTex);
         SendEyeLinkMessage_Part2b(E, 'IMAGE_ONSET %d %d %d %d', blockIndex, trialIndex, decoded.rawNode, decoded.graphNodeIndex);
-        WaitSecs(E.times.imagePresentationMs / 1000);
+        runSkipped = waitSecsWithRunSkip(E, E.times.imagePresentationMs / 1000);
         E.part2.trials{end + 1} = struct( ...
             'trial_name', 'part2_fmri_picture_viewing', ...
             'part', 2, ...
@@ -45,15 +49,21 @@ for trialIndex = 1:numel(blockItems)
             'duration_ms', E.times.imagePresentationMs, ...
             'timestamp_sec', imageOnsetSecs, ...
             'timestamp_rel_sec', imageOnsetSecs - E.begintime, ...
-            'timestamp_clock', imageOnsetClock);
+            'timestamp_clock', imageOnsetClock, ...
+            'run_skipped', false);
 
         previousNodeIndex = decoded.experimentNodeIndex;
+
+        if runSkipped
+            SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d', blockIndex);
+            break;
+        end
 
         if trialIndex < numel(blockItems)
             itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
             [itiOnsetSecs, itiOnsetClock] = drawFixationTrial(E);
             SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', blockIndex, trialIndex, round(itiSeconds * 1000));
-            WaitSecs(itiSeconds);
+            runSkipped = waitSecsWithRunSkip(E, itiSeconds);
             E.part2.trials{end + 1} = struct( ...
                 'trial_name', 'part2_fmri_iti', ...
                 'part', 2, ...
@@ -62,7 +72,8 @@ for trialIndex = 1:numel(blockItems)
                 'iti_seconds', itiSeconds, ...
                 'timestamp_sec', itiOnsetSecs, ...
                 'timestamp_rel_sec', itiOnsetSecs - E.begintime, ...
-                'timestamp_clock', itiOnsetClock);
+                'timestamp_clock', itiOnsetClock, ...
+                'run_skipped', false);
             previousItiSeconds = itiSeconds;
             itiIndex = itiIndex + 1;
         end
@@ -99,7 +110,7 @@ for trialIndex = 1:numel(blockItems)
             'rightPathLength', rightPathLength, ...
             'correctChoice', correctChoice);
 
-        [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock] = GetKeyResp_Part2b(E, leftNode.imageTex, rightNode.imageTex, trialInfo);
+        [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRunChoice] = GetKeyResp_Part2b(E, leftNode.imageTex, rightNode.imageTex, trialInfo);
         E.part2.trials{end + 1} = struct( ...
             'trial_name', 'part2_dual_stimulus_choice', ...
             'part', 2, ...
@@ -126,15 +137,22 @@ for trialIndex = 1:numel(blockItems)
             'timed_out', strcmp(responseSide, 'timeout'), ...
             'timestamp_sec', choiceOnsetSecs, ...
             'timestamp_rel_sec', choiceOnsetSecs - E.begintime, ...
-            'timestamp_clock', choiceOnsetClock);
+            'timestamp_clock', choiceOnsetClock, ...
+            'run_skipped', skipRunChoice);
 
         previousNodeIndex = [];
+
+        if skipRunChoice
+            runSkipped = true;
+            SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d', blockIndex);
+            break;
+        end
 
         if trialIndex < numel(blockItems)
             itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
             [itiOnsetSecs, itiOnsetClock] = drawFixationTrial(E);
             SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', blockIndex, trialIndex, round(itiSeconds * 1000));
-            WaitSecs(itiSeconds);
+            runSkipped = waitSecsWithRunSkip(E, itiSeconds);
             E.part2.trials{end + 1} = struct( ...
                 'trial_name', 'part2_fmri_iti', ...
                 'part', 2, ...
@@ -143,7 +161,8 @@ for trialIndex = 1:numel(blockItems)
                 'iti_seconds', itiSeconds, ...
                 'timestamp_sec', itiOnsetSecs, ...
                 'timestamp_rel_sec', itiOnsetSecs - E.begintime, ...
-                'timestamp_clock', itiOnsetClock);
+                'timestamp_clock', itiOnsetClock, ...
+                'run_skipped', false);
             previousItiSeconds = itiSeconds;
             itiIndex = itiIndex + 1;
         end
@@ -238,6 +257,23 @@ if ~isfinite(vbl)
     vbl = GetSecs;
 end
 clockStamp = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
+end
+
+function skipped = waitSecsWithRunSkip(E, durationSecs)
+skipped = false;
+startTime = GetSecs;
+while true
+    elapsed = GetSecs - startTime;
+    if elapsed >= durationSecs
+        break;
+    end
+    [keyIsDown, ~, keyCode] = KbCheck;
+    if keyIsDown && keyCode(E.keys.space) && any(keyCode(E.keys.shift))
+        skipped = true;
+        break;
+    end
+    WaitSecs(min(0.01, durationSecs - elapsed));
+end
 end
 
 function itiSeconds = getItiSeconds(E, part2ItiBlocks, blockIndex, itiIndex, subjectCode)

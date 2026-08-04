@@ -21,4 +21,6 @@ E.keys.trigger = KbName('5%');
 E.keys.left = KbName('LeftArrow');
 E.keys.right = KbName('RightArrow');
 E.keys.escape = KbName('Escape');
+E.keys.space = KbName('space');
+E.keys.shift = [KbName('LeftShift') KbName('RightShift')];
 end
