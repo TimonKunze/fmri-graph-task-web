@@ -65,6 +65,7 @@ TrialIndex = nan(n, 1);
 TrialName = strings(n, 1);
 Response = nan(n, 1);
 RT = nan(n, 1);
+TimedOut = false(n, 1);
 TimestampSec = nan(n, 1);
 TimestampRelSec = nan(n, 1);
 TimestampClock = strings(n, 1);
@@ -81,6 +82,7 @@ for i = 1:n
     TrialName(i) = string(trialField(t, 'trial_name', ""));
     Response(i) = trialField(t, 'response', NaN);
     RT(i) = trialField(t, 'rt_seconds', NaN);
+    TimedOut(i) = logical(trialField(t, 'timed_out', false));
     TimestampSec(i) = trialField(t, 'timestamp_sec', NaN);
     TimestampRelSec(i) = trialField(t, 'timestamp_rel_sec', NaN);
     TimestampClock(i) = string(trialField(t, 'timestamp_clock', ""));
@@ -91,7 +93,7 @@ for i = 1:n
     CorrectChoice(i) = trialField(t, 'correct_choice', NaN);
 end
 
-T = table(Subject, Block, TrialIndex, TrialName, Response, RT, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice);
+T = table(Subject, Block, TrialIndex, TrialName, Response, RT, TimedOut, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice);
 end
 
 function value = trialField(t, fieldName, defaultValue)

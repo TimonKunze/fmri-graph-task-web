@@ -29,7 +29,7 @@ end
 
 if startBlock > numel(E.assignment.part2RawNodeBlocks)
     error('ExperimentScript_Part2b:InvalidStartBlock', ...
-        'Start block %d is outside the valid range.', startBlock);
+        'Start run %d is outside the valid range.', startBlock);
 end
 
 for b = startBlock:numel(E.assignment.part2RawNodeBlocks)
@@ -40,7 +40,7 @@ for b = startBlock:numel(E.assignment.part2RawNodeBlocks)
     end
     if b < numel(E.assignment.part2RawNodeBlocks)
         showBlockBreak(E, b, numel(E.assignment.part2RawNodeBlocks));
-        waitForSpecificKey(E.keys.right);
+        waitForSpecificKey(E.times.continueKey);
         E = RecalibrateAndValidateEyeLink_Part2b(E, b);
     end
 end

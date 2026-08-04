@@ -6,5 +6,6 @@ if E.debugmode
 end
 E.times.scannerOffsetSec = 12;
 E.times.triggerKey = KbName('5%');
-E.times.continueKey = KbName('RightArrow');
+E.times.continueKey = KbName('space');
+E.times.choiceTimeoutSec = 60;
 end

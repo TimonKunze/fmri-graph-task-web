@@ -24,8 +24,19 @@ startTime = GetSecs;
 response = NaN;
 responseSide = '';
 rtSecs = NaN;
+timedOut = false;
+timeoutAt = startTime + E.times.choiceTimeoutSec;
 
 while true
+    nowSecs = GetSecs;
+    if nowSecs >= timeoutAt
+        timedOut = true;
+        responseSide = 'timeout';
+        rtSecs = E.times.choiceTimeoutSec;
+        SendEyeLinkMessage_Part2b(E, 'TIMEOUT %d %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), round(rtSecs * 1000));
+        break;
+    end
+
     [keyIsDown, secs, keyCode] = KbCheck;
     if keyIsDown
         if keyCode(E.keys.left)
