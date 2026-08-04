@@ -18,8 +18,8 @@ E.screen.bckgrnd = [255 255 255];
 
 KbName('UnifyKeyNames');
 E.keys.trigger = KbName('5%');
-E.keys.left = KbName('LeftArrow');
-E.keys.right = KbName('RightArrow');
+E.keys.left = KbName('1!');
+E.keys.right = KbName('2@');
 E.keys.escape = KbName('Escape');
 E.keys.space = KbName('space');
 E.keys.enter = KbName('Return');
