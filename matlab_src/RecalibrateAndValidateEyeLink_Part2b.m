@@ -1,11 +1,11 @@
-function E = RecalibrateAndValidateEyeLink_Part2b(E, blockIndex)
+function E = RecalibrateAndValidateEyeLink_Part2b(E, runIndex)
 %RECALIBRATEANDVALIDATEEYELINK_PART2B Pause recording, recalibrate, and resume.
 
 if ~isfield(E, 'eye') || ~isfield(E.eye, 'enabled') || ~E.eye.enabled || (isfield(E.eye, 'dummy') && E.eye.dummy)
     return;
 end
 
-SendEyeLinkMessage_Part2b(E, 'TRACKER_SETUP_START %d', blockIndex);
+SendEyeLinkMessage_Part2b(E, 'TRACKER_SETUP_START %d', runIndex);
 
 if isfield(E.eye, 'recording') && E.eye.recording
     try
@@ -26,5 +26,5 @@ E.eye.setupComplete = true;
 
 E = StartEyeLinkRecording_Part2b(E);
 
-SendEyeLinkMessage_Part2b(E, 'TRACKER_SETUP_END %d', blockIndex);
+SendEyeLinkMessage_Part2b(E, 'TRACKER_SETUP_END %d', runIndex);
 end

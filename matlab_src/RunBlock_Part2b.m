@@ -1,12 +1,12 @@
-function E = RunBlock_Part2b(E, blockIndex, startTrialIndex)
+function E = RunBlock_Part2b(E, runIndex, startTrialIndex)
 if nargin < 3 || isempty(startTrialIndex)
     startTrialIndex = 1;
 end
 
-blockItems = E.assignment.part2RawNodeBlocks{blockIndex};
-if startTrialIndex < 1 || startTrialIndex > numel(blockItems)
+runItems = E.assignment.part2RawNodeRuns{runIndex};
+if startTrialIndex < 1 || startTrialIndex > numel(runItems)
     error('RunBlock_Part2b:InvalidStartTrial', ...
-        'Start trial %d is outside the valid range for block %d.', startTrialIndex, blockIndex);
+        'Start trial %d is outside the valid range for run %d.', startTrialIndex, runIndex);
 end
 
 adjM = E.G.adjM;
@@ -15,31 +15,31 @@ canonicalToExp = invertPermutation(E.assignment.experimentNodeToGraphNode);
 
 if startTrialIndex > 1
     [previousNodeIndex, previousItiSeconds, itiIndex] = primeResumeState( ...
-        E, blockItems, blockIndex, startTrialIndex, adjM, canonicalToExp);
+        E, runItems, runIndex, startTrialIndex, adjM, canonicalToExp);
 else
     previousNodeIndex = [];
     previousItiSeconds = [];
     itiIndex = 1;
 end
 
-SendEyeLinkMessage_Part2b(E, 'BLOCK_START %d', blockIndex);
+SendEyeLinkMessage_Part2b(E, 'RUN_START %d', runIndex);
 runSkipped = false;
 
-for trialIndex = 1:numel(blockItems)
+for trialIndex = 1:numel(runItems)
     if runSkipped
         break;
     end
-    item = blockItems{trialIndex};
+    item = runItems{trialIndex};
 
     if isnumeric(item) && isscalar(item)
         decoded = decodeFmriNode(item, size(adjM, 1), canonicalToExp, E);
         [imageOnsetSecs, imageOnsetClock] = drawSingleImageTrial(E, decoded.imageTex);
-        SendEyeLinkMessage_Part2b(E, 'IMAGE_ONSET %d %d %d %d', blockIndex, trialIndex, decoded.rawNode, decoded.graphNodeIndex);
+        SendEyeLinkMessage_Part2b(E, 'IMAGE_ONSET %d %d %d %d', runIndex, trialIndex, decoded.rawNode, decoded.graphNodeIndex);
         runSkipped = waitSecsWithRunSkip(E, E.times.imagePresentationMs / 1000);
         E.part2.trials{end + 1} = struct( ...
             'trial_name', 'part2_fmri_picture_viewing', ...
             'part', 2, ...
-            'block_index', blockIndex, ...
+            'run_index', runIndex, ...
             'trial_index', trialIndex, ...
             'raw_node_index', decoded.rawNode, ...
             'graph_node_index', decoded.graphNodeIndex, ...
@@ -55,19 +55,19 @@ for trialIndex = 1:numel(blockItems)
         previousNodeIndex = decoded.experimentNodeIndex;
 
         if runSkipped
-            SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d', blockIndex);
+            SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d', runIndex);
             break;
         end
 
-        if trialIndex < numel(blockItems)
-            itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
+        if trialIndex < numel(runItems)
+            itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, runIndex, itiIndex, E.sbj.n);
             [itiOnsetSecs, itiOnsetClock] = drawFixationTrial(E);
-            SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', blockIndex, trialIndex, round(itiSeconds * 1000));
+            SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', runIndex, trialIndex, round(itiSeconds * 1000));
             runSkipped = waitSecsWithRunSkip(E, itiSeconds);
             E.part2.trials{end + 1} = struct( ...
                 'trial_name', 'part2_fmri_iti', ...
                 'part', 2, ...
-                'block_index', blockIndex, ...
+                'run_index', runIndex, ...
                 'trial_index', trialIndex, ...
                 'iti_seconds', itiSeconds, ...
                 'timestamp_sec', itiOnsetSecs, ...
@@ -101,7 +101,7 @@ for trialIndex = 1:numel(blockItems)
         end
 
         trialInfo = struct( ...
-            'blockIndex', blockIndex, ...
+            'runIndex', runIndex, ...
             'trialIndex', trialIndex, ...
             'leftRawNode', item(1), ...
             'rightRawNode', item(2), ...
@@ -114,7 +114,7 @@ for trialIndex = 1:numel(blockItems)
         E.part2.trials{end + 1} = struct( ...
             'trial_name', 'part2_dual_stimulus_choice', ...
             'part', 2, ...
-            'block_index', blockIndex, ...
+            'run_index', runIndex, ...
             'trial_index', trialIndex, ...
             'left_raw_node_index', item(1), ...
             'right_raw_node_index', item(2), ...
@@ -144,19 +144,19 @@ for trialIndex = 1:numel(blockItems)
 
         if skipRunChoice
             runSkipped = true;
-            SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d', blockIndex);
+            SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d', runIndex);
             break;
         end
 
-        if trialIndex < numel(blockItems)
-            itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
+        if trialIndex < numel(runItems)
+            itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, runIndex, itiIndex, E.sbj.n);
             [itiOnsetSecs, itiOnsetClock] = drawFixationTrial(E);
-            SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', blockIndex, trialIndex, round(itiSeconds * 1000));
+            SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', runIndex, trialIndex, round(itiSeconds * 1000));
             runSkipped = waitSecsWithRunSkip(E, itiSeconds);
             E.part2.trials{end + 1} = struct( ...
                 'trial_name', 'part2_fmri_iti', ...
                 'part', 2, ...
-                'block_index', blockIndex, ...
+                'run_index', runIndex, ...
                 'trial_index', trialIndex, ...
                 'iti_seconds', itiSeconds, ...
                 'timestamp_sec', itiOnsetSecs, ...
@@ -169,7 +169,7 @@ for trialIndex = 1:numel(blockItems)
     end
 end
 
-SendEyeLinkMessage_Part2b(E, 'BLOCK_END %d', blockIndex);
+SendEyeLinkMessage_Part2b(E, 'RUN_END %d', runIndex);
 
 end
 
@@ -212,13 +212,13 @@ for experimentIndex = 1:nb
 end
 end
 
-function [previousNodeIndex, previousItiSeconds, itiIndex] = primeResumeState(E, blockItems, blockIndex, startTrialIndex, adjM, canonicalToExp)
+function [previousNodeIndex, previousItiSeconds, itiIndex] = primeResumeState(E, runItems, runIndex, startTrialIndex, adjM, canonicalToExp)
 previousNodeIndex = [];
 previousItiSeconds = [];
 itiIndex = 1;
 
 for trialIndex = 1:(startTrialIndex - 1)
-    item = blockItems{trialIndex};
+    item = runItems{trialIndex};
 
     if isnumeric(item) && isscalar(item)
         decoded = decodeFmriNode(item, size(adjM, 1), canonicalToExp, E);
@@ -227,8 +227,8 @@ for trialIndex = 1:(startTrialIndex - 1)
         previousNodeIndex = [];
     end
 
-    if trialIndex < numel(blockItems)
-        itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, blockIndex, itiIndex, E.sbj.n);
+    if trialIndex < numel(runItems)
+        itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, runIndex, itiIndex, E.sbj.n);
         previousItiSeconds = itiSeconds;
         itiIndex = itiIndex + 1;
     end
@@ -276,48 +276,48 @@ while true
 end
 end
 
-function itiSeconds = getItiSeconds(E, part2ItiBlocks, blockIndex, itiIndex, subjectCode)
-blockIti = getBlockItiValues(part2ItiBlocks, blockIndex, subjectCode);
-if itiIndex < 1 || itiIndex > numel(blockIti)
-    error('RunBlock_Part2b:MissingITI', 'Missing ITI value for block %d, iti index %d, subject %s.', blockIndex, itiIndex, num2str(subjectCode));
+function itiSeconds = getItiSeconds(E, part2ItiRuns, runIndex, itiIndex, subjectCode)
+runIti = getRunItiValues(part2ItiRuns, runIndex, subjectCode);
+if itiIndex < 1 || itiIndex > numel(runIti)
+    error('RunBlock_Part2b:MissingITI', 'Missing ITI value for run %d, iti index %d, subject %s.', runIndex, itiIndex, num2str(subjectCode));
 end
-itiSeconds = double(blockIti(itiIndex));
+itiSeconds = double(runIti(itiIndex));
 if ~isfinite(itiSeconds)
-    error('RunBlock_Part2b:InvalidITI', 'Missing ITI value for block %d, iti index %d, subject %s.', blockIndex, itiIndex, num2str(subjectCode));
+    error('RunBlock_Part2b:InvalidITI', 'Missing ITI value for run %d, iti index %d, subject %s.', runIndex, itiIndex, num2str(subjectCode));
 end
 if isfield(E, 'debugmode') && E.debugmode
     itiSeconds = itiSeconds / 2;
 end
 end
 
-function blockIti = getBlockItiValues(part2ItiBlocks, blockIndex, subjectCode)
-if iscell(part2ItiBlocks)
-    if numel(part2ItiBlocks) < blockIndex || isempty(part2ItiBlocks{blockIndex})
-        error('RunBlock_Part2b:MissingITI', 'Missing ITI values for block %d, subject %s.', blockIndex, num2str(subjectCode));
+function runIti = getRunItiValues(part2ItiRuns, runIndex, subjectCode)
+if iscell(part2ItiRuns)
+    if numel(part2ItiRuns) < runIndex || isempty(part2ItiRuns{runIndex})
+        error('RunBlock_Part2b:MissingITI', 'Missing ITI values for run %d, subject %s.', runIndex, num2str(subjectCode));
     end
-    blockIti = part2ItiBlocks{blockIndex};
+    runIti = part2ItiRuns{runIndex};
     return;
 end
 
-if isnumeric(part2ItiBlocks)
-    if ndims(part2ItiBlocks) == 2
-        if size(part2ItiBlocks, 1) < blockIndex
-            error('RunBlock_Part2b:MissingITI', 'Missing ITI values for block %d, subject %s.', blockIndex, num2str(subjectCode));
+if isnumeric(part2ItiRuns)
+    if ndims(part2ItiRuns) == 2
+        if size(part2ItiRuns, 1) < runIndex
+            error('RunBlock_Part2b:MissingITI', 'Missing ITI values for run %d, subject %s.', runIndex, num2str(subjectCode));
         end
-        blockIti = part2ItiBlocks(blockIndex, :);
+        runIti = part2ItiRuns(runIndex, :);
         return;
     end
-    if ndims(part2ItiBlocks) == 3
-        if size(part2ItiBlocks, 1) < blockIndex
-            error('RunBlock_Part2b:MissingITI', 'Missing ITI values for block %d, subject %s.', blockIndex, num2str(subjectCode));
+    if ndims(part2ItiRuns) == 3
+        if size(part2ItiRuns, 1) < runIndex
+            error('RunBlock_Part2b:MissingITI', 'Missing ITI values for run %d, subject %s.', runIndex, num2str(subjectCode));
         end
-        blockIti = squeeze(part2ItiBlocks(blockIndex, :, :));
-        blockIti = blockIti(:).';
+        runIti = squeeze(part2ItiRuns(runIndex, :, :));
+        runIti = runIti(:).';
         return;
     end
 end
 
-error('RunBlock_Part2b:InvalidITIContainer', 'Unsupported ITI container for block %d, subject %s.', blockIndex, num2str(subjectCode));
+error('RunBlock_Part2b:InvalidITIContainer', 'Unsupported ITI container for run %d, subject %s.', runIndex, num2str(subjectCode));
 end
 
 function matrix = createShortestPathDistanceMatrix(adjM)

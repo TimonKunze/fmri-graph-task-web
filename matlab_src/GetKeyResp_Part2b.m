@@ -9,7 +9,7 @@ if ~isfinite(choiceOnsetSecs)
     choiceOnsetSecs = GetSecs;
 end
 choiceOnsetClock = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
-SendEyeLinkMessage_Part2b(E, 'CHOICE_ONSET %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1));
+SendEyeLinkMessage_Part2b(E, 'CHOICE_ONSET %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1));
 
 if isfield(E, 'debugmode') && E.debugmode
     WaitSecs(0.1);
@@ -17,7 +17,7 @@ if isfield(E, 'debugmode') && E.debugmode
     responseSide = 'right';
     rtSecs = 0.1;
     skipRun = false;
-    SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
+    SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
     return;
 end
 
@@ -33,7 +33,7 @@ while true
     if nowSecs >= timeoutAt
         responseSide = 'timeout';
         rtSecs = E.times.choiceTimeoutSec;
-        SendEyeLinkMessage_Part2b(E, 'TIMEOUT %d %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), round(rtSecs * 1000));
+        SendEyeLinkMessage_Part2b(E, 'TIMEOUT %d %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), round(rtSecs * 1000));
         break;
     end
 
@@ -42,20 +42,20 @@ while true
         if keyCode(E.keys.space) && any(keyCode(E.keys.shift))
             skipRun = true;
             responseSide = 'skip';
-            SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1));
+            SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1));
             break;
         end
         if keyCode(E.keys.left)
             response = 0;
             responseSide = 'left';
             rtSecs = secs - startTime;
-            SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
+            SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
             break;
         elseif keyCode(E.keys.right)
             response = 1;
             responseSide = 'right';
             rtSecs = secs - startTime;
-            SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'blockIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
+            SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
             break;
         elseif keyCode(E.keys.escape)
             CleanupPart2b(E);

@@ -12,7 +12,7 @@ E.sbj.hand = answer{5};
 E.sbj.lang = answer{6};
 E.debugmode = logical(str2double(answer{7}));
 E.eye.enabled = logical(str2double(answer{8}));
-E.part2.startBlock = parsePositiveInteger(answer{9}, 1);
+E.part2.startRun = parsePositiveInteger(answer{9}, 1);
 E.part2.startTrial = parsePositiveInteger(answer{10}, 1);
 end
 

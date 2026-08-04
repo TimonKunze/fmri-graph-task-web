@@ -16,32 +16,32 @@ E = StartEyeLinkRecording_Part2b(E);
 E.part2.trials = {};
 WaitSecs(E.times.scannerOffsetSec);
 
-startBlock = 1;
+startRun = 1;
 startTrial = 1;
 if isfield(E, 'part2')
-    if isfield(E.part2, 'startBlock') && isfinite(E.part2.startBlock)
-        startBlock = max(1, floor(E.part2.startBlock));
+    if isfield(E.part2, 'startRun') && isfinite(E.part2.startRun)
+        startRun = max(1, floor(E.part2.startRun));
     end
     if isfield(E.part2, 'startTrial') && isfinite(E.part2.startTrial)
         startTrial = max(1, floor(E.part2.startTrial));
     end
 end
 
-if startBlock > numel(E.assignment.part2RawNodeBlocks)
-    error('ExperimentScript_Part2b:InvalidStartBlock', ...
-        'Start run %d is outside the valid range.', startBlock);
+if startRun > numel(E.assignment.part2RawNodeRuns)
+    error('ExperimentScript_Part2b:InvalidStartRun', ...
+        'Start run %d is outside the valid range.', startRun);
 end
 
-for b = startBlock:numel(E.assignment.part2RawNodeBlocks)
-    if b == startBlock
-        E = RunBlock_Part2b(E, b, startTrial);
+for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
+    if runIndex == startRun
+        E = RunBlock_Part2b(E, runIndex, startTrial);
     else
-        E = RunBlock_Part2b(E, b, 1);
+        E = RunBlock_Part2b(E, runIndex, 1);
     end
-    if b < numel(E.assignment.part2RawNodeBlocks)
-        showBlockBreak(E, b, numel(E.assignment.part2RawNodeBlocks));
+    if runIndex < numel(E.assignment.part2RawNodeRuns)
+        showRunBreak(E, runIndex, numel(E.assignment.part2RawNodeRuns));
         waitForSpecificKey(E.times.continueKey);
-        E = RecalibrateAndValidateEyeLink_Part2b(E, b);
+        E = RecalibrateAndValidateEyeLink_Part2b(E, runIndex);
     end
 end
 
@@ -85,8 +85,8 @@ while true
 end
 end
 
-function showBlockBreak(E, blockIndex, totalBlocks)
-msg = sprintf(E.text.part2BlockBreak, blockIndex, totalBlocks);
+function showRunBreak(E, runIndex, totalRuns)
+msg = sprintf(E.text.part2RunBreak, runIndex, totalRuns);
 DrawFormattedText(E.screen.theWindow, msg, 'center', 'center', E.screen.textcolor);
 Screen('Flip', E.screen.theWindow);
 end

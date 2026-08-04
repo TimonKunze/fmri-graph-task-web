@@ -60,7 +60,7 @@ trials = E.part2.trials;
 n = numel(trials);
 
 Subject = repmat(E.sbj.n, n, 1);
-Block = nan(n, 1);
+Run = nan(n, 1);
 TrialIndex = nan(n, 1);
 TrialName = strings(n, 1);
 Response = nan(n, 1);
@@ -78,7 +78,7 @@ CorrectChoice = nan(n, 1);
 
 for i = 1:n
     t = trials{i};
-    Block(i) = trialField(t, 'block_index', NaN);
+    Run(i) = trialField(t, 'run_index', NaN);
     TrialIndex(i) = trialField(t, 'trial_index', NaN);
     TrialName(i) = string(trialField(t, 'trial_name', ""));
     Response(i) = trialField(t, 'response', NaN);
@@ -95,7 +95,7 @@ for i = 1:n
     CorrectChoice(i) = trialField(t, 'correct_choice', NaN);
 end
 
-T = table(Subject, Block, TrialIndex, TrialName, Response, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice);
+T = table(Subject, Run, TrialIndex, TrialName, Response, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice);
 end
 
 function value = trialField(t, fieldName, defaultValue)
