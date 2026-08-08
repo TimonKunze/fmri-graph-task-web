@@ -14,6 +14,7 @@ Screen('Flip', E.screen.theWindow);
 E.begintime = GetSecs;
 E = StartEyeLinkRecording_Part2b(E);
 E.part2.trials = {};
+E.part2.resultsMatNeedsFlush = false;
 WaitSecs(E.times.scannerOffsetSec);
 
 startRun = 1;

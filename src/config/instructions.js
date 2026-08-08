@@ -115,6 +115,9 @@ const INSTRUCTION_COPY = {
       Usa i tasti freccia sinistra e destra per rispondere.
     </p>
     <p>
+      Hai al massimo 20s per rispondere a ogni prova di scelta.
+    </p>
+    <p>
       Per continuare, premi il tasto freccia destra e ti mostreremo una breve dimostrazione.
     </p>
   `,
@@ -307,6 +310,9 @@ const INSTRUCTION_COPY = {
       Benutze zum Antworten die linke und rechte Pfeiltaste.
     </p>
     <p>
+      Du hast maximal 20s, um auf jede Auswahlaufgabe zu antworten.
+    </p>
+    <p>
       Drucke jetzt die rechte Pfeiltaste, und wir zeigen dir eine kurze Demonstration.
     </p>
   `,
@@ -497,6 +503,9 @@ const INSTRUCTION_COPY = {
     </p>
     <p>
     Use the left and right arrow keys to respond.
+    </p>
+    <p>
+    You have maximally 20s to respond on each choice trial.
     </p>
     <p>
     Press the right arrow key now, and we will show you a short demo.

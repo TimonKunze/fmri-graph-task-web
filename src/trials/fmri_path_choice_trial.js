@@ -54,6 +54,7 @@ export function createFmriPathChoiceTrial({
   trialIndex = null,
   trialName = "part2_dual_stimulus_choice",
   dataExtras = {},
+  trialDuration = 20000,
 } = {}) {
   return {
     type: jsPsychHtmlKeyboardResponse,
@@ -72,6 +73,7 @@ export function createFmriPathChoiceTrial({
       </div>
     `,
     choices: CONFIG.debug ? "ALL_KEYS" : ["arrowleft", "arrowright"],
+    trial_duration: trialDuration,
     data: {
       trial_name: trialName,
       part: 2,
@@ -100,7 +102,9 @@ export function createFmriPathChoiceTrial({
         data.response = 1;
         data.response_side = "right";
       } else {
-        data.response_side = null;
+        data.response = null;
+        data.response_side = "timeout";
+        data.timed_out = true;
       }
     },
   };

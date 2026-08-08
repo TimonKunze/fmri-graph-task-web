@@ -61,7 +61,7 @@ export const reflecting_questionaire_trial = {
       it: {
         preamble:
           "<h3>Domande di riflessione</h3><p>Di seguito, alcune domande di riflessione sull'esperimento.</p>",
-        systematic: "Hai notato qualcosa di sistematico nel modo in cui gli oggetti erano disposti sullo schermo?",
+        systematic: "Ieri durante l'apprendimento, hai notato qualcosa di sistematico nel modo in cui gli oggetti erano disposti sullo schermo?",
         systematicHint: "Descrivi separatamente il primo e il secondo insieme.",
         firstSet: "Primo insieme",
         secondSet: "Secondo insieme",
@@ -78,7 +78,7 @@ export const reflecting_questionaire_trial = {
       en: {
         preamble:
           "<h3>Reflection Questions</h3><p>Please answer a few questions reflecting on the experiment.</p>",
-        systematic: "Did you notice anything systematic about how the objects were arranged on the screen?",
+        systematic: "Yesterday during learning, did you notice anything systematic about how the objects were arranged on the screen?",
         systematicHint: "Please describe the first and second sets separately.",
         firstSet: "First set",
         secondSet: "Second set",
@@ -95,7 +95,7 @@ export const reflecting_questionaire_trial = {
       de: {
         preamble:
           "<h3>Reflexionsfragen</h3><p>Bitte beantworte im Folgenden einige Reflexionsfragen zum Experiment.</p>",
-        systematic: "Ist dir etwas Systematisches daran aufgefallen, wie die Objekte auf dem Bildschirm angeordnet waren?",
+        systematic: "Gestern beim Lernen, ist dir etwas Systematisches daran aufgefallen, wie die Objekte auf dem Bildschirm angeordnet waren?",
         systematicHint: "Bitte beschreibe das erste und das zweite Set getrennt.",
         firstSet: "Erstes Set",
         secondSet: "Zweites Set",
