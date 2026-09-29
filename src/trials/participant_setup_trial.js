@@ -7,6 +7,7 @@ import {
   setParticipantSetup,
   t,
 } from "../state/participant.js";
+import { getRandomizationAssignment } from "../state/subjectAssignment.js";
 
 const COPY = {
   en: {
@@ -20,6 +21,7 @@ const COPY = {
     languagePlaceholder: "Select a language",
     continueLabel: "Continue",
     invalidSubject: "Please enter a valid integer subject identity code.",
+    noAssignment: "No randomization assignment exists for this subject code.",
     missingLanguage: "Please select a language.",
   },
   it: {
@@ -33,6 +35,7 @@ const COPY = {
     languagePlaceholder: "Seleziona una lingua",
     continueLabel: "Continua",
     invalidSubject: "Inserisci un codice identificativo valido sotto forma di numero intero.",
+    noAssignment: "Non esiste alcuna assegnazione di randomizzazione per questo codice identificativo.",
     missingLanguage: "Seleziona una lingua.",
   },
   de: {
@@ -46,6 +49,7 @@ const COPY = {
     languagePlaceholder: "Sprache auswahlen",
     continueLabel: "Weiter",
     invalidSubject: "Bitte gib einen gultigen Identifikationscode als ganze Zahl ein.",
+    noAssignment: "Fuer diesen Identifikationscode gibt es keine Randomisierungszuordnung.",
     missingLanguage: "Bitte wahle eine Sprache aus.",
   },
 };
@@ -162,6 +166,13 @@ export const participant_setup_trial = {
           event.preventDefault();
           event.stopImmediatePropagation();
           errorEl.textContent = copy.invalidSubject;
+          return;
+        }
+
+        if (!getRandomizationAssignment(subjectCode)) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          errorEl.textContent = copy.noAssignment;
           return;
         }
 

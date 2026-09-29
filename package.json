@@ -22,6 +22,7 @@
     "@jspsych/plugin-survey-multi-select": "^2.1.0",
     "@jspsych/plugin-survey-text": "^2.1.0",
     "jspsych": "^8.2.3",
-    "p5": "^2.2.1"
+    "p5": "^2.2.1",
+    "seedrandom": "^3.0.5"
   }
 }
