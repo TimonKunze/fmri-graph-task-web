@@ -19,5 +19,8 @@ export async function save_data(data, data_dir, file_name) {
     }),
   });
 
+  if (!response.ok) {
+    throw new Error(`Data save failed with HTTP ${response.status}.`);
+  }
   return response.text();
 }

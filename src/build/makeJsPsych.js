@@ -22,6 +22,7 @@ export function makeJsPsych({ data_dir }) {
   let debugAdvanceHandler = null;
   let persistenceReady = false;
   let saveSequence = 0;
+  let saveQueue = Promise.resolve();
   const sessionStartedAt = new Date();
   const sessionId = globalThis.crypto?.randomUUID?.() || `session_${sessionStartedAt.getTime()}_${Math.random().toString(16).slice(2)}`;
   const fileSessionId = sessionId.replace(/[^A-Za-z0-9]/g, "");
@@ -87,7 +88,7 @@ export function makeJsPsych({ data_dir }) {
 
     on_data_update: (data) => {
       if (!persistenceReady) return;
-      persistData(data);
+      enqueueSave(data);
     },
   });
 
@@ -98,16 +99,31 @@ export function makeJsPsych({ data_dir }) {
     return data;
   }
 
-  function persistData(data) {
+  async function persistData(data) {
     decorateData(data);
     const dataJsonl = JSON.stringify(data) + "\n";
     const participantSetup = getParticipantSetup();
     const subjectCode = participantSetup?.subjectCode ?? "unknown";
     const dateString = makeShortDate();
     const file_name = `subj${subjectCode}_p${part}_${dateString}_${makeSessionStamp()}_${fileSessionId}.jsonl`;
-    return save_data(dataJsonl, data_dir, file_name).catch((error) => {
-      console.error("[save_data] Failed to save trial data:", error);
-    });
+
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      try {
+        await save_data(dataJsonl, data_dir, file_name);
+        return;
+      } catch (error) {
+        if (attempt === 3) {
+          console.error(`[save_data] Failed after ${attempt} attempts:`, error);
+          return;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 250 * attempt));
+      }
+    }
+  }
+
+  function enqueueSave(data) {
+    saveQueue = saveQueue.then(() => persistData(data));
+    return saveQueue;
   }
 
   // Participant setup is collected in a short bootstrap run.  Keep those
@@ -118,9 +134,11 @@ export function makeJsPsych({ data_dir }) {
     const records = jsPsych.data.get().values();
     persistenceReady = true;
     for (const record of records) {
-      await persistData(record);
+      enqueueSave(record);
     }
+    await jsPsych.flushSaves();
   };
+  jsPsych.flushSaves = () => saveQueue;
 
   return jsPsych;
 }

@@ -223,6 +223,7 @@ async function bootstrap() {
   jsPsych.options.show_progress_bar = showProgressBar;
   window.__JSPSYCH_DISPLAY_DATA_ON_FINISH__ = CONFIG.debug;
   await jsPsych.run(timeline);
+  await jsPsych.flushSaves();
 }
 
 bootstrap();
