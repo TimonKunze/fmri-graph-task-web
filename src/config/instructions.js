@@ -153,7 +153,7 @@ const INSTRUCTION_COPY = {
       Per questa parte non è prevista una prova di pratica. Prenditi tutto il tempo di cui hai bisogno.
     </p>
     <p>
-      Dopo aver premuto "Continua", la prova successiva inizierà con il primo insieme di elementi.
+      Dopo aver premuto "Continua", la prova successiva inizierà con questi elementi.
     </p>
     <br>
   `,
@@ -348,7 +348,7 @@ const INSTRUCTION_COPY = {
       Fur diesen Teil gibt es keinen Ubungsdurchgang. Nimm dir so viel Zeit, wie du brauchst.
     </p>
     <p>
-      Nachdem du auf "Weiter" geklickt hast, beginnt der nachste Durchgang mit dem ersten Satz von Elementen.
+      Nachdem du auf "Weiter" geklickt hast, beginnt der nächste Durchgang mit diesen Elementen.
     </p>
     <br>
   `,
@@ -546,7 +546,7 @@ const INSTRUCTION_COPY = {
     There is no practice trial for this part. Take as much time as you need.
     </p>
     <p>
-    After pressing "Continue," the next trial will begin with the first set of items.
+    After pressing "Continue," the next trial will begin with these items.
     </p>
     <br>
   `,

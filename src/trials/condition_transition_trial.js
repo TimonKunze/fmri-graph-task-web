@@ -8,9 +8,9 @@ export function createConditionTransitionTrial(trialName) {
     choices: [""],
     on_start: (trial) => {
       trial.stimulus = `<p>${t({
-        it: "Per favore continua il compito con il secondo insieme di elementi.",
-        en: "Please continue the task with the second set of items.",
-        de: "Bitte setze die Aufgabe mit dem zweiten Satz von Elementen fort.",
+        it: "Per favore continua il compito con l'altro insieme di elementi.",
+        en: "Please continue the task with the other set of items.",
+        de: "Bitte setze die Aufgabe mit dem anderen Satz von Elementen fort.",
       })}</p>`;
       trial.choices = [t({ it: "Continua", en: "Continue", de: "Weiter" })];
     },
