@@ -12,7 +12,7 @@ import { getCurrentLanguage, t } from "../state/participant.js";
 
 import { jsPsych } from "../main.js";
 import { rotatePoint } from "../utils/geometry.js";
-import { shortenLine, addUniqueArray } from "../utils/helper-tools.js";
+import { shortenLine } from "../utils/helper-tools.js";
 import { isConnected, transformToAdjacencyObject } from "../utils/graph-tools.js";
 
 function getPart3NodeMapping(layoutType) {
@@ -344,6 +344,7 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
   let nodeEnded = -1;
 
   let connectedPos = [];
+  let connectedEdgeKeys = new Set();
   let towPosLastTrial = [];
   const secondStimSet = useSecondStimSet(layoutType);
   const arenaNodeSize = secondStimSet ? SIZES.task14Treetop : SIZES.task14Flower;
@@ -373,6 +374,41 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
 
     return (lastArenaTrial?.connected_pos_spatialpos_rel ?? [])
       .map((edge) => [...edge]);
+  }
+
+  function findNodeIndex(position) {
+    return towPosLastTrial.findIndex(
+      (candidate) => candidate[0] === position[0] && candidate[1] === position[1]
+    );
+  }
+
+  function canonicalEdgeKey(nodeA, nodeB) {
+    const first = Math.min(nodeA, nodeB);
+    const second = Math.max(nodeA, nodeB);
+    return `${first}:${second}`;
+  }
+
+  function normalizeConnectedEdges(edges) {
+    const normalized = [];
+    connectedEdgeKeys = new Set();
+
+    for (const edge of edges) {
+      const nodeA = findNodeIndex(edge.slice(0, 2));
+      const nodeB = findNodeIndex(edge.slice(-2));
+      if (nodeA < 0 || nodeB < 0 || nodeA === nodeB) continue;
+
+      const edgeKey = canonicalEdgeKey(nodeA, nodeB);
+      if (connectedEdgeKeys.has(edgeKey)) continue;
+
+      const [first, second] = nodeA < nodeB ? [nodeA, nodeB] : [nodeB, nodeA];
+      connectedEdgeKeys.add(edgeKey);
+      normalized.push([
+        ...towPosLastTrial[first],
+        ...towPosLastTrial[second],
+      ]);
+    }
+
+    return normalized;
   }
 
   return {
@@ -526,13 +562,9 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
     },
 
     on_start: function (trial) {
-      if (c_type === "first") {
-        towPosLastTrial = getLatestSpatialPositions();
-        connectedPos = [];
-      } else {
-        towPosLastTrial = getLatestSpatialPositions();
-        connectedPos = getLatestConnectedEdges();
-      }
+      towPosLastTrial = getLatestSpatialPositions();
+      connectedPos = c_type === "first" ? [] : getLatestConnectedEdges();
+      connectedPos = normalizeConnectedEdges(connectedPos);
 
       startTimeRT = performance.now();
       trialEnded = false;
@@ -619,8 +651,17 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
           if (p.TLD.nodes[i].msOverReleased) nodeEnded = i;
 
           if (nodeStarted !== -1 && nodeEnded !== -1 && nodeStarted !== nodeEnded) {
-            const newEdge = [...p.TLD.towPos[nodeStarted], ...p.TLD.towPos[nodeEnded]];
-            addUniqueArray(connectedPos, newEdge);
+            const edgeKey = canonicalEdgeKey(nodeStarted, nodeEnded);
+            if (!connectedEdgeKeys.has(edgeKey)) {
+              const [first, second] = nodeStarted < nodeEnded
+                ? [nodeStarted, nodeEnded]
+                : [nodeEnded, nodeStarted];
+              connectedEdgeKeys.add(edgeKey);
+              connectedPos.push([
+                ...p.TLD.towPos[first],
+                ...p.TLD.towPos[second],
+              ]);
+            }
           }
         }
       }
@@ -628,7 +669,13 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
       // Delete one edge on double click if cursor is near it
       p.doubleClicked = function () {
         const ind = cursorHand.findIndex((el) => el === true);
-        if (ind >= 0 && ind < connectedPos.length) connectedPos.splice(ind, 1);
+        if (ind >= 0 && ind < connectedPos.length) {
+        const removed = connectedPos[ind];
+        const nodeA = findNodeIndex(removed.slice(0, 2));
+        const nodeB = findNodeIndex(removed.slice(-2));
+        connectedEdgeKeys.delete(canonicalEdgeKey(nodeA, nodeB));
+        connectedPos.splice(ind, 1);
+      }
       };
 
       // if (trialEnded) p.remove();
@@ -644,10 +691,18 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
       const posToIndex = new Map(towPosLastTrial.map((pos, idx) => [JSON.stringify(pos), idx]));
 
       const drawnRelations = [];
+      const relationKeys = new Set();
       for (const rel of connectedPos) {
         const a = posToIndex.get(JSON.stringify(rel.slice(0, 2)));
         const b = posToIndex.get(JSON.stringify(rel.slice(-2)));
-        drawnRelations.push([a ?? -1, b ?? -1]);
+        if (a == null || b == null || a === b) continue;
+
+        const first = Math.min(a, b);
+        const second = Math.max(a, b);
+        const relationKey = `${first}:${second}`;
+        if (relationKeys.has(relationKey)) continue;
+        relationKeys.add(relationKey);
+        drawnRelations.push([first, second]);
       }
 
       // Connectedness test
