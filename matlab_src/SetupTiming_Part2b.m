@@ -5,6 +5,7 @@ if E.debugmode
     E.times.imagePresentationMs = 100;
 end
 E.times.scannerOffsetSec = 12;
+E.times.eyeLinkRecordingLeadSec = 0.2;
 E.times.triggerKey = KbName('5%');
 E.times.continueKey = KbName('space');
 E.times.choiceTimeoutSec = 20;

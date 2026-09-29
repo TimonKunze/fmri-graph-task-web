@@ -11,7 +11,7 @@ testCase.applyFixture(matlab.unittest.fixtures.PathFixture(fullfile(testDir, 'he
 folder = testCase.applyFixture(matlab.unittest.fixtures.TemporaryFolderFixture);
 global PART2B_TEST_EYELINK
 PART2B_TEST_EYELINK = struct('initOk', 1, 'dummy', false, ...
-    'openStatus', 0, 'startStatus', 0, 'writeFile', true, ...
+    'openStatus', 0, 'startStatus', 0, 'recordingStatus', 0, 'writeFile', true, ...
     'throwOnReceive', false, 'calibrations', 0);
 PART2B_TEST_EYELINK.calls = {};
 PART2B_TEST_EYELINK.messages = {};
@@ -207,6 +207,15 @@ E = SetupEyeLink_Part2b(testCase.TestData.E);
 PART2B_TEST_EYELINK.startStatus = -1;
 verifyError(testCase, @() StartEyeLinkRecording_Part2b(E), ...
     'StartEyeLinkRecording_Part2b:StartRecordingFailed');
+end
+
+function testRecordingCheckFailureIsReported(testCase)
+global PART2B_TEST_EYELINK
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+PART2B_TEST_EYELINK.recordingStatus = -1;
+verifyError(testCase, @() StartEyeLinkRecording_Part2b(E), ...
+    'StartEyeLinkRecording_Part2b:RecordingLost');
+verifyTrue(testCase, any(strcmp(callNames(), 'CheckRecording')));
 end
 
 function names = callNames()

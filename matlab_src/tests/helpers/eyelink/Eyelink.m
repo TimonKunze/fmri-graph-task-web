@@ -8,6 +8,8 @@ switch command
         status = PART2B_TEST_EYELINK.openStatus;
     case 'StartRecording'
         status = PART2B_TEST_EYELINK.startStatus;
+    case 'CheckRecording'
+        status = PART2B_TEST_EYELINK.recordingStatus;
     case 'Message'
         PART2B_TEST_EYELINK.messages{end + 1} = sprintf(varargin{:});
     case 'ReceiveFile'

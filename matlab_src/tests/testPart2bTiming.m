@@ -43,6 +43,7 @@ function testProductionAndDebugTimingDefaults(testCase)
 E = SetupTiming_Part2b(testCase.TestData.E);
 verifyEqual(testCase, E.times.runTimeoutSec, 1800);
 verifyEqual(testCase, E.times.choiceTimeoutSec, 20);
+verifyEqual(testCase, E.times.eyeLinkRecordingLeadSec, 0.2);
 verifyEqual(testCase, E.times.imagePresentationMs, 1300);
 E.debugmode = true;
 E = SetupTiming_Part2b(E);

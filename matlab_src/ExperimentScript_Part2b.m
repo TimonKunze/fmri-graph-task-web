@@ -13,9 +13,23 @@ waitForSpecificKey(E.keys.trigger);
 Screen('Flip', E.screen.theWindow);
 E.part2.trials = {};
 E.part2.resultsMatNeedsFlush = false;
-WaitSecs(E.times.scannerOffsetSec);
-E.begintime = GetSecs;
+scannerOffsetDeadlineSecs = GetSecs + E.times.scannerOffsetSec;
+recordingLeadSecs = min(E.times.eyeLinkRecordingLeadSec, E.times.scannerOffsetSec);
+WaitSecs(max(0, E.times.scannerOffsetSec - recordingLeadSecs));
 E = StartEyeLinkRecording_Part2b(E);
+if GetSecs > scannerOffsetDeadlineSecs
+    error('ExperimentScript_Part2b:EyeLinkStartupOverrun', ...
+        'EyeLink startup exceeded the scanner offset deadline by %.3f seconds.', ...
+        GetSecs - scannerOffsetDeadlineSecs);
+end
+
+% Keep the first stimulus aligned to the planned scanner offset. EyeLink
+% starts during the final part of the offset and is verified before this
+% absolute deadline, so the recording warm-up does not delay the fMRI design.
+while GetSecs < scannerOffsetDeadlineSecs
+    WaitSecs(min(0.01, scannerOffsetDeadlineSecs - GetSecs));
+end
+E.begintime = scannerOffsetDeadlineSecs;
 SendEyeLinkMessage_Part2b(E, 'SCANNER_OFFSET_END');
 
 startRun = 1;
