@@ -49,8 +49,6 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
       start_node: startNode,
       end_node: endNode,
       stim_size_px: STIM_SIZE,
-      stim_agent: agentLabel,
-      stim_nodes: nodeLabel,
       stim_set: stimSet,
       experiment_nodes: nodeMapping.experimentNodes,
       graph_nodes: nodeMapping.graphNodes,
