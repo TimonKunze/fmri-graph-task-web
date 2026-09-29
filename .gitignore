@@ -26,3 +26,7 @@ dist-ssr
 # Local tooling/cache
 .npm-cache/
 local-rg/
+
+# Participant data and crash files
+matlab_src/Data/
+matlab_src/Crashed/
