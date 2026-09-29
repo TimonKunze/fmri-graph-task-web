@@ -23,6 +23,7 @@ export function makeJsPsych({ data_dir }) {
   let persistenceReady = false;
   let saveSequence = 0;
   let saveQueue = Promise.resolve();
+  const saveFailures = [];
   const sessionStartedAt = new Date();
   const sessionId = globalThis.crypto?.randomUUID?.() || `session_${sessionStartedAt.getTime()}_${Math.random().toString(16).slice(2)}`;
   const fileSessionId = sessionId.replace(/[^A-Za-z0-9]/g, "");
@@ -113,8 +114,7 @@ export function makeJsPsych({ data_dir }) {
         return;
       } catch (error) {
         if (attempt === 3) {
-          console.error(`[save_data] Failed after ${attempt} attempts:`, error);
-          return;
+          throw new Error(`[save_data] Failed after ${attempt} attempts`, { cause: error });
         }
         await new Promise((resolve) => setTimeout(resolve, 250 * attempt));
       }
@@ -122,7 +122,12 @@ export function makeJsPsych({ data_dir }) {
   }
 
   function enqueueSave(data) {
-    saveQueue = saveQueue.then(() => persistData(data));
+    saveQueue = saveQueue
+      .then(() => persistData(data))
+      .catch((error) => {
+        saveFailures.push({ data, error });
+        console.error("[save_data] Record retained after all retries failed:", error);
+      });
     return saveQueue;
   }
 
@@ -139,7 +144,16 @@ export function makeJsPsych({ data_dir }) {
     }
     await jsPsych.flushSaves();
   };
-  jsPsych.flushSaves = () => saveQueue;
+  jsPsych.flushSaves = async () => {
+    await saveQueue;
+    if (saveFailures.length > 0) {
+      const error = new Error(
+        `${saveFailures.length} record(s) could not be saved after retries.`
+      );
+      error.failures = saveFailures;
+      throw error;
+    }
+  };
 
   return jsPsych;
 }

@@ -24,7 +24,9 @@ export const finalPart1Trial = {
       </div>
     `;
   },
+  // Keep the final screen finite so jsPsych.run() reaches the save barrier.
   choices: [],
+  trial_duration: 1000,
   data: {
     trial_name: "final_part1_trial",
     part: 1,

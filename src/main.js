@@ -228,8 +228,15 @@ async function bootstrap() {
   const showProgressBar = !(CONFIG.part2 && !CONFIG.part1 && !CONFIG.part3);
   jsPsych.options.show_progress_bar = showProgressBar;
   window.__JSPSYCH_DISPLAY_DATA_ON_FINISH__ = CONFIG.debug;
-  await jsPsych.run(timeline);
-  await jsPsych.flushSaves();
+  try {
+    await jsPsych.run(timeline);
+    await jsPsych.flushSaves();
+  } catch (error) {
+    console.error("[experiment] Final data save failed:", error);
+    const message =
+      "Some experiment data could not be saved. Please notify the experimenter before closing this page.";
+    if (typeof window.alert === "function") window.alert(message);
+  }
 }
 
 bootstrap();
