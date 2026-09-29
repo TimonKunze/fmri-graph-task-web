@@ -33,6 +33,7 @@ verifyEqual(testCase, first.resultsTable.Response(1), 0);
 verifyEqual(testCase, first.resultsTable.RT(1), 0.75);
 verifyEqual(testCase, first.resultsTable.Subject, [7; 7]);
 verifyEqual(testCase, first.resultsTable.Run, [1; 1]);
+verifyFalse(testCase, isfile([testCase.TestData.checkpoint '.tmp']));
 
 E.part2.trials(end + 1:end + 2) = ...
     {choiceTrial(4, 1, 1.25, false), itiTrial(4)};
