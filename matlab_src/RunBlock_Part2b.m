@@ -41,9 +41,12 @@ for trialIndex = startTrialIndex:numel(runItems)
 
     if isnumeric(item) && isscalar(item)
         decoded = decodeFmriNode(item, size(adjM, 1), canonicalToExp, E);
+        SendEyeLinkMessage_Part2b(E, 'TRIALID R%d_T%d', runIndex, trialIndex);
+        SendEyeLinkMessage_Part2b(E, 'TRIAL_VAR RAW_NODE %d GRAPH_NODE %d', decoded.rawNode, decoded.graphNodeIndex);
         [imageOnsetSecs, imageOnsetClock, runSkipped, runTimedOut] = ...
             drawSingleImageTrial(E, decoded.imageTex, nextStimulusDeadlineSecs, runDeadlineSecs);
         if ~isfinite(imageOnsetSecs)
+            SendEyeLinkMessage_Part2b(E, 'TRIAL_RESULT 1');
             break;
         end
         E = finishIti(E, pendingItiIndex, imageOnsetSecs);
@@ -71,6 +74,7 @@ for trialIndex = startTrialIndex:numel(runItems)
                 'timestamp_clock', imageOnsetClock, ...
                 'run_skipped', runSkipped, ...
                 'timed_out', runTimedOut);
+        SendEyeLinkMessage_Part2b(E, 'TRIAL_RESULT %d', double(runSkipped || runTimedOut));
 
         previousNodeIndex = decoded.experimentNodeIndex;
 
@@ -114,6 +118,12 @@ for trialIndex = startTrialIndex:numel(runItems)
             end
         end
 
+        SendEyeLinkMessage_Part2b(E, 'TRIALID R%d_T%d', runIndex, trialIndex);
+        SendEyeLinkMessage_Part2b(E, 'TRIAL_VAR LEFT_OBJECT_ID %d', getObjectId(E, leftNode));
+        SendEyeLinkMessage_Part2b(E, 'TRIAL_VAR RIGHT_OBJECT_ID %d', getObjectId(E, rightNode));
+        SendEyeLinkMessage_Part2b(E, 'TRIAL_VAR LEFT_GRAPH_NODE %d RIGHT_GRAPH_NODE %d', ...
+            leftNode.graphNodeIndex, rightNode.graphNodeIndex);
+
         trialInfo = struct( ...
             'runIndex', runIndex, ...
             'trialIndex', trialIndex, ...
@@ -127,6 +137,7 @@ for trialIndex = startTrialIndex:numel(runItems)
         [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRunChoice, runTimedOut] = GetKeyResp_Part2b(E, leftNode.imageTex, rightNode.imageTex, trialInfo, runDeadlineSecs, nextStimulusDeadlineSecs);
         if ~isfinite(choiceOnsetSecs)
             runSkipped = skipRunChoice;
+            SendEyeLinkMessage_Part2b(E, 'TRIAL_RESULT 1');
             break;
         end
         E = finishIti(E, pendingItiIndex, choiceOnsetSecs);
@@ -160,6 +171,7 @@ for trialIndex = startTrialIndex:numel(runItems)
             'timestamp_rel_sec', choiceOnsetSecs - E.begintime, ...
             'timestamp_clock', choiceOnsetClock, ...
             'run_skipped', skipRunChoice);
+        SendEyeLinkMessage_Part2b(E, 'TRIAL_RESULT %d', double(skipRunChoice || runTimedOut));
         E.part2.resultsMatNeedsFlush = true;
 
         previousNodeIndex = [];
@@ -420,6 +432,11 @@ if isnumeric(part2ItiRuns)
 end
 
 error('RunBlock_Part2b:InvalidITIContainer', 'Unsupported ITI container for run %d, subject %s.', runIndex, num2str(subjectCode));
+end
+
+function objectId = getObjectId(E, decoded)
+objectOffset = strcmp(decoded.stimSet, 'set2') * 8;
+objectId = E.assignment.objectToNodes(decoded.experimentNodeIndex + 1 + objectOffset);
 end
 
 function matrix = createShortestPathDistanceMatrix(adjM)
