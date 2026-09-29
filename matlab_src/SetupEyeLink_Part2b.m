@@ -18,6 +18,12 @@ E.eye.recording = false;
 E.eye.fileOpened = false;
 E.eye.fileTransferred = false;
 E.eye.shutdown = false;
+E.eye.requestedSampleRateHz = 1000;
+E.eye.actualSampleRateHz = NaN;
+E.eye.sampleRateVerified = false;
+E.eye.sampleRateVerificationStatus = 'NOT_VERIFIED';
+E.eye.trackerVersion = NaN;
+E.eye.trackerVersionString = '';
 E.eye.edfBaseName = makeEdfBaseName(E);
 E.eye.localEdfPath = fullfile(E.paths.dataDir, [E.eye.edfBaseName '.edf']);
 E.eye.defaults = EyelinkInitDefaults(E.screen.theWindow);
@@ -37,6 +43,17 @@ if Eyelink('OpenFile', E.eye.edfBaseName) ~= 0
     error('SetupEyeLink_Part2b:OpenFileFailed', 'EyeLink could not open EDF file %s.', E.eye.edfBaseName);
 end
 E.eye.fileOpened = true;
+
+if Eyelink('Command', 'sample_rate = %d', E.eye.requestedSampleRateHz) ~= 0
+    error('SetupEyeLink_Part2b:SampleRateCommandFailed', ...
+        'EyeLink rejected the requested sample rate (%d Hz).', E.eye.requestedSampleRateHz);
+end
+try
+    [E.eye.trackerVersion, versionText] = Eyelink('GetTrackerVersion');
+    E.eye.trackerVersionString = char(versionText);
+catch err
+    E.eye.trackerVersionError = err.message;
+end
 
 SendEyeLinkMessage_Part2b(E, 'EXPERIMENT_START %d', E.sbj.n);
 EyelinkDoTrackerSetup(E.eye.defaults);

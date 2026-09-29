@@ -11,7 +11,9 @@ testCase.applyFixture(matlab.unittest.fixtures.PathFixture(fullfile(testDir, 'he
 folder = testCase.applyFixture(matlab.unittest.fixtures.TemporaryFolderFixture);
 global PART2B_TEST_EYELINK
 PART2B_TEST_EYELINK = struct('initOk', 1, 'dummy', false, ...
-    'openStatus', 0, 'startStatus', 0, 'recordingStatus', 0, 'writeFile', true, ...
+    'openStatus', 0, 'startStatus', 0, 'recordingStatus', 0, ...
+    'sampleRateCommandStatus', 0, 'trackerVersion', 5, ...
+    'trackerVersionString', '1000 Plus', 'writeFile', true, ...
     'throwOnReceive', false, 'calibrations', 0);
 PART2B_TEST_EYELINK.calls = {};
 PART2B_TEST_EYELINK.messages = {};
@@ -39,6 +41,13 @@ verifyFalse(testCase, E.eye.fileTransferred);
 verifyEqual(testCase, E.eye.edfBaseName, 'P007A01');
 verifyEqual(testCase, PART2B_TEST_EYELINK.calibrations, 1);
 verifyTrue(testCase, any(strcmp(PART2B_TEST_EYELINK.messages, 'EXPERIMENT_START 7')));
+verifyEqual(testCase, E.eye.requestedSampleRateHz, 1000);
+verifyEqual(testCase, E.eye.trackerVersion, 5);
+verifyEqual(testCase, E.eye.trackerVersionString, '1000 Plus');
+commands = callNames();
+commandIndex = find(strcmp(commands, 'Command'), 1, 'last');
+verifyEqual(testCase, PART2B_TEST_EYELINK.calls{commandIndex}{2}, 'sample_rate = %d');
+verifyEqual(testCase, PART2B_TEST_EYELINK.calls{commandIndex}{3}, 1000);
 end
 
 function testAttemptIsEncodedInUniqueEdfName(testCase)

@@ -8,6 +8,12 @@ EdfFileName = repmat("", n, 1);
 if strlength(edfBaseName) > 0
     EdfFileName(:) = edfBaseName + ".edf";
 end
+RequestedSampleRateHz = repmat(trialField(E.eye, 'requestedSampleRateHz', NaN), n, 1);
+ActualSampleRateHz = repmat(trialField(E.eye, 'actualSampleRateHz', NaN), n, 1);
+SampleRateVerified = repmat(logical(trialField(E.eye, 'sampleRateVerified', false)), n, 1);
+SampleRateVerificationStatus = repmat(string(trialField(E.eye, 'sampleRateVerificationStatus', "NOT_VERIFIED")), n, 1);
+TrackerVersion = repmat(trialField(E.eye, 'trackerVersion', NaN), n, 1);
+TrackerVersionString = repmat(string(trialField(E.eye, 'trackerVersionString', "")), n, 1);
 Run = nan(n, 1);
 TrialIndex = nan(n, 1);
 TrialName = strings(n, 1);
@@ -55,7 +61,7 @@ for i = 1:n
     PresentationDeadlineSec(i) = trialField(t, 'presentation_deadline_secs', NaN);
 end
 
-T = table(Subject, EdfFileName, Run, TrialIndex, TrialName, Response, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec);
+T = table(Subject, EdfFileName, RequestedSampleRateHz, ActualSampleRateHz, SampleRateVerified, SampleRateVerificationStatus, TrackerVersion, TrackerVersionString, Run, TrialIndex, TrialName, Response, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec);
 end
 
 function value = trialField(t, fieldName, defaultValue)

@@ -42,6 +42,9 @@ if (~isfield(E.eye, 'fileTransferred') || ~E.eye.fileTransferred) && (~isfield(E
         if ~E.eye.fileTransferred
             E.eye.transferError = 'EDF transfer failed or the local file size does not match the transfer result.';
         end
+        if E.eye.fileTransferred
+            E = VerifyEdfSampleRate_Part2b(E);
+        end
     catch err
         E.eye.transferError = err.message;
     end
