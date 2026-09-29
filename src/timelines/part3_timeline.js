@@ -27,17 +27,23 @@ export function makePart3Timeline() {
     if (!Array.isArray(testLayouts) || testLayouts.length < 2) {
       throw new Error("[makePart3Timeline] Missing randomized Part III layout order.");
     }
-    const congrTrials = testLayouts.flatMap((layoutType) =>
-      [...(G.eCongrPairs ?? []), ...(G.eIncongrPairs ?? [])].map((pair) => ({
+    const congrTrials = testLayouts.flatMap((layoutType) => [
+      ...(G.eCongrPairs ?? []).map((pair) => ({
         layoutType,
         pair,
-      }))
-    );
+        congruency: "congruent",
+      })),
+      ...(G.eIncongrPairs ?? []).map((pair) => ({
+        layoutType,
+        pair,
+        congruency: "incongruent",
+      })),
+    ]);
     const appendCongrTrials = () => {
       tl.push(part3_congr_intro_trial);
       const orderedCongrTrials = CONFIG.randomize ? htools.shuffleArray([...congrTrials]) : congrTrials;
-      orderedCongrTrials.forEach(({ layoutType, pair }, trialIndex) => {
-        tl.push(createCongrTestTrial(trialIndex, pair, layoutType));
+      orderedCongrTrials.forEach(({ layoutType, pair, congruency }, trialIndex) => {
+        tl.push(createCongrTestTrial(trialIndex, pair, layoutType, congruency));
       });
     };
 

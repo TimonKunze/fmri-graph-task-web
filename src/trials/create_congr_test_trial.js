@@ -9,7 +9,12 @@ import { t } from "../state/participant.js";
 import { getCongrChoiceOrder } from "./congr_test_utils.js";
 
 
-export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.varType) {
+export function createCongrTestTrial(
+  tTrialI,
+  currentPair,
+  layoutType = CONFIG.varType,
+  congruency
+) {
 
   const path1SDPlongerPath2 = currentPair[0].length > currentPair[1].length;
   const secondStimSet = useSecondStimSet(layoutType);
@@ -101,6 +106,7 @@ export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.v
         pathpair_congrtest: currentPair,
         choice_switched_congrtest: choiceSwitched,
         displayed_pair_order_congrtest: choiceSwitched ? [1, 0] : [0, 1],
+        congruency,
         layout_type: layoutType,
         stim_set: getStimSet(layoutType),
       });

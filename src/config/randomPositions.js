@@ -111,19 +111,29 @@ async function fetchCsv(path) {
 }
 
 export async function loadGraphData() {
-  const [positionsCsvText, randomizationCsvText] = await Promise.all([
-    fetchCsv(PATHS.randomPositionsTable),
-    fetchCsv(PATHS.randomizationTable),
-  ]);
+  const randomizationCsvText = await fetchCsv(PATHS.randomizationTable);
+  const randomizationRows = parseCsvRows(randomizationCsvText);
+  const graphHexes = [
+    ...new Set(
+      randomizationRows
+        .map((row) => getFirstPresent(row, ["hex_string", "graph_hex"]))
+        .filter(Boolean)
+    ),
+  ];
 
-  const positionRows = parseCsvRows(await positionsCsvText);
-  const randomizationRows = parseCsvRows(await randomizationCsvText);
+  if (graphHexes.length === 0) {
+    throw new Error("[randomPositions] No graph hex found in randomization_table.csv.");
+  }
+
+  const positionRows = (
+    await Promise.all(graphHexes.map((graphHex) => fetchCsv(PATHS.randomPositionsTable(graphHex))))
+  ).flatMap((csvText) => parseCsvRows(csvText));
 
   const positionsByHex = parsePositionSetsByHex(positionRows);
   const graphDefinitions = parseGraphDefinitions(randomizationRows);
 
   if (Object.keys(positionsByHex).length === 0) {
-    throw new Error("[randomPositions] No graph_poss rows found in random_positions.csv.");
+    throw new Error("[randomPositions] No graph_poss rows found in random position files selected by graph hex.");
   }
 
   if (Object.keys(graphDefinitions).length === 0) {
