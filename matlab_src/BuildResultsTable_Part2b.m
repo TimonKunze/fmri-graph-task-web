@@ -19,6 +19,7 @@ TrialIndex = nan(n, 1);
 TrialName = strings(n, 1);
 Response = nan(n, 1);
 RT = nan(n, 1);
+ResponseTimestampSec = nan(n, 1);
 TimedOut = false(n, 1);
 RunSkipped = false(n, 1);
 TimestampSec = nan(n, 1);
@@ -57,6 +58,7 @@ for i = 1:n
     TrialName(i) = string(trialField(t, 'trial_name', ""));
     Response(i) = trialField(t, 'response', NaN);
     RT(i) = trialField(t, 'rt_seconds', NaN);
+    ResponseTimestampSec(i) = trialField(t, 'response_timestamp_sec', NaN);
     TimedOut(i) = logical(trialField(t, 'timed_out', false));
     RunSkipped(i) = logical(trialField(t, 'run_skipped', false));
     TimestampSec(i) = trialField(t, 'timestamp_sec', NaN);
@@ -89,7 +91,7 @@ for i = 1:n
     OnsetFromTaskStart(i) = trialField(t, 'onset_from_task_start', NaN);
 end
 
-T = table(Subject, EdfFileName, RequestedSampleRateHz, ActualSampleRateHz, SampleRateVerified, SampleRateVerificationStatus, TrackerVersion, TrackerVersionString, Run, TrialIndex, TrialName, Response, ResponseSide, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, ReferenceNode, LeftRawNode, RightRawNode, LeftGraphNode, RightGraphNode, LeftExperimentNode, RightExperimentNode, PathLengthLeft, PathLengthRight, LeftImageSrc, RightImageSrc, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec, OnsetFromTrigger, OnsetFromTaskStart);
+T = table(Subject, EdfFileName, RequestedSampleRateHz, ActualSampleRateHz, SampleRateVerified, SampleRateVerificationStatus, TrackerVersion, TrackerVersionString, Run, TrialIndex, TrialName, Response, ResponseSide, RT, ResponseTimestampSec, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, ReferenceNode, LeftRawNode, RightRawNode, LeftGraphNode, RightGraphNode, LeftExperimentNode, RightExperimentNode, PathLengthLeft, PathLengthRight, LeftImageSrc, RightImageSrc, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec, OnsetFromTrigger, OnsetFromTaskStart);
 end
 
 function value = trialField(t, fieldName, defaultValue)

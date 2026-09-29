@@ -1,4 +1,4 @@
-function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRun, runTimedOut] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo, runDeadlineSecs, stimulusDeadlineSecs)
+function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRun, runTimedOut, responseTimestampSecs] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo, runDeadlineSecs, stimulusDeadlineSecs)
 if nargin < 5
     runDeadlineSecs = Inf;
 end
@@ -9,6 +9,7 @@ response = NaN;
 rtSecs = NaN;
 choiceOnsetClock = '';
 runTimedOut = false;
+responseTimestampSecs = NaN;
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 leftRect = CenterRectOnPointd([0 0 220 220], E.screen.cx - 160, E.screen.cy);
 rightRect = CenterRectOnPointd([0 0 220 220], E.screen.cx + 160, E.screen.cy);
@@ -39,13 +40,14 @@ if isfield(E, 'debugmode') && E.debugmode
     end
     response = 1;
     responseSide = 'right';
-    rtSecs = 0.1;
+    responseTimestampSecs = choiceOnsetSecs + 0.1;
+    rtSecs = responseTimestampSecs - choiceOnsetSecs;
     skipRun = false;
     SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
     return;
 end
 
-startTime = GetSecs;
+startTime = choiceOnsetSecs;
 response = NaN;
 responseSide = '';
 rtSecs = NaN;
@@ -78,13 +80,15 @@ while true
         if keyCode(E.keys.left)
             response = 0;
             responseSide = 'left';
-            rtSecs = secs - startTime;
+            responseTimestampSecs = secs;
+            rtSecs = responseTimestampSecs - startTime;
             SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
             break;
         elseif keyCode(E.keys.right)
             response = 1;
             responseSide = 'right';
-            rtSecs = secs - startTime;
+            responseTimestampSecs = secs;
+            rtSecs = responseTimestampSecs - startTime;
             SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
             break;
         elseif keyCode(E.keys.escape)
