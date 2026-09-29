@@ -23,7 +23,7 @@ function getPart3NodeMapping(layoutType) {
   const graphNodes = experimentNodes.map((experimentNode) =>
     Number(assignment.experimentNodeToGraphNode?.[experimentNode] ?? experimentNode)
   );
-  const rawExperimentNodes = experimentNodes.map((experimentNode) => rawOffset + experimentNode);
+  const rawExperimentNodes = graphNodes.map((graphNode) => rawOffset + graphNode);
 
   return {
     experimentNodes,

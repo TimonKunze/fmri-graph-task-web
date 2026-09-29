@@ -206,7 +206,7 @@ E = resumeFixture(testCase);
 E = RunBlock_Part2b(E, 1, 3);
 choice = E.part2.trials{1};
 verifyEqual(testCase, choice.trial_name, 'part2_dual_stimulus_choice');
-verifyEqual(testCase, choice.reference_node_index, 1);
+verifyEqual(testCase, choice.reference_experiment_node_index, 1);
 verifyEqual(testCase, choice.path_lengths, [1 0]);
 verifyEqual(testCase, choice.correct_choice, 1);
 % Debug mode halves the fixture's 0.04-second preceding ITI.
@@ -218,7 +218,7 @@ function testResumeConsecutiveChoiceClearsReference(testCase)
 E = resumeFixture(testCase);
 E = RunBlock_Part2b(E, 1, 6);
 choice = E.part2.trials{1};
-verifyEmpty(testCase, choice.reference_node_index);
+verifyEmpty(testCase, choice.reference_experiment_node_index);
 verifyTrue(testCase, all(isnan(choice.path_lengths)));
 verifyTrue(testCase, isnan(choice.correct_choice));
 verifyEqual(testCase, choice.iti_seconds_previous, 0.05);

@@ -1,6 +1,9 @@
 import test from "node:test";
+import fs from "node:fs";
 import assert from "node:assert/strict";
 import {
+  getNodeMappingForStimSet,
+  getObjectNodeId,
   getRandomizationAssignment,
   getSubjectAssignment,
   loadRandomizationRows,
@@ -51,4 +54,30 @@ test("rejects malformed object assignments instead of using identity", () => {
     () => loadRandomizationRows(csvFor(JSON.stringify(participantMapping), "experiment_node_to_graph", "[0,1,2]")),
     /object_id_by_experiment_node as a permutation/
   );
+});
+
+test("derives raw experiment nodes from canonical graph nodes", () => {
+  loadRandomizationRows(csvFor(JSON.stringify(participantMapping)));
+  setSubjectAssignment(getRandomizationAssignment(1));
+  const mapping = getNodeMappingForStimSet("set2");
+  assert.deepEqual(mapping.graphNodes, participantMapping);
+  assert.deepEqual(mapping.rawExperimentNodes, participantMapping.map((node) => node + 8));
+});
+
+test("real randomization rows align graph, raw, object, and image indices", () => {
+  const csv = fs.readFileSync("public/config/randomization_table.csv", "utf8");
+  loadRandomizationRows(csv);
+  const assignment = getRandomizationAssignment(1);
+  setSubjectAssignment(assignment);
+
+  for (const setName of ["set1", "set2"]) {
+    const mapping = getNodeMappingForStimSet(setName);
+    const offset = setName === "set2" ? 8 : 0;
+    assert.deepEqual(mapping.rawExperimentNodes, mapping.graphNodes.map((node) => node + offset));
+    mapping.experimentNodes.forEach((experimentNode, index) => {
+      const objectId = assignment.objectToNodes[offset + experimentNode] + 1;
+      assert.equal(getObjectNodeId(setName, experimentNode), objectId);
+      assert.equal(mapping.graphNodes[index], assignment.experimentNodeToGraphNode[experimentNode]);
+    });
+  }
 });

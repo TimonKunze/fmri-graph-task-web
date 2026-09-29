@@ -81,7 +81,7 @@ export function createFmriPathChoiceTrial({
       trial_index: trialIndex,
       left_node_index: leftNodeIndex,
       right_node_index: rightNodeIndex,
-      reference_node_index: referenceNodeIndex,
+      reference_experiment_node_index: referenceNodeIndex,
       iti_seconds_previous: itiSecondsPrevious,
       path_length_left: leftPathLength,
       path_length_right: rightPathLength,
