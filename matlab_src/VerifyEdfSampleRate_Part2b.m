@@ -24,7 +24,28 @@ if ~isfinite(rate) || rate <= 0
     E.eye.sampleRateVerificationOutput = output; return;
 end
 E.eye.actualSampleRateHz = rate;
+E.eye.sampleRateVerificationOutput = output;
+
+requestedRate = NaN;
+if isfield(E.eye, 'requestedSampleRateHz')
+    requestedRate = double(E.eye.requestedSampleRateHz);
+end
+if ~isfinite(requestedRate) || requestedRate <= 0
+    E.eye.sampleRateVerificationStatus = 'REQUESTED_RATE_MISSING';
+    warning('VerifyEdfSampleRate_Part2b:RequestedRateMissing', ...
+        'EDF sample rate is %.3f Hz, but no valid requested rate is recorded.', rate);
+    return;
+end
+
+% Treat rates within half a hertz as the same nominal tracker setting.
+if abs(rate - requestedRate) > 0.5
+    E.eye.sampleRateVerified = false;
+    E.eye.sampleRateVerificationStatus = 'RATE_MISMATCH';
+    warning('VerifyEdfSampleRate_Part2b:RateMismatch', ...
+        'EDF sample rate is %.3f Hz; requested %.3f Hz.', rate, requestedRate);
+    return;
+end
+
 E.eye.sampleRateVerified = true;
 E.eye.sampleRateVerificationStatus = 'VERIFIED';
-E.eye.sampleRateVerificationOutput = output;
 end
