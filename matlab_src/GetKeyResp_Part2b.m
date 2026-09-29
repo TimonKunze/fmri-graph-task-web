@@ -1,16 +1,28 @@
-function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRun, runTimedOut] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo, runDeadlineSecs)
+function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRun, runTimedOut] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo, runDeadlineSecs, stimulusDeadlineSecs)
 if nargin < 5
     runDeadlineSecs = Inf;
 end
+if nargin < 6
+    stimulusDeadlineSecs = 0;
+end
+response = NaN;
+rtSecs = NaN;
+choiceOnsetClock = '';
 runTimedOut = false;
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 leftRect = CenterRectOnPointd([0 0 220 220], E.screen.cx - 160, E.screen.cy);
 rightRect = CenterRectOnPointd([0 0 220 220], E.screen.cx + 160, E.screen.cy);
 Screen('DrawTexture', E.screen.theWindow, leftTex, [], leftRect);
 Screen('DrawTexture', E.screen.theWindow, rightTex, [], rightRect);
-choiceOnsetSecs = Screen('Flip', E.screen.theWindow);
+[choiceOnsetSecs, skipRun, runTimedOut] = ...
+    FlipPreparedStimulus_Part2b(E, stimulusDeadlineSecs, runDeadlineSecs);
 if ~isfinite(choiceOnsetSecs)
-    choiceOnsetSecs = GetSecs;
+    if skipRun
+        responseSide = 'skip';
+    else
+        responseSide = 'run_timeout';
+    end
+    return;
 end
 choiceOnsetClock = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
 SendEyeLinkMessage_Part2b(E, 'CHOICE_ONSET %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1));

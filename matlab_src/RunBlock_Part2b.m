@@ -4,7 +4,9 @@ if nargin < 3 || isempty(startTrialIndex)
 end
 
 runItems = E.assignment.part2RawNodeRuns{runIndex};
-if startTrialIndex < 1 || startTrialIndex > numel(runItems)
+if ~isnumeric(startTrialIndex) || ~isscalar(startTrialIndex) || ...
+        ~isfinite(startTrialIndex) || startTrialIndex ~= floor(startTrialIndex) || ...
+        startTrialIndex < 1 || startTrialIndex > numel(runItems)
     error('RunBlock_Part2b:InvalidStartTrial', ...
         'Start trial %d is outside the valid range for run %d.', startTrialIndex, runIndex);
 end
@@ -26,8 +28,10 @@ runDeadlineSecs = GetSecs + E.times.runTimeoutSec;
 runTimedOut = false;
 SendEyeLinkMessage_Part2b(E, 'RUN_START %d', runIndex);
 runSkipped = false;
+pendingItiIndex = [];
+nextStimulusDeadlineSecs = 0;
 
-for trialIndex = 1:numel(runItems)
+for trialIndex = startTrialIndex:numel(runItems)
     runTimedOut = runTimedOut || GetSecs >= runDeadlineSecs;
     if runSkipped || runTimedOut
         break;
@@ -36,7 +40,14 @@ for trialIndex = 1:numel(runItems)
 
     if isnumeric(item) && isscalar(item)
         decoded = decodeFmriNode(item, size(adjM, 1), canonicalToExp, E);
-        [imageOnsetSecs, imageOnsetClock] = drawSingleImageTrial(E, decoded.imageTex);
+        [imageOnsetSecs, imageOnsetClock, runSkipped, runTimedOut] = ...
+            drawSingleImageTrial(E, decoded.imageTex, nextStimulusDeadlineSecs, runDeadlineSecs);
+        if ~isfinite(imageOnsetSecs)
+            break;
+        end
+        E = finishIti(E, pendingItiIndex, imageOnsetSecs);
+        pendingItiIndex = [];
+        nextStimulusDeadlineSecs = 0;
         SendEyeLinkMessage_Part2b(E, 'IMAGE_ONSET %d %d %d %d', runIndex, trialIndex, decoded.rawNode, decoded.graphNodeIndex);
         [runSkipped, runTimedOut] = waitSecsWithRunSkip(E, E.times.imagePresentationMs / 1000, runDeadlineSecs);
             E.part2.trials{end + 1} = struct( ...
@@ -68,19 +79,8 @@ for trialIndex = 1:numel(runItems)
         end
         if trialIndex < numel(runItems)
             itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, runIndex, itiIndex, E.sbj.n);
-            [itiOnsetSecs, itiOnsetClock] = drawFixationTrial(E);
-            SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', runIndex, trialIndex, round(itiSeconds * 1000));
-            [runSkipped, runTimedOut] = waitSecsWithRunSkip(E, itiSeconds, runDeadlineSecs);
-            E.part2.trials{end + 1} = struct( ...
-                'trial_name', 'part2_fmri_iti', ...
-                'part', 2, ...
-                'run_index', runIndex, ...
-                'trial_index', trialIndex, ...
-                'iti_seconds', itiSeconds, ...
-                'timestamp_sec', itiOnsetSecs, ...
-                'timestamp_rel_sec', itiOnsetSecs - E.begintime, ...
-                'timestamp_clock', itiOnsetClock, ...
-                'run_skipped', false);
+            [E, pendingItiIndex, nextStimulusDeadlineSecs] = ...
+                beginIti(E, runIndex, trialIndex, itiSeconds, false);
             previousItiSeconds = itiSeconds;
             itiIndex = itiIndex + 1;
         end
@@ -117,7 +117,14 @@ for trialIndex = 1:numel(runItems)
             'rightPathLength', rightPathLength, ...
             'correctChoice', correctChoice);
 
-        [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRunChoice, runTimedOut] = GetKeyResp_Part2b(E, leftNode.imageTex, rightNode.imageTex, trialInfo, runDeadlineSecs);
+        [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRunChoice, runTimedOut] = GetKeyResp_Part2b(E, leftNode.imageTex, rightNode.imageTex, trialInfo, runDeadlineSecs, nextStimulusDeadlineSecs);
+        if ~isfinite(choiceOnsetSecs)
+            runSkipped = skipRunChoice;
+            break;
+        end
+        E = finishIti(E, pendingItiIndex, choiceOnsetSecs);
+        pendingItiIndex = [];
+        nextStimulusDeadlineSecs = 0;
         E.part2.trials{end + 1} = struct( ...
             'trial_name', 'part2_dual_stimulus_choice', ...
             'part', 2, ...
@@ -162,29 +169,18 @@ for trialIndex = 1:numel(runItems)
         end
         if trialIndex < numel(runItems)
             itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, runIndex, itiIndex, E.sbj.n);
-            [itiOnsetSecs, itiOnsetClock] = drawFixationTrial(E);
-            SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', runIndex, trialIndex, round(itiSeconds * 1000));
-            [runSkipped, runTimedOut] = waitSecsWithRunSkip(E, itiSeconds, runDeadlineSecs);
-            E.part2.trials{end + 1} = struct( ...
-                'trial_name', 'part2_fmri_iti', ...
-                'part', 2, ...
-                'run_index', runIndex, ...
-                'trial_index', trialIndex, ...
-                'iti_seconds', itiSeconds, ...
-                'timestamp_sec', itiOnsetSecs, ...
-                'timestamp_rel_sec', itiOnsetSecs - E.begintime, ...
-                'timestamp_clock', itiOnsetClock, ...
-                'run_skipped', false);
-            if ~runTimedOut && isfield(E, 'part2') && isfield(E.part2, 'resultsMatNeedsFlush') && E.part2.resultsMatNeedsFlush
-                E = FlushResultsMat_Part2b(E);
-                E.part2.resultsMatNeedsFlush = false;
-            end
+            [E, pendingItiIndex, nextStimulusDeadlineSecs] = ...
+                beginIti(E, runIndex, trialIndex, itiSeconds, true);
             previousItiSeconds = itiSeconds;
             itiIndex = itiIndex + 1;
         end
     end
 end
 
+if runSkipped && ~isempty(pendingItiIndex)
+    E.part2.trials{pendingItiIndex}.run_skipped = true;
+    SendEyeLinkMessage_Part2b(E, 'RUN_SKIP %d', runIndex);
+end
 if runTimedOut
     % Clear the current stimulus before saving and returning to the run break.
     Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
@@ -267,17 +263,50 @@ for trialIndex = 1:(startTrialIndex - 1)
 end
 end
 
-function [vbl, clockStamp] = drawSingleImageTrial(E, imageTex)
+function [E, recordIndex, deadlineSecs] = beginIti(E, runIndex, trialIndex, itiSeconds, saveCheckpoint)
+[onsetSecs, onsetClock] = drawFixationTrial(E);
+deadlineSecs = onsetSecs + itiSeconds;
+SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', runIndex, trialIndex, round(itiSeconds * 1000));
+recordIndex = numel(E.part2.trials) + 1;
+% This record denotes ITI onset, not completion. Actual duration is filled
+% after the next stimulus flips; a checkpoint taken now keeps it as NaN.
+E.part2.trials{recordIndex} = struct( ...
+    'trial_name', 'part2_fmri_iti', 'part', 2, ...
+    'run_index', runIndex, 'trial_index', trialIndex, ...
+    'iti_seconds', itiSeconds, 'iti_deadline_sec', deadlineSecs, ...
+    'iti_actual_seconds', NaN, 'iti_lateness_seconds', NaN, ...
+    'checkpoint_save_seconds', NaN, ...
+    'timestamp_sec', onsetSecs, 'timestamp_rel_sec', onsetSecs - E.begintime, ...
+    'timestamp_clock', onsetClock, 'run_skipped', false);
+if saveCheckpoint
+    saveStartedSecs = GetSecs;
+    E = FlushResultsMat_Part2b(E);
+    E.part2.resultsMatNeedsFlush = false;
+    E.part2.trials{recordIndex}.checkpoint_save_seconds = GetSecs - saveStartedSecs;
+end
+end
+
+function E = finishIti(E, recordIndex, nextOnsetSecs)
+if isempty(recordIndex)
+    return;
+end
+iti = E.part2.trials{recordIndex};
+iti.iti_actual_seconds = nextOnsetSecs - iti.timestamp_sec;
+iti.iti_lateness_seconds = max(0, nextOnsetSecs - iti.iti_deadline_sec);
+E.part2.trials{recordIndex} = iti;
+end
+
+function [vbl, clockStamp, skipped, timedOut] = drawSingleImageTrial(E, imageTex, deadlineSecs, runDeadlineSecs)
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 imageWidth = 320;
 imageHeight = 320;
 rect = CenterRectOnPointd([0 0 imageWidth imageHeight], E.screen.cx, E.screen.cy);
 Screen('DrawTexture', E.screen.theWindow, imageTex, [], rect);
-vbl = Screen('Flip', E.screen.theWindow);
-if ~isfinite(vbl)
-    vbl = GetSecs;
+[vbl, skipped, timedOut] = FlipPreparedStimulus_Part2b(E, deadlineSecs, runDeadlineSecs);
+clockStamp = '';
+if isfinite(vbl)
+    clockStamp = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
 end
-clockStamp = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
 end
 
 function [vbl, clockStamp] = drawFixationTrial(E)

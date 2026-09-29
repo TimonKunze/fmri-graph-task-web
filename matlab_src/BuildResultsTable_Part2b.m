@@ -18,6 +18,10 @@ GraphNode = nan(n, 1);
 StimSet = strings(n, 1);
 LayoutType = strings(n, 1);
 CorrectChoice = nan(n, 1);
+ITIDeadlineSec = nan(n, 1);
+ITIActualSec = nan(n, 1);
+ITILatenessSec = nan(n, 1);
+CheckpointSaveSec = nan(n, 1);
 
 for i = 1:n
     t = trials{i};
@@ -36,9 +40,13 @@ for i = 1:n
     StimSet(i) = string(trialField(t, 'stim_set', ""));
     LayoutType(i) = string(trialField(t, 'layout_type', ""));
     CorrectChoice(i) = trialField(t, 'correct_choice', NaN);
+    ITIDeadlineSec(i) = trialField(t, 'iti_deadline_sec', NaN);
+    ITIActualSec(i) = trialField(t, 'iti_actual_seconds', NaN);
+    ITILatenessSec(i) = trialField(t, 'iti_lateness_seconds', NaN);
+    CheckpointSaveSec(i) = trialField(t, 'checkpoint_save_seconds', NaN);
 end
 
-T = table(Subject, Run, TrialIndex, TrialName, Response, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice);
+T = table(Subject, Run, TrialIndex, TrialName, Response, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec);
 end
 
 function value = trialField(t, fieldName, defaultValue)
