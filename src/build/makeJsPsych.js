@@ -22,10 +22,22 @@ export function makeJsPsych({ data_dir }) {
   let debugAdvanceHandler = null;
   let persistenceReady = false;
   let saveSequence = 0;
-  const sessionId = globalThis.crypto?.randomUUID?.() || `session_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  const sessionStartedAt = new Date();
+  const sessionId = globalThis.crypto?.randomUUID?.() || `session_${sessionStartedAt.getTime()}_${Math.random().toString(16).slice(2)}`;
+  const fileSessionId = sessionId.replace(/[^A-Za-z0-9]/g, "");
+
+  function makeSessionStamp() {
+    const yyyy = sessionStartedAt.getFullYear();
+    const mm = String(sessionStartedAt.getMonth() + 1).padStart(2, "0");
+    const dd = String(sessionStartedAt.getDate()).padStart(2, "0");
+    const hh = String(sessionStartedAt.getHours()).padStart(2, "0");
+    const min = String(sessionStartedAt.getMinutes()).padStart(2, "0");
+    const ss = String(sessionStartedAt.getSeconds()).padStart(2, "0");
+    return `${yyyy}${mm}${dd}_${hh}${min}${ss}`;
+  }
 
   function makeShortDate() {
-    const now = new Date();
+    const now = sessionStartedAt;
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
@@ -92,7 +104,7 @@ export function makeJsPsych({ data_dir }) {
     const participantSetup = getParticipantSetup();
     const subjectCode = participantSetup?.subjectCode ?? "unknown";
     const dateString = makeShortDate();
-    const file_name = `subj${subjectCode}_p${part}_${dateString}.jsonl`;
+    const file_name = `subj${subjectCode}_p${part}_${dateString}_${makeSessionStamp()}_${fileSessionId}.jsonl`;
     return save_data(dataJsonl, data_dir, file_name).catch((error) => {
       console.error("[save_data] Failed to save trial data:", error);
     });
