@@ -20,6 +20,7 @@ function computePart({ part1, part2, part3 }) {
 export function makeJsPsych({ data_dir }) {
   const part = computePart(CONFIG);
   let debugAdvanceHandler = null;
+  let persistenceReady = false;
 
   function makeShortDate() {
     const now = new Date();
@@ -71,16 +72,33 @@ export function makeJsPsych({ data_dir }) {
     },
 
     on_data_update: (data) => {
-      const dataJsonl = JSON.stringify(data) + "\n";
-      const participantSetup = getParticipantSetup();
-      const subjectCode = participantSetup?.subjectCode ?? "unknown";
-      const dateString = makeShortDate();
-      const file_name = `subj${subjectCode}_p${part}_${dateString}.jsonl`;
-      save_data(dataJsonl, data_dir, file_name).catch((error) => {
-        console.error("[save_data] Failed to save trial data:", error);
-      });
+      if (!persistenceReady) return;
+      persistData(data);
     },
   });
+
+
+  function persistData(data) {
+    const dataJsonl = JSON.stringify(data) + "\n";
+    const participantSetup = getParticipantSetup();
+    const subjectCode = participantSetup?.subjectCode ?? "unknown";
+    const dateString = makeShortDate();
+    const file_name = `subj${subjectCode}_p${part}_${dateString}.jsonl`;
+    return save_data(dataJsonl, data_dir, file_name).catch((error) => {
+      console.error("[save_data] Failed to save trial data:", error);
+    });
+  }
+
+  // Participant setup is collected in a short bootstrap run.  Keep those
+  // records out of the persisted stream until the assignment and session
+  // properties have been added to every existing record.
+  jsPsych.flushPendingData = async () => {
+    const records = jsPsych.data.get().values();
+    persistenceReady = true;
+    for (const record of records) {
+      await persistData(record);
+    }
+  };
 
   return jsPsych;
 }

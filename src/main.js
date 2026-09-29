@@ -190,6 +190,7 @@ async function bootstrap() {
   refreshGraphState();
   refreshDesign();
   addExperimentProperties();
+  await jsPsych.flushPendingData();
   logDebugStimulusMapping();
 
   console.log("CSV mapping check: stimulus paths", {
