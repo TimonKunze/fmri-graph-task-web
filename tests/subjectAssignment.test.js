@@ -9,10 +9,10 @@ import {
 
 const participantMapping = [5, 2, 0, 6, 1, 4, 7, 3];
 
-function csvFor(mappingCell, header = "experiment_node_to_graph") {
+function csvFor(mappingCell, header = "experiment_node_to_graph", objectMapping = "[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]") {
   return [
     `subject_code,${header},object_id_by_experiment_node`,
-    `1,"${mappingCell}","[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]"`,
+    `1,"${mappingCell}","${objectMapping}"`,
   ].join("\n");
 }
 
@@ -44,4 +44,11 @@ test("rejects malformed or non-permutation mappings instead of using identity", 
       /experiment_node_to_graph as a permutation/
     );
   }
+});
+
+test("rejects malformed object assignments instead of using identity", () => {
+  assert.throws(
+    () => loadRandomizationRows(csvFor(JSON.stringify(participantMapping), "experiment_node_to_graph", "[0,1,2]")),
+    /object_id_by_experiment_node as a permutation/
+  );
 });

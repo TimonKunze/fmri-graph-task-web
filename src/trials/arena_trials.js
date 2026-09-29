@@ -393,7 +393,8 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
       .last(1)
       .values()[0];
 
-    return lastArenaTrial?.connected_pos_spatialpos_rel ?? [];
+    return (lastArenaTrial?.connected_pos_spatialpos_rel ?? [])
+      .map((edge) => [...edge]);
   }
 
   return {

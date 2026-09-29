@@ -4,22 +4,30 @@ import { parseCsvRows } from "../utils/csv.js";
 const IDENTITY_NODE_TO_GRAPH = [0, 1, 2, 3, 4, 5, 6, 7];
 const IDENTITY_OBJECT_TO_NODES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
-function parseExperimentNodeToGraphNode(row) {
-  const mapping = parseNumberArray(row?.experiment_node_to_graph);
+function parsePermutation(row, fieldName, expectedLength, description) {
+  const mapping = parseNumberArray(row?.[fieldName]);
 
   if (
     !Array.isArray(mapping) ||
-    mapping.length !== IDENTITY_NODE_TO_GRAPH.length ||
-    mapping.some((value) => !Number.isInteger(value) || value < 0 || value >= IDENTITY_NODE_TO_GRAPH.length) ||
-    new Set(mapping).size !== IDENTITY_NODE_TO_GRAPH.length
+    mapping.length !== expectedLength ||
+    mapping.some((value) => !Number.isInteger(value) || value < 0 || value >= expectedLength) ||
+    new Set(mapping).size !== expectedLength
   ) {
     throw new Error(
       `Randomization row for subject ${row?.subject_code ?? "unknown"} must contain ` +
-      "experiment_node_to_graph as a permutation of graph nodes 0..7."
+      `${fieldName} as a permutation of ${description}.`
     );
   }
 
   return mapping;
+}
+
+function parseExperimentNodeToGraphNode(row) {
+  return parsePermutation(row, "experiment_node_to_graph", 8, "graph nodes 0..7");
+}
+
+function parseObjectToNodes(row) {
+  return parsePermutation(row, "object_id_by_experiment_node", 16, "object IDs 0..15");
 }
 
 const currentAssignment = {
@@ -111,7 +119,7 @@ export function loadRandomizationRows(csvText) {
         subjectCode,
         randomizationRow: row,
         experimentNodeToGraphNode: parseExperimentNodeToGraphNode(row),
-        objectToNodes: parseNumberArray(row.object_id_by_experiment_node) ?? [...IDENTITY_OBJECT_TO_NODES],
+        objectToNodes: parseObjectToNodes(row),
         part1LayoutOrder: parseNumberArray(row.part1_layout_order),
         part3LayoutOrder: parseNumberArray(row.part3_layout_order),
         part2RawNodeBlocks: parseNestedArray(row.part2_raw_node_blocks),
@@ -130,12 +138,13 @@ export function getRandomizationAssignment(subjNb) {
 
 export function setSubjectAssignment(assignment) {
   const experimentNodeToGraphNode = parseExperimentNodeToGraphNode(assignment?.randomizationRow);
+  const objectToNodes = parseObjectToNodes(assignment?.randomizationRow);
   currentAssignment.subjectCode = assignment?.subjectCode ?? null;
   currentAssignment.randomizationRow = assignment?.randomizationRow
     ? { ...assignment.randomizationRow }
     : null;
   currentAssignment.experimentNodeToGraphNode = [...experimentNodeToGraphNode];
-  currentAssignment.objectToNodes = [...(assignment?.objectToNodes ?? IDENTITY_OBJECT_TO_NODES)];
+  currentAssignment.objectToNodes = [...objectToNodes];
   currentAssignment.part1LayoutOrder = assignment?.part1LayoutOrder
     ? [...assignment.part1LayoutOrder]
     : null;
