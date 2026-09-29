@@ -44,6 +44,8 @@ if startRun > numel(E.assignment.part2RawNodeRuns)
 end
 
 for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
+    E.part2.run(runIndex).triggerSecs = triggerSecs;
+    E.part2.run(runIndex).taskStartSecs = GetSecs;
     if runIndex == startRun
         E = RunBlock_Part2b(E, runIndex, startTrial);
     else

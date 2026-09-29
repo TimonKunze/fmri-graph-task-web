@@ -47,6 +47,8 @@ ITILatenessSec = nan(n, 1);
 CheckpointSaveSec = nan(n, 1);
 ActualDurationMs = nan(n, 1);
 PresentationDeadlineSec = nan(n, 1);
+OnsetFromTrigger = nan(n, 1);
+OnsetFromTaskStart = nan(n, 1);
 
 for i = 1:n
     t = trials{i};
@@ -83,9 +85,11 @@ for i = 1:n
     CheckpointSaveSec(i) = trialField(t, 'checkpoint_save_seconds', NaN);
     ActualDurationMs(i) = trialField(t, 'actual_duration_ms', NaN);
     PresentationDeadlineSec(i) = trialField(t, 'presentation_deadline_secs', NaN);
+    OnsetFromTrigger(i) = trialField(t, 'onset_from_trigger', NaN);
+    OnsetFromTaskStart(i) = trialField(t, 'onset_from_task_start', NaN);
 end
 
-T = table(Subject, EdfFileName, RequestedSampleRateHz, ActualSampleRateHz, SampleRateVerified, SampleRateVerificationStatus, TrackerVersion, TrackerVersionString, Run, TrialIndex, TrialName, Response, ResponseSide, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, ReferenceNode, LeftRawNode, RightRawNode, LeftGraphNode, RightGraphNode, LeftExperimentNode, RightExperimentNode, PathLengthLeft, PathLengthRight, LeftImageSrc, RightImageSrc, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec);
+T = table(Subject, EdfFileName, RequestedSampleRateHz, ActualSampleRateHz, SampleRateVerified, SampleRateVerificationStatus, TrackerVersion, TrackerVersionString, Run, TrialIndex, TrialName, Response, ResponseSide, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, ReferenceNode, LeftRawNode, RightRawNode, LeftGraphNode, RightGraphNode, LeftExperimentNode, RightExperimentNode, PathLengthLeft, PathLengthRight, LeftImageSrc, RightImageSrc, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec, OnsetFromTrigger, OnsetFromTaskStart);
 end
 
 function value = trialField(t, fieldName, defaultValue)
