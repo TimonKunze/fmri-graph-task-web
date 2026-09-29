@@ -12,8 +12,9 @@ Screen('Flip', E.screen.theWindow);
 E.part2.trials = {};
 E.part2.resultsMatNeedsFlush = false;
 
-% Start recording before scanner triggers so every pulse is represented in
-% both the EDF and the behavioral timing log.
+% Start recording before the scanner trigger so the trigger and subsequent
+% scanner-period samples are represented in the EDF. The behavioral log
+% stores one trigger timestamp per run.
 E = StartEyeLinkRecording_Part2b(E);
 E.part2.scannerPulses = [];
 
