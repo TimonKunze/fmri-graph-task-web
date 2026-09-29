@@ -6,6 +6,7 @@ import { CONFIG } from "../config.js";
 import { SIZES } from "../config/sizes.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
 import { t } from "../state/participant.js";
+import { getCongrChoiceOrder } from "./congr_test_utils.js";
 
 
 export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.varType) {
@@ -44,12 +45,12 @@ export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.v
     required: true,
     stimulus: "",
     choices: function() {
-      const choices = [choice1, choice2];
-      choiceSwitched = CONFIG.randomize ? Math.random() < 0.5 : false;
-      if (choiceSwitched) {
-        choices.reverse();
-      }
-      return choices;
+      const ordered = getCongrChoiceOrder(
+        [choice1, choice2],
+        CONFIG.randomize
+      );
+      choiceSwitched = ordered.choiceSwitched;
+      return ordered.choices;
     },
     save_trial_parameters: {
       choices: true, // Save randomly-selected button order and post trial gap duration to trial data
@@ -70,7 +71,7 @@ export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.v
     on_finish: function(data) {
       // Score response as correct or incorrect and save
       if (choiceSwitched) {
-        currentPair = currentPair.reverse()
+        currentPair = [...currentPair].reverse();
         if (data.response == 0 && path1SDPlongerPath2) {
           data.correct = true;
         } else if (data.response == 1 && !path1SDPlongerPath2) {
@@ -91,11 +92,15 @@ export function createCongrTestTrial(tTrialI, currentPair, layoutType = CONFIG.v
       // console.log("correct", data.correct)
       // console.log("choiceSwitched", choiceSwitched)
 
-      // Save data
+      // Save the pair in displayed order and record the button permutation
+      // explicitly. jsPsych cannot reliably serialize an evaluated choices
+      // function through save_trial_parameters.
       jsPsych.data.addDataToLastTrial({
         trial_name: "test_congr",
         trial_ind_congrtest: tTrialI,
         pathpair_congrtest: currentPair,
+        choice_switched_congrtest: choiceSwitched,
+        displayed_pair_order_congrtest: choiceSwitched ? [1, 0] : [0, 1],
         layout_type: layoutType,
         stim_set: getStimSet(layoutType),
       });
