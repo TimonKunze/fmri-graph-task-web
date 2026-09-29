@@ -59,11 +59,11 @@ const ITEMS = {
 
 const INTRO = {
   en:
-    "The following statements ask you about your spatial and navigational abilities, preferences, and experiences. After each statement, you should circle a number to indicate your level of agreement with the statement. Circle “1” if you strongly agree that the statement applies to you, “7” if you strongly disagree, or some number in between if your agreement is intermediate. Circle “4” if you neither agree nor disagree.",
+    "The following statements ask you about your spatial and navigational abilities, preferences, and experiences. After each statement, you should mark a number to indicate your level of agreement with the statement. Mark “1” if you strongly agree that the statement applies to you, “7” if you strongly disagree, or some number in between if your agreement is intermediate. Mark “4” if you neither agree nor disagree.",
   it:
-    "Le affermazioni seguenti riguardano le tue abilita', preferenze ed esperienze spaziali e di orientamento. Dopo ogni affermazione, dovresti cerchiare un numero per indicare il tuo livello di accordo con l'affermazione. Cerchia “1” se sei fortemente d'accordo che l'affermazione ti si applica, “7” se sei fortemente in disaccordo, oppure un numero intermedio se il tuo accordo e' intermedio. Cerchia “4” se non sei ne' d'accordo ne' in disaccordo.",
+    "Le affermazioni seguenti riguardano le tue abilita', preferenze ed esperienze spaziali e di orientamento. Dopo ogni affermazione, dovresti segnare un numero per indicare il tuo livello di accordo con l'affermazione. Segna “1” se sei fortemente d'accordo che l'affermazione ti si applica, “7” se sei fortemente in disaccordo, oppure un numero intermedio se il tuo accordo e' intermedio. Segna “4” se non sei ne' d'accordo ne' in disaccordo.",
   de:
-    "Die folgenden Aussagen betreffen deine raeumlichen und navigationsbezogenen Faehigkeiten, Vorlieben und Erfahrungen. Nach jeder Aussage solltest du eine Zahl einkreisen, um dein Zustimmungsniveau anzugeben. Kreise „1“ ein, wenn du voll und ganz zustimmst, dass die Aussage auf dich zutrifft, „7“, wenn du voll und ganz nicht zustimmst, oder eine Zahl dazwischen, wenn deine Zustimmung dazwischen liegt. Kreise „4“ ein, wenn du weder zustimmst noch nicht zustimmst.",
+    "Die folgenden Aussagen betreffen deine raeumlichen und navigationsbezogenen Faehigkeiten, Vorlieben und Erfahrungen. Nach jeder Aussage solltest du eine Zahl markieren, um dein Zustimmungsniveau anzugeben. Markiere „1“, wenn du voll und ganz zustimmst, dass die Aussage auf dich zutrifft, „7“, wenn du voll und ganz nicht zustimmst, oder eine Zahl dazwischen, wenn deine Zustimmung dazwischen liegt. Markiere „4“, wenn du weder zustimmst noch nicht zustimmst.",
 };
 
 const OPTIONS = [1, 2, 3, 4, 5, 6, 7];

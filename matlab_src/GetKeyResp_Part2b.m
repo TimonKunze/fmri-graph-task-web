@@ -1,4 +1,8 @@
-function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRun] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo)
+function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRun, runTimedOut] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo, runDeadlineSecs)
+if nargin < 5
+    runDeadlineSecs = Inf;
+end
+runTimedOut = false;
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 leftRect = CenterRectOnPointd([0 0 220 220], E.screen.cx - 160, E.screen.cy);
 rightRect = CenterRectOnPointd([0 0 220 220], E.screen.cx + 160, E.screen.cy);
@@ -12,7 +16,15 @@ choiceOnsetClock = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
 SendEyeLinkMessage_Part2b(E, 'CHOICE_ONSET %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1));
 
 if isfield(E, 'debugmode') && E.debugmode
-    WaitSecs(0.1);
+    WaitSecs(max(0, min(0.1, runDeadlineSecs - GetSecs)));
+    if GetSecs >= runDeadlineSecs
+        response = NaN;
+        responseSide = 'run_timeout';
+        rtSecs = max(0, runDeadlineSecs - choiceOnsetSecs);
+        skipRun = false;
+        runTimedOut = true;
+        return;
+    end
     response = 1;
     responseSide = 'right';
     rtSecs = 0.1;
@@ -30,6 +42,12 @@ timeoutAt = startTime + E.times.choiceTimeoutSec;
 
 while true
     nowSecs = GetSecs;
+    if nowSecs >= runDeadlineSecs
+        responseSide = 'run_timeout';
+        rtSecs = max(0, runDeadlineSecs - startTime);
+        runTimedOut = true;
+        break;
+    end
     if nowSecs >= timeoutAt
         responseSide = 'timeout';
         rtSecs = E.times.choiceTimeoutSec;
@@ -67,6 +85,10 @@ while true
 end
 
 while true
+    if GetSecs >= runDeadlineSecs
+        runTimedOut = true;
+        break;
+    end
     [~, ~, keyCode] = KbCheck;
     if ~any(keyCode)
         break;

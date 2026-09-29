@@ -8,4 +8,5 @@ E.times.scannerOffsetSec = 12;
 E.times.triggerKey = KbName('5%');
 E.times.continueKey = KbName('space');
 E.times.choiceTimeoutSec = 20;
+E.times.runTimeoutSec = 30 * 60; % Active run time; excludes breaks and calibration.
 end

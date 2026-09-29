@@ -4,9 +4,9 @@ import { SIZES } from "./config/sizes.js";
 import { parseActivePart } from "./utils/part.js";
 
 const baseConfig = {
-  mode: "prod", // "dev" | "prod"
+  mode: "dev", // "dev" | "prod"
 
-  activePart: "1", // 1 | 2a | 2b | 3
+  activePart: "3", // 1 | 2a | 2b | 3
 
   defaultLanguage: "en", // "en" | "it" | "de"
 
