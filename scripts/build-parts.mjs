@@ -39,6 +39,7 @@ for (const build of builds) {
       stdio: "inherit",
       env: {
         ...process.env,
+        VITE_MODE: "prod",
         VITE_ACTIVE_PART: build.part,
         VITE_BASE_PATH: build.base,
         VITE_SAVE_DATA_URL: saveDataUrl,

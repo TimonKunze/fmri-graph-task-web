@@ -47,7 +47,11 @@ end
 row = rows{matchingRows(1)};
 E.assignment.subjectCode = E.sbj.n;
 E.assignment.experimentNodeToGraphNode = double(parseJsonArray(getCellByName(row, headers, 'experiment_node_to_graph')));
+validatePermutation(E.assignment.experimentNodeToGraphNode, 8, ...
+    'experiment_node_to_graph');
 E.assignment.objectToNodes = double(parseJsonArray(getCellByName(row, headers, 'object_id_by_experiment_node')));
+validatePermutation(E.assignment.objectToNodes, 16, ...
+    'object_id_by_experiment_node');
 E.assignment.part1LayoutOrder = double(parseJsonArray(getCellByName(row, headers, 'part1_layout_order')));
 E.assignment.part3LayoutOrder = double(parseJsonArray(getCellByName(row, headers, 'part3_layout_order')));
 E.assignment.part2RawNodeRuns = parseJsonArray(getCellByName(row, headers, 'part2_raw_node_blocks'));
@@ -55,8 +59,19 @@ E.assignment.part2ItiTimesFmri = parseJsonArray(getCellByName(row, headers, 'par
 E.assignment.graphHex = getCellByName(row, headers, 'graph_hex');
 E.assignment.adjM = double(parseAdjacencyMatrix(getCellByName(row, headers, 'adj_m')));
 
-E.G.adjM = E.assignment.adjM;
+idx = E.assignment.experimentNodeToGraphNode + 1;
+E.G.adjM = E.assignment.adjM(idx, idx);
 E.G.nbNodes = size(E.G.adjM, 1);
+end
+
+function validatePermutation(value, expectedLength, fieldName)
+if ~isvector(value) || numel(value) ~= expectedLength || ...
+        any(~isfinite(value)) || any(value ~= floor(value)) || ...
+        numel(unique(value)) ~= expectedLength || ...
+        ~isequal(sort(value(:))', 0:(expectedLength - 1))
+    error('LoadLists_Part2b:InvalidAssignment', ...
+        '%s must be a permutation of 0..%d.', fieldName, expectedLength - 1);
+end
 end
 
 function value = getCellByName(row, headers, name)

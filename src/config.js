@@ -3,8 +3,13 @@ import { PATHS } from "./config/paths.js";
 import { SIZES } from "./config/sizes.js";
 import { parseActivePart } from "./utils/part.js";
 
+const configuredMode = import.meta.env?.VITE_MODE ?? "dev";
+if (!["dev", "prod"].includes(configuredMode)) {
+  throw new Error(`VITE_MODE must be "dev" or "prod". Received: ${configuredMode}`);
+}
+
 const baseConfig = {
-  mode: "dev", // "dev" | "prod"
+  mode: configuredMode, // "dev" | "prod"
 
   activePart: "3", // 1 | 2a | 2b | 3
 

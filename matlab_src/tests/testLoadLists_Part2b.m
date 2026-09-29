@@ -58,7 +58,9 @@ for rowIndex = indices
     assertEqual(testCase, numel(entries), n * n, diagnostic);
     expectedAdjacency = reshape(entries, n, n).';
     verifyEqual(testCase, E.assignment.adjM, expectedAdjacency, diagnostic);
-    verifyEqual(testCase, E.G.adjM, expectedAdjacency, diagnostic);
+    idx = E.assignment.experimentNodeToGraphNode + 1;
+    expectedExperimentAdjacency = expectedAdjacency(idx, idx);
+    verifyEqual(testCase, E.G.adjM, expectedExperimentAdjacency, diagnostic);
     verifyEqual(testCase, E.G.nbNodes, n, diagnostic);
 end
 end
@@ -68,17 +70,20 @@ rows = fixtureRows();
 writeFixture(testCase, rows);
 E = loadSubject(testCase, 42);
 verifyEqual(testCase, E.assignment.subjectCode, 42);
-verifyEqual(testCase, E.assignment.experimentNodeToGraphNode, [1; 0]);
-verifyEqual(testCase, E.assignment.objectToNodes, [3; 2; 1; 0]);
+verifyEqual(testCase, E.assignment.experimentNodeToGraphNode, [1; 0; 2; 3; 4; 5; 6; 7]);
+verifyEqual(testCase, E.assignment.objectToNodes, [3; 2; 1; 0; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15]);
 verifyEqual(testCase, E.assignment.part1LayoutOrder, [1; 0]);
 verifyEqual(testCase, E.assignment.part3LayoutOrder, [0; 1]);
 verifyEqual(testCase, E.assignment.part2RawNodeRuns, ...
     jsondecode('[[0,[0,1],1],[1,[1,0],0]]'));
 verifyEqual(testCase, E.assignment.part2ItiTimesFmri, [0.2 0.3; 0.4 0.5]);
 % Deliberately asymmetric to detect accidental matrix transposition.
-verifyEqual(testCase, E.assignment.adjM, [0 1; 0 0]);
-verifyEqual(testCase, E.G.adjM, [0 1; 0 0]);
-verifyEqual(testCase, E.G.nbNodes, 2);
+expectedAdjacency = zeros(8);
+expectedAdjacency(1, 2) = 1;
+verifyEqual(testCase, E.assignment.adjM, expectedAdjacency);
+idx = E.assignment.experimentNodeToGraphNode + 1;
+verifyEqual(testCase, E.G.adjM, expectedAdjacency(idx, idx));
+verifyEqual(testCase, E.G.nbNodes, 8);
 % A comma and escaped quotes exercise CSV unquoting, independently of JSON.
 verifyEqual(testCase, E.assignment.graphHex, 'fixture,"quoted"');
 end
@@ -100,6 +105,20 @@ rows = fixtureRows();
 rows.subject_code = [];
 writeFixture(testCase, rows);
 verifyError(testCase, @() loadSubject(testCase, 42), 'LoadLists_Part2b:MissingHeader');
+end
+
+function testInvalidExperimentGraphMappingIsRejected(testCase)
+rows = fixtureRows();
+rows.experiment_node_to_graph(2) = {'[0,1,2,3,4,5,6,6]'};
+writeFixture(testCase, rows);
+verifyError(testCase, @() loadSubject(testCase, 42), 'LoadLists_Part2b:InvalidAssignment');
+end
+
+function testInvalidObjectAssignmentIsRejected(testCase)
+rows = fixtureRows();
+rows.object_id_by_experiment_node(2) = {'[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,14]'};
+writeFixture(testCase, rows);
+verifyError(testCase, @() loadSubject(testCase, 42), 'LoadLists_Part2b:InvalidAssignment');
 end
 
 function testMissingAssignmentColumnIsRejected(testCase)
@@ -126,11 +145,13 @@ headers = {'subject_code', 'experiment_node_to_graph', ...
     'object_id_by_experiment_node', 'part1_layout_order', ...
     'part3_layout_order', 'part2_raw_node_blocks', ...
     'part2_iti_times_fmri', 'graph_hex', 'adj_m'};
+adjFirstText = sprintf('[[0 0 0 0 0 0 0 0]\n [1 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]]';
+adjSecondText = sprintf('[[0 1 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]\n [0 0 0 0 0 0 0 0]]';
 rows = cell2table({ ...
-    '7', '[0,1]', '[0,1,2,3]', '[0,1]', '[1,0]', ...
-    '[[1,[1,0],0]]', '[[0.8,0.9]]', 'first', sprintf('[[0 0]\n [1 0]]'); ...
-    '42', '[1,0]', '[3,2,1,0]', '[1,0]', '[0,1]', ...
+    '7', '[0,1,2,3,4,5,6,7]', '[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]', '[0,1]', '[1,0]', ...
+    '[[1,[1,0],0]]', '[[0.8,0.9]]', 'first', adjFirstText; ...
+    '42', '[1,0,2,3,4,5,6,7]', '[3,2,1,0,4,5,6,7,8,9,10,11,12,13,14,15]', '[1,0]', '[0,1]', ...
     '[[0,[0,1],1],[1,[1,0],0]]', '[[0.2,0.3],[0.4,0.5]]', ...
-    'fixture,"quoted"', sprintf('[[0 1]\n [0 0]]')}, ...
+    'fixture,"quoted"', adjSecondText}, ...
     'VariableNames', headers);
 end

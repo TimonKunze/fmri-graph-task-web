@@ -3,14 +3,16 @@
 
 This project uses vite, start a start a server with `npm run dev`.
 
+Local Vite builds default to development mode. `npm run build:parts` explicitly builds all deployed parts in production mode.
+
 ## Randomization Info
 
-- The participant-specific randomization is defined in `public/config/randomization_table.csv`. 
-    - Each row corresponds to one `subject_code`. 
-    - The column `experiment_node_to_graph_node` specifies, for the 8 experiment nodes shown in the task, which underlying graph node (`0..7`) each experiment node should behave like. 
-    - The column `object_id_by_experiment_node` specifies which object image id should be shown at each experiment node: the first 8 entries belong to the rotational layout (`set1`) and the next 8 entries belong to the unconstrained layout (`set2`). 
-    - The column `part1_layout_order` determines the order of the Part I learning layouts (`0 = rotational`, `1 = unconstrained`), and `part3_layout_order` does the same for Part III. 
-    - Finally, `part2_raw_node_blocks` defines the Part II trial blocks using raw node codes: `0..7` always refer to graph nodes `0..7` in the rotational layout, and `8..15` refer to graph nodes `0..7` in the unconstrained layout. 
+- The participant-specific randomization is defined in `public/config/randomization_table.csv`.
+    - Each row corresponds to one `subject_code`.
+    - The column `experiment_node_to_graph` specifies, for the 8 experiment nodes shown in the task, which underlying graph node (`0..7`) each experiment node should behave like.
+    - The column `object_id_by_experiment_node` specifies which object image id should be shown at each experiment node: the first 8 entries belong to the rotational layout (`set1`) and the next 8 entries belong to the unconstrained layout (`set2`).
+    - The column `part1_layout_order` determines the order of the Part I learning layouts (`0 = rotational`, `1 = unconstrained`), and `part3_layout_order` does the same for Part III.
+    - Finally, `part2_raw_node_blocks` defines the Part II trial blocks using raw node codes: `0..7` always refer to graph nodes `0..7` in the rotational layout, and `8..15` refer to graph nodes `0..7` in the unconstrained layout.
     - Internally, these raw codes are decoded into a stimulus set, a graph node, and the corresponding experiment node before the trial is shown.
 
 ### How To Read One Randomization_table.csv Row
@@ -21,7 +23,7 @@ The most important distinction is between `experiment nodes`, `graph nodes`, `ob
 - `object_ids` determine which image file is shown at a given experiment node and layout.
 - `raw experiment nodes` are only used in Part II. They are the codes `0..15` from `part2_raw_node_blocks`, where `0..7` refer to the rotational layout and `8..15` refer to the unconstrained layout.
 
-For example, if: `experiment_node_to_graph_node = [6,4,7,5,1,0,2,3]` then:
+For example, if: `experiment_node_to_graph = [6,4,7,5,1,0,2,3]` then:
 - experiment node `0` behaves like graph node `6`
 - experiment node `1` behaves like graph node `4`
 - experiment node `2` behaves like graph node `7`
@@ -46,7 +48,7 @@ So:
 - raw experiment node `3` means graph node `3` in the rotational layout
 - raw experiment node `11` means graph node `3` in the unconstrained layout
 
-The code then converts that graph node into the corresponding experiment node for the participant by using `experiment_node_to_graph_node`.
+The code then converts that graph node into the corresponding experiment node for the participant by using `experiment_node_to_graph`.
 
 ## Saved Data Overview
 

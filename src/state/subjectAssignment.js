@@ -4,6 +4,24 @@ import { parseCsvRows } from "../utils/csv.js";
 const IDENTITY_NODE_TO_GRAPH = [0, 1, 2, 3, 4, 5, 6, 7];
 const IDENTITY_OBJECT_TO_NODES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
+function parseExperimentNodeToGraphNode(row) {
+  const mapping = parseNumberArray(row?.experiment_node_to_graph);
+
+  if (
+    !Array.isArray(mapping) ||
+    mapping.length !== IDENTITY_NODE_TO_GRAPH.length ||
+    mapping.some((value) => !Number.isInteger(value) || value < 0 || value >= IDENTITY_NODE_TO_GRAPH.length) ||
+    new Set(mapping).size !== IDENTITY_NODE_TO_GRAPH.length
+  ) {
+    throw new Error(
+      `Randomization row for subject ${row?.subject_code ?? "unknown"} must contain ` +
+      "experiment_node_to_graph as a permutation of graph nodes 0..7."
+    );
+  }
+
+  return mapping;
+}
+
 const currentAssignment = {
   subjectCode: null,
   randomizationRow: null,
@@ -92,8 +110,7 @@ export function loadRandomizationRows(csvText) {
       return {
         subjectCode,
         randomizationRow: row,
-        experimentNodeToGraphNode:
-          parseNumberArray(row.experiment_node_to_graph_node) ?? [...IDENTITY_NODE_TO_GRAPH],
+        experimentNodeToGraphNode: parseExperimentNodeToGraphNode(row),
         objectToNodes: parseNumberArray(row.object_id_by_experiment_node) ?? [...IDENTITY_OBJECT_TO_NODES],
         part1LayoutOrder: parseNumberArray(row.part1_layout_order),
         part3LayoutOrder: parseNumberArray(row.part3_layout_order),
@@ -112,13 +129,12 @@ export function getRandomizationAssignment(subjNb) {
 }
 
 export function setSubjectAssignment(assignment) {
+  const experimentNodeToGraphNode = parseExperimentNodeToGraphNode(assignment?.randomizationRow);
   currentAssignment.subjectCode = assignment?.subjectCode ?? null;
   currentAssignment.randomizationRow = assignment?.randomizationRow
     ? { ...assignment.randomizationRow }
     : null;
-  currentAssignment.experimentNodeToGraphNode = [
-    ...(assignment?.experimentNodeToGraphNode ?? IDENTITY_NODE_TO_GRAPH),
-  ];
+  currentAssignment.experimentNodeToGraphNode = [...experimentNodeToGraphNode];
   currentAssignment.objectToNodes = [...(assignment?.objectToNodes ?? IDENTITY_OBJECT_TO_NODES)];
   currentAssignment.part1LayoutOrder = assignment?.part1LayoutOrder
     ? [...assignment.part1LayoutOrder]

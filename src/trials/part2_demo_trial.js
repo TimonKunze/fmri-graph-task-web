@@ -9,6 +9,7 @@ import { t } from "../state/participant.js";
 import { createFmriPictureViewingTrial } from "./fmri_picture_viewing_trial.js";
 import { createFmriPathChoiceTrial } from "./fmri_path_choice_trial.js";
 import { getPart2LearningStimulusOrder, getPart2LearningStimulusPaths } from "../utils/part.js";
+import { getPart2DemoExample } from "./part2_demo_metadata.js";
 
 function createDemoTopHtml() {
   return `
@@ -25,31 +26,11 @@ function createDemoTopHtml() {
   `;
 }
 
-function getDemoExample(shortestPathDistanceMatrix) {
-  const singleNodeIndices = getPart2LearningStimulusOrder();
-  const referenceNodeIndex = 1;
-  const leftNodeIndex = 2;
-  const rightNodeIndex = 3;
-  const leftPathLength = shortestPathDistanceMatrix[referenceNodeIndex]?.[leftNodeIndex] ?? null;
-  const rightPathLength = shortestPathDistanceMatrix[referenceNodeIndex]?.[rightNodeIndex] ?? null;
 
-  return {
-    singleNodeIndices,
-    referenceNodeIndex,
-    leftNodeIndex,
-    rightNodeIndex,
-    leftPathLength,
-    rightPathLength,
-    correctChoice:
-      leftPathLength === null || rightPathLength === null || leftPathLength === rightPathLength
-        ? null
-        : leftPathLength < rightPathLength ? 0 : 1,
-  };
-}
 
-export function createPart2DemoTimeline(shortestPathDistanceMatrix) {
+export function createPart2DemoTimeline() {
   const topHtml = createDemoTopHtml();
-  const demoExample = getDemoExample(shortestPathDistanceMatrix);
+  const demoExample = getPart2DemoExample(getPart2LearningStimulusOrder());
   const part2Timings = CONFIG.behavioral ? TIMINGS.part2.behavioral : TIMINGS.part2.default;
   const trialTopHtml = "";
   const demoImageDuration = part2Timings.imagePresentationMs + 400;

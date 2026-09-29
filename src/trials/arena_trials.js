@@ -485,6 +485,12 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
             p.TLD.nodes[i].diam / 2;
           p.TLD.nodes[i].msOverReleased = over;
         }
+
+        // Undo only on an actual mouse release over the button. The callback
+        // itself is always defined, so checking p.mouseReleased in draw_func
+        // would clear edges merely while hovering over the button.
+        p.TLD.undoMsOver = p.TLD.isMsOver(...p.TLD.undoPos, 3);
+        if (p.TLD.undoMsOver) connectedPos = [];
       };
 
       p.TLD.isMsOver = function (posX, posY, widthX, widthY, padding = 0) {
@@ -645,9 +651,6 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
         const ind = cursorHand.findIndex((el) => el === true);
         if (ind >= 0 && ind < connectedPos.length) connectedPos.splice(ind, 1);
       };
-
-      // Delete all edges if undo button clicked
-      if (p.mouseReleased && p.TLD.undoMsOver) connectedPos = [];
 
       // if (trialEnded) p.remove();
     },

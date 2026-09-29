@@ -118,6 +118,20 @@ E = testCase.TestData.E;
 E.times.runTimeoutSec = 0.05;
 E = RunBlock_Part2b(E, 1);
 verifyTimeoutCheckpoint(testCase, E, 'part2_fmri_picture_viewing', 2);
+verifyTrue(testCase, E.part2.trials{1}.timed_out);
+verifyFalse(testCase, E.part2.trials{1}.run_skipped);
+end
+
+function testShiftEnterMarksImageAsSkipped(testCase)
+global PART2B_TEST_CLOCK
+E = testCase.TestData.E;
+PART2B_TEST_CLOCK.keyStart = 0.02;
+PART2B_TEST_CLOCK.keyEnd = 1;
+PART2B_TEST_CLOCK.keys = [3 4];
+E = RunBlock_Part2b(E, 1);
+verifyEqual(testCase, E.part2.trials{1}.trial_name, 'part2_fmri_picture_viewing');
+verifyTrue(testCase, E.part2.trials{1}.run_skipped);
+verifyFalse(testCase, E.part2.trials{1}.timed_out);
 end
 
 function testRunDeadlineInterruptsItiAndSaves(testCase)
