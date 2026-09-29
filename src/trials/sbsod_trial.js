@@ -77,7 +77,7 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-function renderItemRow(prompt, index) {
+function renderItemRow(prompt, index, anchors) {
   const optionCells = OPTIONS.map(
     (option) => `
       <label style="display:flex; flex-direction:column; align-items:center; gap:6px; min-width: 34px;">
@@ -93,9 +93,9 @@ function renderItemRow(prompt, index) {
         <span style="font-weight: 600;">${index + 1}. </span>${escapeHtml(prompt)}
       </div>
       <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-        <span style="font-size: 14px; white-space: nowrap;">strongly agree</span>
+        <span style="font-size: 14px; white-space: nowrap;">${escapeHtml(anchors.stronglyAgree)}</span>
         ${optionCells}
-        <span style="font-size: 14px; white-space: nowrap;">strongly disagree</span>
+        <span style="font-size: 14px; white-space: nowrap;">${escapeHtml(anchors.stronglyDisagree)}</span>
       </div>
     </div>
   `;
@@ -115,20 +115,28 @@ export const sbsod_trial = {
     const copy = t({
       en: {
         title: "<h3>Santa Barbara Sense-of-Direction Scale</h3>",
+        stronglyAgree: "strongly agree",
+        stronglyDisagree: "strongly disagree",
         button: "Continue",
       },
       it: {
         title: "<h3>Scala di Santa Barbara sul Senso dell'Orientamento</h3>",
+        stronglyAgree: "fortemente d'accordo",
+        stronglyDisagree: "fortemente in disaccordo",
         button: "Continua",
       },
       de: {
         title: "<h3>Santa-Barbara-Skala fuer den Orientierungssinn</h3>",
+        stronglyAgree: "stimme voll und ganz zu",
+        stronglyDisagree: "stimme überhaupt nicht zu",
         button: "Weiter",
       },
     });
 
     const items = ITEMS[language] ?? ITEMS.en;
-    const rows = items.map((prompt, index) => renderItemRow(prompt, index)).join("");
+    const rows = items
+      .map((prompt, index) => renderItemRow(prompt, index, copy))
+      .join("");
 
     trial.stimulus = `
       <form id="sbsod-form" style="max-width: 980px; margin: 0 auto; text-align: left; line-height: 1.55;">
@@ -136,9 +144,9 @@ export const sbsod_trial = {
         <p style="margin-bottom: 24px;">${escapeHtml(t(INTRO))}</p>
         <div style="margin-bottom: 8px;">
           <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-left: 0; padding-left: 0; font-weight: 600;">
-            <span style="font-size: 14px; white-space: nowrap;">strongly agree</span>
+            <span style="font-size: 14px; white-space: nowrap;">${escapeHtml(copy.stronglyAgree)}</span>
             ${OPTIONS.map((option) => `<span style="width: 34px; text-align: center;">${option}</span>`).join("")}
-            <span style="font-size: 14px; white-space: nowrap;">strongly disagree</span>
+            <span style="font-size: 14px; white-space: nowrap;">${escapeHtml(copy.stronglyDisagree)}</span>
           </div>
         </div>
         ${rows}
