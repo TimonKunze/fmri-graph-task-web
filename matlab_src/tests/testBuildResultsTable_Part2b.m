@@ -9,6 +9,7 @@ end
 
 function testEmptyTrialsProduceEmptyTable(testCase)
 E.sbj.n = 7;
+E.eye.edfBaseName = 'P007A02';
 E.part2.trials = {};
 T = BuildResultsTable_Part2b(E);
 verifyEqual(testCase, height(T), 0);
@@ -18,6 +19,7 @@ end
 
 function testMixedRowsPreserveFieldsAndUseMissingDefaults(testCase)
 E.sbj.n = 7;
+E.eye.edfBaseName = 'P007A02';
 E.part2.trials = { ...
     struct('trial_name', 'part2_fmri_picture_viewing', 'run_index', 2, ...
         'trial_index', 1, 'raw_node_index', 3, 'graph_node_index', 1, ...
@@ -31,6 +33,7 @@ E.part2.trials = { ...
 T = BuildResultsTable_Part2b(E);
 verifyEqual(testCase, height(T), 3);
 verifyEqual(testCase, T.Subject, [7; 7; 7]);
+verifyEqual(testCase, T.EdfFileName, ["P007A02.edf"; "P007A02.edf"; "P007A02.edf"]);
 verifyEqual(testCase, T.Run, [2; 2; 2]);
 verifyEqual(testCase, T.TrialIndex(1:2), [1; 2]);
 verifyTrue(testCase, isnan(T.TrialIndex(3)));

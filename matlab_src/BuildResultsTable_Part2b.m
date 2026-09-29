@@ -3,6 +3,11 @@ trials = E.part2.trials;
 n = numel(trials);
 
 Subject = repmat(E.sbj.n, n, 1);
+edfBaseName = string(trialField(E.eye, 'edfBaseName', ""));
+EdfFileName = repmat("", n, 1);
+if strlength(edfBaseName) > 0
+    EdfFileName(:) = edfBaseName + ".edf";
+end
 Run = nan(n, 1);
 TrialIndex = nan(n, 1);
 TrialName = strings(n, 1);
@@ -50,7 +55,7 @@ for i = 1:n
     PresentationDeadlineSec(i) = trialField(t, 'presentation_deadline_secs', NaN);
 end
 
-T = table(Subject, Run, TrialIndex, TrialName, Response, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec);
+T = table(Subject, EdfFileName, Run, TrialIndex, TrialName, Response, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec);
 end
 
 function value = trialField(t, fieldName, defaultValue)

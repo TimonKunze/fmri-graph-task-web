@@ -36,9 +36,17 @@ verifyTrue(testCase, E.eye.initialized);
 verifyTrue(testCase, E.eye.fileOpened);
 verifyTrue(testCase, E.eye.setupComplete);
 verifyFalse(testCase, E.eye.fileTransferred);
-verifyEqual(testCase, E.eye.edfBaseName, 'P2B0007');
+verifyEqual(testCase, E.eye.edfBaseName, 'P007A01');
 verifyEqual(testCase, PART2B_TEST_EYELINK.calibrations, 1);
 verifyTrue(testCase, any(strcmp(PART2B_TEST_EYELINK.messages, 'EXPERIMENT_START 7')));
+end
+
+function testAttemptIsEncodedInUniqueEdfName(testCase)
+E = testCase.TestData.E;
+E.part2.attempt = 2;
+E = SetupEyeLink_Part2b(E);
+verifyEqual(testCase, E.eye.edfBaseName, 'P007A02');
+verifyEqual(testCase, E.eye.localEdfPath, fullfile(E.paths.dataDir, 'P007A02.edf'));
 end
 
 function testRecordingStopsClosesAndSavesExactPayload(testCase)
@@ -58,7 +66,7 @@ verifyLessThan(testCase, find(strcmp(commands, 'CloseFile'), 1), find(strcmp(com
 verifyTrue(testCase, any(strcmp(PART2B_TEST_EYELINK.messages, 'RECORDING_START 7')));
 verifyTrue(testCase, any(strcmp(PART2B_TEST_EYELINK.messages, 'RECORDING_STOP 7')));
 transfer = PART2B_TEST_EYELINK.calls{find(strcmp(commands, 'ReceiveFile'), 1)};
-verifyEqual(testCase, transfer(2:end), {'P2B0007.edf', E.eye.localEdfPath, 0});
+verifyEqual(testCase, transfer(2:end), {'P007A01.edf', E.eye.localEdfPath, 0});
 end
 
 function testCancellationAndNegativeStatusRejectExistingFile(testCase)

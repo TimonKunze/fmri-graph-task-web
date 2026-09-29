@@ -50,8 +50,17 @@ if isfield(E, 'sbj') && isfield(E.sbj, 'n') && isfinite(E.sbj.n)
 end
 
 subjectCode = max(0, min(9999, subjectCode));
-edfBaseName = sprintf('P2B%04d', subjectCode);
-if numel(edfBaseName) > 8
-    edfBaseName = edfBaseName(1:8);
+attempt = 1;
+if isfield(E, 'part2') && isfield(E.part2, 'attempt') && isfinite(E.part2.attempt)
+    attempt = round(double(E.part2.attempt));
 end
+if subjectCode > 999
+    error('SetupEyeLink_Part2b:SubjectCodeTooLarge', ...
+        'Subject code %d cannot be encoded in the EDF basename.', subjectCode);
+end
+if attempt < 1 || attempt > 99
+    error('SetupEyeLink_Part2b:InvalidAttempt', ...
+        'EyeLink attempt must be an integer from 1 to 99.');
+end
+edfBaseName = sprintf('P%03dA%02d', subjectCode, attempt);
 end
