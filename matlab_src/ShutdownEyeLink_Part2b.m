@@ -3,7 +3,8 @@ if ~isfield(E, 'eye') || ~isfield(E.eye, 'enabled') || ~E.eye.enabled
     return;
 end
 
-if isfield(E.eye, 'shutdown') && E.eye.shutdown
+if isfield(E.eye, 'shutdown') && E.eye.shutdown && ...
+        isfield(E.eye, 'fileTransferred') && E.eye.fileTransferred
     return;
 end
 

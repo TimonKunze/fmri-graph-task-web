@@ -39,6 +39,7 @@ try
     end
 
     E = ExperimentScript_Part2b(E);
+    E = CleanupPart2b(E);
 
     save(fullfile(E.paths.dataDir, E.filenameFullStateMat), 'E');
 
@@ -46,13 +47,19 @@ try
     resultsTable = E.part2.resultsTable;
     save(fullfile(E.paths.dataDir, E.filenameResultsMat), 'resultsTable');
 
+    if isfield(E, 'eye') && isfield(E.eye, 'finalizationOk') && ~E.eye.finalizationOk
+        warning('The EyeLink EDF was not finalized successfully. Review E.eye.finalizationError before closing the session.');
+    end
     ThankYou_Part2b(E);
-    CleanupPart2b(E);
     Screen('CloseAll');
 catch err
+    try
+        E = CleanupPart2b(E);
+    catch cleanupErr
+        E.cleanupError = cleanupErr;
+    end
     E.err = err;
     save(fullfile(E.paths.crashedDir, E.filenameCrashMat), 'E');
-    CleanupPart2b(E);
     Screen('CloseAll');
     rethrow(err);
 end
