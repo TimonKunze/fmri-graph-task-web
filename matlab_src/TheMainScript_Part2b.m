@@ -9,7 +9,12 @@ E.paths.dataDir = fullfile(E.paths.scriptDir, 'Data');
 E.paths.crashedDir = fullfile(E.paths.scriptDir, 'Crashed');
 
 dateTag = datestr(now, 'yyyymmdd');
-E.fileStem = sprintf('part2b_subj%d_%s', E.sbj.n, dateTag);
+attempt = 1;
+if isfield(E, 'part2') && isfield(E.part2, 'attempt') && ...
+        isfinite(E.part2.attempt) && E.part2.attempt >= 1
+    attempt = floor(E.part2.attempt);
+end
+E.fileStem = sprintf('part2b_subj%d_A%02d_%s', E.sbj.n, attempt, dateTag);
 E.filenameFullStateMat = [E.fileStem '_fullstate.mat'];
 E.filenameResultsMat = [E.fileStem '_results.mat'];
 E.filenameResultsCheckpointMat = [E.fileStem '_checkpoint.mat'];
