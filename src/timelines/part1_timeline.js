@@ -110,21 +110,36 @@ export function makeLearnTimeline() {
     throw new Error("[makeLearnTimeline] Missing randomized Part I layout order.");
   }
 
-  let blockCounter = 0;
+  let globalBlockCounter = 0;
+  const localBlockCounters = new Map();
   let relQueryInstrShown = false;
 
-  const pushBlock = (layoutType, nodePositions) => {
-    blockCounter += 1;
-    const block = `${layoutType}_${blockCounter}`;
+  const annotateBlock = (trials, layoutType, localBlockIndex, globalBlockIndex) => {
+    trials.forEach((trial) => {
+      trial.data = {
+        ...(trial.data ?? {}),
+        layout_type: layoutType,
+        block_index: localBlockIndex,
+        global_block_index: globalBlockIndex,
+      };
+    });
+    return trials;
+  };
 
-    tl.push(...createLearnTrials(nodePositions, block, layoutType));
+  const pushBlock = (layoutType, nodePositions) => {
+    globalBlockCounter += 1;
+    const localBlockIndex = (localBlockCounters.get(layoutType) ?? 0) + 1;
+    localBlockCounters.set(layoutType, localBlockIndex);
+    const block = `${layoutType}_${localBlockIndex}`;
+
+    tl.push(...annotateBlock(createLearnTrials(nodePositions, block, layoutType), layoutType, localBlockIndex, globalBlockCounter));
 
     if (!relQueryInstrShown) {
       tl.push(learnTrialRelQueryInstr);
       relQueryInstrShown = true;
     }
 
-    tl.push(...createRelQueryTrials(1, block));
+    tl.push(...annotateBlock(createRelQueryTrials(1, block), layoutType, localBlockIndex, globalBlockCounter));
     if (CONFIG.feedback) {
       tl.push(createRelQueryTrialFeedback(1));
     }

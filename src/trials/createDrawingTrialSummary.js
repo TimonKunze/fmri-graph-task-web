@@ -1,5 +1,6 @@
 import htmlButtonResponse from "@jspsych/plugin-html-button-response";
 import { getCurrentLanguage, t } from "../state/participant.js";
+import { getSubjectAssignment } from "../state/subjectAssignment.js";
 
 function cheerUpFromFraction(fraction) {
   return t({
@@ -34,6 +35,9 @@ function cheerUpFromFraction(fraction) {
 }
 
 function formatBlockLabel(block) {
+  const layoutOrder = getSubjectAssignment().part1LayoutOrder || [];
+  const isRotational = block.startsWith("rotational");
+  const firstSet = Number(layoutOrder[0]) === (isRotational ? 0 : 1);
   if (block === "sample") {
     return t({
       it: "blocco di pratica",
@@ -42,11 +46,9 @@ function formatBlockLabel(block) {
     });
   }
 
-  const setLabel = block.startsWith("rotational")
+  const setLabel = firstSet
     ? t({ it: "primo insieme", en: "first set", de: "ersten Satz" })
-    : block.startsWith("unconstrained")
-      ? t({ it: "secondo insieme", en: "second set", de: "zweiten Satz" })
-      : "";
+    : t({ it: "secondo insieme", en: "second set", de: "zweiten Satz" });
 
   const blockNumber = block.match(/_(\d+)$/)?.[1] ?? "";
 
