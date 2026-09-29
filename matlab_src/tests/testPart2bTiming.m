@@ -209,6 +209,7 @@ verifyEqual(testCase, choice.trial_name, 'part2_dual_stimulus_choice');
 verifyEqual(testCase, choice.reference_experiment_node_index, 1);
 verifyEqual(testCase, choice.path_lengths, [1 0]);
 verifyEqual(testCase, choice.correct_choice, 1);
+verifyEqual(testCase, choice.layout_type, 'rotational');
 % Debug mode halves the fixture's 0.04-second preceding ITI.
 verifyEqual(testCase, choice.iti_seconds_previous, 0.02);
 verifyEqual(testCase, E.part2.trials{2}.iti_seconds, 0.03);
