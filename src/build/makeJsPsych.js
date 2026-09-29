@@ -130,6 +130,7 @@ export function makeJsPsych({ data_dir }) {
   // records out of the persisted stream until the assignment and session
   // properties have been added to every existing record.
   jsPsych.session_id = sessionId;
+  jsPsych.saveSessionMetadata = (metadata) => enqueueSave(metadata);
   jsPsych.flushPendingData = async () => {
     const records = jsPsych.data.get().values();
     persistenceReady = true;

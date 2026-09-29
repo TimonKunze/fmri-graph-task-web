@@ -38,8 +38,7 @@ function addExperimentProperties() {
     : Array.isArray(CONFIG.nbLearnBlocks)
       ? CONFIG.nbLearnBlocks.reduce((sum, n) => sum + Number(n || 0), 0)
       : Number(CONFIG.nbLearnBlocks || 0);
-
-  jsPsych.data.addProperties({
+  const sessionProperties = {
     study_id,
     session_id: jsPsych.session_id,
     date: new Date().toDateString(),
@@ -57,9 +56,30 @@ function addExperimentProperties() {
     randomize: CONFIG.randomize,
     maxAttemptsDraw: CONFIG.maxAttemptsDraw,
     maxLearnRelations: CONFIG.maxLearnRelations,
+    subject_code: assignment.subjectCode,
+    part2_imagePresentationMs: part2Timings.imagePresentationMs,
+    canvas_size: SIZES.env,
+    node_size: SIZES.node,
+    nb_learn_passes: CONFIG.nbLearnPasses,
+    nb_relation: G.relations.length,
+    nb_learn_trials_in_block: CONFIG.nbLearnPasses * G.relations.length,
+    nb_learn_trials: CONFIG.nbLearnPasses * G.relations.length * totalLearnBlocks,
+    debug_flag: CONFIG.debug,
+    part1_flag: CONFIG.part1,
+    part2_flag: CONFIG.part2,
+    part2a_flag: CONFIG.part2a,
+    part2b_flag: CONFIG.part2b,
+    part3_flag: CONFIG.part3,
+    feedback_flag: CONFIG.feedback,
+    experiment_version: EXPERIMENT_VERSION,
+    deployment_date: CONFIG.deploymentDate,
+    deployment_comment: CONFIG.deploymentComment,
+  };
+  const sessionMetadata = {
+    record_type: "session_metadata",
+    ...sessionProperties,
     randomization_table_row: assignment.randomizationRow,
     subject_assignment: assignment,
-    subject_code: assignment.subjectCode,
     experiment_node_to_graph_node: assignment.experimentNodeToGraphNode,
     object_to_nodes: assignment.objectToNodes,
     learn_block_order: assignment.learnBlockOrder,
@@ -67,16 +87,8 @@ function addExperimentProperties() {
     part2_raw_node_blocks: assignment.part2RawNodeBlocks,
     part2_iti_times_behav: assignment.part2ItiTimesBehav,
     part2_iti_times_fmri: assignment.part2ItiTimesFmri,
-    part2_imagePresentationMs: part2Timings.imagePresentationMs,
     random_node_positions: DESIGN.randomPoss,
     rotation_node_positions: DESIGN.rotationPos,
-    canvas_size: SIZES.env,
-    node_size: SIZES.node,
-    nb_learn_passes: CONFIG.nbLearnPasses,
-    nb_learn_blocks: assignment.learnBlockOrder ?? CONFIG.nbLearnBlocks,
-    nb_relation: G.relations.length,
-    nb_learn_trials_in_block: CONFIG.nbLearnPasses * G.relations.length,
-    nb_learn_trials: CONFIG.nbLearnPasses * G.relations.length * totalLearnBlocks,
     relations: G.relations,
     adjacency_matrix: G.adjM,
     eucd_congr_pairs: G.eCongrPairs,
@@ -86,18 +98,11 @@ function addExperimentProperties() {
     test3_pairs: DESIGN.test3Pairs,
     node_paths_set1: Array.from({ length: G.nbNodes }, (_, i) => PATHS.nodeImages1(i)),
     node_paths_set2: Array.from({ length: G.nbNodes }, (_, i) => PATHS.nodeImages2(i)),
-    debug_flag: CONFIG.debug,
-    part1_flag: CONFIG.part1,
-    part2_flag: CONFIG.part2,
-    part2a_flag: CONFIG.part2a,
-    part2b_flag: CONFIG.part2b,
-    part3_flag: CONFIG.part3,
-    feedback_flag: CONFIG.feedback,
     stimulus_condition_map: STIMULUS_CONDITION_MAP,
-    experiment_version: EXPERIMENT_VERSION,
-    deployment_date: CONFIG.deploymentDate,
-    deployment_comment: CONFIG.deploymentComment,
-  });
+    nb_learn_blocks: assignment.learnBlockOrder ?? CONFIG.nbLearnBlocks,
+  };
+  jsPsych.data.addProperties(sessionProperties);
+  return sessionMetadata;
 }
 
 function logDebugStimulusMapping() {
@@ -188,7 +193,8 @@ async function bootstrap() {
   setActiveGraphHex(assignment.randomizationRow?.hex_string || assignment.randomizationRow?.graph_hex);
   refreshGraphState();
   refreshDesign();
-  addExperimentProperties();
+  const sessionMetadata = addExperimentProperties();
+  await jsPsych.saveSessionMetadata(sessionMetadata);
   await jsPsych.flushPendingData();
   logDebugStimulusMapping();
 
