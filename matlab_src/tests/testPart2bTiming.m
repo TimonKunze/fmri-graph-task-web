@@ -17,7 +17,7 @@ E.screen = struct('theWindow', 1, 'cx', 400, 'cy', 300, ...
     'bckgrnd', 0, 'textsize', 20, 'textcolor', 255);
 E.keys = struct('left', 1, 'right', 2, 'enter', 3, 'shift', [4 5], 'escape', 6);
 E.times = struct('choiceTimeoutSec', 20, 'runTimeoutSec', 1800, ...
-    'imagePresentationMs', 100);
+    'imagePresentationMs', 100, 'postRunFixationSec', 0);
 E.eye.enabled = false;
 E.sbj.n = 1;
 E.paths.dataDir = folder.Folder;
@@ -44,6 +44,7 @@ E = SetupTiming_Part2b(testCase.TestData.E);
 verifyEqual(testCase, E.times.runTimeoutSec, 1800);
 verifyEqual(testCase, E.times.choiceTimeoutSec, 20);
 verifyEqual(testCase, E.times.imagePresentationMs, 1300);
+verifyEqual(testCase, E.times.postRunFixationSec, 8);
 E.debugmode = true;
 E = SetupTiming_Part2b(E);
 verifyEqual(testCase, E.times.runTimeoutSec, 1800);
