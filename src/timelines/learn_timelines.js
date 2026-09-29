@@ -24,7 +24,11 @@ export function createLearnTrials(nodePoss, block, layoutType) {
   }
 
   const baseNodePos = Array.isArray(nodePoss?.[0]) ? nodePoss[0] : [];
-  const unconstrainedPool = Array.isArray(nodePoss) ? nodePoss : [];
+  // Each learning block receives a fresh order of the unconstrained
+  // arrangements; rotational blocks generate fresh angles below.
+  const unconstrainedPool = CONFIG.randomize && Array.isArray(nodePoss)
+    ? htools.shuffleArray([...nodePoss])
+    : (Array.isArray(nodePoss) ? nodePoss : []);
 
   const makeRotatedNodePos = (angle) =>
     baseNodePos.map((point) => rotatePoint(center, point, angle));
@@ -46,7 +50,7 @@ export function createLearnTrials(nodePoss, block, layoutType) {
 
     for (const trialI of trialOrder) {
       if (learnTrialsTL.length >= task1TrialLimit) break outerLoop;
-      nodePosInd = learnPassI*nbRelations + trialI*2;
+      nodePosInd = (learnPassI * nbRelations + trialI) * 2;
       let randAngle = 0;
       let nodePos;
 
