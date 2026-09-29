@@ -210,28 +210,6 @@ export function createSpatialPosTrial(layoutType) {
         }
       }
 
-      p.TLD.drawRelations = function (adjMat, nodePos) {
-        for (let i=0; i < nodePos.length; i++) {
-          for (let j=0; j < nodePos.length; j++) {
-            if (
-              adjMat[i][j]==1 
-                & p.TLD.mouseClicked
-              ) {
-              p.stroke(COLORS["edgeTrue"]);
-              p.strokeWeight(2);
-              p.line(nodePos[i][0], nodePos[i][1], 
-                     nodePos[j][0], nodePos[j][1]);
-              lineDist = false;
-            } else {
-              p.stroke("grey");
-              p.strokeWeight(0.2);
-              // p.line(nodePos[i][0], nodePos[i][1], 
-              //        nodePos[j][0], nodePos[j][1]);
-            }
-          }
-        }
-      }
-
       p.TLD.changeCursorHand = function (positions, thresh) {
         let dists = []
         for (const ps of positions) {
