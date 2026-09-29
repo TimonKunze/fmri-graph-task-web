@@ -5,27 +5,22 @@ Screen(E.screen.theWindow, 'TextSize', E.screen.textsize * 2);
 DrawFormattedText(E.screen.theWindow, E.text.part2Intro, 'center', 'center', E.screen.textcolor);
 Screen('Flip', E.screen.theWindow);
 waitForSpecificKey(E.times.continueKey);
+waitForKeyRelease();
 
 DrawFormattedText(E.screen.theWindow, E.text.part2Start, 'center', 'center', E.screen.textcolor);
 Screen('Flip', E.screen.theWindow);
-waitForSpecificKey(E.keys.trigger);
-
-Screen('Flip', E.screen.theWindow);
 E.part2.trials = {};
 E.part2.resultsMatNeedsFlush = false;
-scannerOffsetDeadlineSecs = GetSecs + E.times.scannerOffsetSec;
-recordingLeadSecs = min(E.times.eyeLinkRecordingLeadSec, E.times.scannerOffsetSec);
-WaitSecs(max(0, E.times.scannerOffsetSec - recordingLeadSecs));
-E = StartEyeLinkRecording_Part2b(E);
-if GetSecs > scannerOffsetDeadlineSecs
-    error('ExperimentScript_Part2b:EyeLinkStartupOverrun', ...
-        'EyeLink startup exceeded the scanner offset deadline by %.3f seconds.', ...
-        GetSecs - scannerOffsetDeadlineSecs);
-end
 
-% Keep the first stimulus aligned to the planned scanner offset. EyeLink
-% starts during the final part of the offset and is verified before this
-% absolute deadline, so the recording warm-up does not delay the fMRI design.
+% Start recording before the scanner trigger so the EDF contains the
+% trigger marker and has time to establish its recording stream.
+E = StartEyeLinkRecording_Part2b(E);
+triggerSecs = waitForSpecificKey(E.keys.trigger);
+SendEyeLinkMessage_Part2b(E, 'SCANNER_TRIGGER');
+waitForKeyRelease();
+
+Screen('Flip', E.screen.theWindow);
+scannerOffsetDeadlineSecs = triggerSecs + E.times.scannerOffsetSec;
 while GetSecs < scannerOffsetDeadlineSecs
     WaitSecs(min(0.01, scannerOffsetDeadlineSecs - GetSecs));
 end
@@ -57,6 +52,7 @@ for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
     if runIndex < numel(E.assignment.part2RawNodeRuns)
         showRunBreak(E, runIndex, numel(E.assignment.part2RawNodeRuns));
         waitForSpecificKey(E.times.continueKey);
+        waitForKeyRelease();
         E = RecalibrateAndValidateEyeLink_Part2b(E, runIndex);
     end
 end
@@ -67,18 +63,22 @@ Screen('Flip', E.screen.theWindow);
 waitForAnyKey();
 end
 
-function waitForSpecificKey(targetKey)
+function pressSecs = waitForSpecificKey(targetKey)
 while true
-    [keyIsDown, ~, keyCode] = KbCheck;
+    [keyIsDown, secs, keyCode] = KbCheck;
     if keyIsDown && keyCode(targetKey)
-        break;
+        pressSecs = secs;
+        return;
     end
     WaitSecs(0.01);
 end
+end
+
+function waitForKeyRelease()
 while true
     [~, ~, keyCode] = KbCheck;
     if ~any(keyCode)
-        break;
+        return;
     end
     WaitSecs(0.01);
 end
