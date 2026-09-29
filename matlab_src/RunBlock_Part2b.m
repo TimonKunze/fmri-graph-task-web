@@ -29,6 +29,7 @@ runTimedOut = false;
 SendEyeLinkMessage_Part2b(E, 'RUN_START %d', runIndex);
 runSkipped = false;
 pendingItiIndex = [];
+pendingImageIndex = [];
 nextStimulusDeadlineSecs = 0;
 
 for trialIndex = startTrialIndex:numel(runItems)
@@ -49,8 +50,10 @@ for trialIndex = startTrialIndex:numel(runItems)
         pendingItiIndex = [];
         nextStimulusDeadlineSecs = 0;
         SendEyeLinkMessage_Part2b(E, 'IMAGE_ONSET %d %d %d %d', runIndex, trialIndex, decoded.rawNode, decoded.graphNodeIndex);
-        [runSkipped, runTimedOut] = waitSecsWithRunSkip(E, E.times.imagePresentationMs / 1000, runDeadlineSecs);
-            E.part2.trials{end + 1} = struct( ...
+        imageDeadlineSecs = imageOnsetSecs + E.times.imagePresentationMs / 1000;
+        [runSkipped, runTimedOut] = waitUntilSecsWithRunSkip(E, imageDeadlineSecs, runDeadlineSecs);
+        pendingImageIndex = numel(E.part2.trials) + 1;
+            E.part2.trials{pendingImageIndex} = struct( ...
                 'trial_name', 'part2_fmri_picture_viewing', ...
             'part', 2, ...
             'run_index', runIndex, ...
@@ -61,6 +64,8 @@ for trialIndex = startTrialIndex:numel(runItems)
             'stim_set', decoded.stimSet, ...
             'image_src', decoded.imageSrc, ...
             'duration_ms', E.times.imagePresentationMs, ...
+            'actual_duration_ms', NaN, ...
+            'presentation_deadline_secs', imageDeadlineSecs, ...
                 'timestamp_sec', imageOnsetSecs, ...
                 'timestamp_rel_sec', imageOnsetSecs - E.begintime, ...
                 'timestamp_clock', imageOnsetClock, ...
@@ -80,7 +85,8 @@ for trialIndex = startTrialIndex:numel(runItems)
         if trialIndex < numel(runItems)
             itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, runIndex, itiIndex, E.sbj.n);
             [E, pendingItiIndex, nextStimulusDeadlineSecs] = ...
-                beginIti(E, runIndex, trialIndex, itiSeconds, false);
+                beginIti(E, runIndex, trialIndex, itiSeconds, false, pendingImageIndex);
+            pendingImageIndex = [];
             previousItiSeconds = itiSeconds;
             itiIndex = itiIndex + 1;
         end
@@ -263,10 +269,17 @@ for trialIndex = 1:(startTrialIndex - 1)
 end
 end
 
-function [E, recordIndex, deadlineSecs] = beginIti(E, runIndex, trialIndex, itiSeconds, saveCheckpoint)
+function [E, recordIndex, deadlineSecs] = beginIti(E, runIndex, trialIndex, itiSeconds, saveCheckpoint, previousImageIndex)
+if nargin < 6
+    previousImageIndex = [];
+end
 [onsetSecs, onsetClock] = drawFixationTrial(E);
 deadlineSecs = onsetSecs + itiSeconds;
 SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', runIndex, trialIndex, round(itiSeconds * 1000));
+if ~isempty(previousImageIndex)
+    E.part2.trials{previousImageIndex}.actual_duration_ms = ...
+        (onsetSecs - E.part2.trials{previousImageIndex}.timestamp_sec) * 1000;
+end
 recordIndex = numel(E.part2.trials) + 1;
 % This record denotes ITI onset, not completion. Actual duration is filled
 % after the next stimulus flips; a checkpoint taken now keeps it as NaN.
@@ -318,6 +331,27 @@ if ~isfinite(vbl)
     vbl = GetSecs;
 end
 clockStamp = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
+end
+
+function [skipped, timedOut] = waitUntilSecsWithRunSkip(E, deadlineSecs, runDeadlineSecs)
+skipped = false;
+timedOut = false;
+while true
+    nowSecs = GetSecs;
+    if nowSecs >= runDeadlineSecs
+        timedOut = true;
+        break;
+    end
+    if nowSecs >= deadlineSecs
+        break;
+    end
+    [keyIsDown, ~, keyCode] = KbCheck;
+    if keyIsDown && keyCode(E.keys.enter) && any(keyCode(E.keys.shift))
+        skipped = true;
+        break;
+    end
+    WaitSecs(min([0.01, deadlineSecs - nowSecs, runDeadlineSecs - nowSecs]));
+end
 end
 
 function [skipped, timedOut] = waitSecsWithRunSkip(E, durationSecs, runDeadlineSecs)

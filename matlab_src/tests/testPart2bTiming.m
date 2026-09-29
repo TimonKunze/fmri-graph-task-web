@@ -261,6 +261,18 @@ for i = 1:numel(trials)
 end
 end
 
+function testImageDurationUsesFlipToNextFixation(testCase)
+E = testCase.TestData.E;
+E.debugmode = true;
+E = RunBlock_Part2b(E, 1);
+image = E.part2.trials{1};
+verifyEqual(testCase, image.duration_ms, 100);
+verifyEqual(testCase, image.actual_duration_ms, 100, 'AbsTol', 1e-9);
+verifyEqual(testCase, image.presentation_deadline_secs, image.timestamp_sec + 0.1, 'AbsTol', 1e-9);
+saved = load(testCase.TestData.checkpoint, 'resultsTable');
+verifyEqual(testCase, saved.resultsTable.ActualDurationMs(1), 100, 'AbsTol', 1e-9);
+end
+
 function testSavingFitsInsideItiWithoutExtendingIt(testCase)
 global PART2B_TEST_CLOCK
 useDelayedSave(testCase, 0.01);

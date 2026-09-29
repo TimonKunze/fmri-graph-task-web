@@ -55,6 +55,7 @@ Each test uses a separate temporary directory that MATLAB cleans up afterward. E
 - Rejecting invalid trial indices and starting partway through run 2 while run 3 starts at trial 1.
 - A checkpoint during the ITI after a choice, before the run ends. This test interrupts the simulated run before the next image, preventing the final run save from masking a missing ITI save.
 
+- Image durations measured from image flip to the next fixation flip, with requested and actual durations stored separately.
 - Saving inside the ITI: a simulated 10-ms save fits within a 20-ms ITI without extending it; a 50-ms save produces a measured 30-ms overrun instead of another full wait.
 - Checkpoints taken before ITI completion, run deadlines crossed during saving, skipping during the remaining ITI, and refresh-aligned scheduled flips.
 

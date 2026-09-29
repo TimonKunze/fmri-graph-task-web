@@ -22,6 +22,8 @@ ITIDeadlineSec = nan(n, 1);
 ITIActualSec = nan(n, 1);
 ITILatenessSec = nan(n, 1);
 CheckpointSaveSec = nan(n, 1);
+ActualDurationMs = nan(n, 1);
+PresentationDeadlineSec = nan(n, 1);
 
 for i = 1:n
     t = trials{i};
@@ -44,9 +46,11 @@ for i = 1:n
     ITIActualSec(i) = trialField(t, 'iti_actual_seconds', NaN);
     ITILatenessSec(i) = trialField(t, 'iti_lateness_seconds', NaN);
     CheckpointSaveSec(i) = trialField(t, 'checkpoint_save_seconds', NaN);
+    ActualDurationMs(i) = trialField(t, 'actual_duration_ms', NaN);
+    PresentationDeadlineSec(i) = trialField(t, 'presentation_deadline_secs', NaN);
 end
 
-T = table(Subject, Run, TrialIndex, TrialName, Response, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec);
+T = table(Subject, Run, TrialIndex, TrialName, Response, RT, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec);
 end
 
 function value = trialField(t, fieldName, defaultValue)
