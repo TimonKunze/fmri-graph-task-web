@@ -67,6 +67,12 @@ for trialIndex = startTrialIndex:numel(runItems)
         nextStimulusDeadlineSecs = 0;
         SendEyeLinkMessage_Part2b(E, 'IMAGE_ONSET %d %d %d %d', runIndex, trialIndex, decoded.rawNode, decoded.graphNodeIndex);
         imageDeadlineSecs = imageOnsetSecs + E.times.imagePresentationMs / 1000;
+        if isfield(E.screen, 'flipinterval') && isfinite(E.screen.flipinterval) && ...
+                E.screen.flipinterval > 0
+            % The fixation flip follows this wait. Bias the deadline by half
+            % a refresh so the immediate flip lands at the requested offset.
+            imageDeadlineSecs = imageDeadlineSecs - 0.5 * E.screen.flipinterval;
+        end
         [runSkipped, runTimedOut] = waitUntilSecsWithRunSkip(E, imageDeadlineSecs, runDeadlineSecs);
         pendingImageIndex = numel(E.part2.trials) + 1;
             E.part2.trials{pendingImageIndex} = struct( ...
