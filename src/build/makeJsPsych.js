@@ -21,6 +21,8 @@ export function makeJsPsych({ data_dir }) {
   const part = computePart(CONFIG);
   let debugAdvanceHandler = null;
   let persistenceReady = false;
+  let saveSequence = 0;
+  const sessionId = globalThis.crypto?.randomUUID?.() || `session_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
   function makeShortDate() {
     const now = new Date();
@@ -78,7 +80,14 @@ export function makeJsPsych({ data_dir }) {
   });
 
 
+  function decorateData(data) {
+    if (data.session_id == null) data.session_id = sessionId;
+    if (data.save_sequence == null) data.save_sequence = ++saveSequence;
+    return data;
+  }
+
   function persistData(data) {
+    decorateData(data);
     const dataJsonl = JSON.stringify(data) + "\n";
     const participantSetup = getParticipantSetup();
     const subjectCode = participantSetup?.subjectCode ?? "unknown";
@@ -92,6 +101,7 @@ export function makeJsPsych({ data_dir }) {
   // Participant setup is collected in a short bootstrap run.  Keep those
   // records out of the persisted stream until the assignment and session
   // properties have been added to every existing record.
+  jsPsych.session_id = sessionId;
   jsPsych.flushPendingData = async () => {
     const records = jsPsych.data.get().values();
     persistenceReady = true;

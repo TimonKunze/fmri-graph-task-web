@@ -29,7 +29,6 @@ const EXPERIMENT_VERSION =
 window.__JSPSYCH_DISPLAY_DATA_ON_FINISH__ = false;
 export const jsPsych = makeJsPsych({ data_dir: PATHS.data_dir });
 const study_id = "custom_study";
-const session_id = "custom_session";
 
 function addExperimentProperties() {
   const assignment = getSubjectAssignment();
@@ -42,7 +41,7 @@ function addExperimentProperties() {
 
   jsPsych.data.addProperties({
     study_id,
-    session_id,
+    session_id: jsPsych.session_id,
     date: new Date().toDateString(),
     session_timestamp: Date.now(),
     mode: CONFIG.mode,
