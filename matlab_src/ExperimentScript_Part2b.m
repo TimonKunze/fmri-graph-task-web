@@ -11,11 +11,12 @@ Screen('Flip', E.screen.theWindow);
 waitForSpecificKey(E.keys.trigger);
 
 Screen('Flip', E.screen.theWindow);
-E.begintime = GetSecs;
-E = StartEyeLinkRecording_Part2b(E);
 E.part2.trials = {};
 E.part2.resultsMatNeedsFlush = false;
 WaitSecs(E.times.scannerOffsetSec);
+E.begintime = GetSecs;
+E = StartEyeLinkRecording_Part2b(E);
+SendEyeLinkMessage_Part2b(E, 'SCANNER_OFFSET_END');
 
 startRun = 1;
 startTrial = 1;
