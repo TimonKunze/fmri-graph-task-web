@@ -15,7 +15,7 @@ catch
 end
 
 try
-    ListenChar;
+    ListenChar(0);
 catch
 end
 end

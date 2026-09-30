@@ -196,6 +196,7 @@ E = StartEyeLinkRecording_Part2b(E);
 StopEyeLinkRecording_Part2b(E);
 verifyEmpty(testCase, PART2B_TEST_EYELINK.calls);
 E.eye.enabled = true;
+E.eye.dummy = true; % Explicit dummy mode remains available for testing.
 PART2B_TEST_EYELINK.dummy = true;
 E = SetupEyeLink_Part2b(E);
 E = StartEyeLinkRecording_Part2b(E);
@@ -233,6 +234,50 @@ PART2B_TEST_EYELINK.recordingStatus = -1;
 verifyError(testCase, @() StartEyeLinkRecording_Part2b(E), ...
     'StartEyeLinkRecording_Part2b:RecordingLost');
 verifyTrue(testCase, any(strcmp(callNames(), 'CheckRecording')));
+verifyFalse(testCase, any(strcmp(PART2B_TEST_EYELINK.messages, 'RECORDING_START 7')));
+end
+
+function testRecordingMarkerFollowsStabilizationAndVerification(testCase)
+global PART2B_TEST_EYELINK
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+PART2B_TEST_EYELINK.calls = {};
+E = StartEyeLinkRecording_Part2b(E);
+verifyTrue(testCase, E.eye.recording);
+verifyEqual(testCase, callNames(), ...
+    {'SetOfflineMode', 'WaitSecs', 'StartRecording', 'WaitSecs', 'CheckRecording', 'Message'});
+verifyEqual(testCase, PART2B_TEST_EYELINK.calls{4}, {'WaitSecs', 0.1});
+verifyEqual(testCase, PART2B_TEST_EYELINK.messages{end}, 'RECORDING_START 7');
+end
+
+function testExistingRecordingIsCheckedWithoutRestartOrDuplicateMarker(testCase)
+global PART2B_TEST_EYELINK
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+E = StartEyeLinkRecording_Part2b(E);
+PART2B_TEST_EYELINK.calls = {};
+E = StartEyeLinkRecording_Part2b(E);
+verifyTrue(testCase, E.eye.recording);
+verifyEqual(testCase, callNames(), {'CheckRecording'});
+verifyEqual(testCase, sum(strcmp(PART2B_TEST_EYELINK.messages, 'RECORDING_START 7')), 1);
+end
+
+function testStaleRecordingFlagDoesNotHideRecordingLoss(testCase)
+global PART2B_TEST_EYELINK
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+E = StartEyeLinkRecording_Part2b(E);
+PART2B_TEST_EYELINK.calls = {};
+PART2B_TEST_EYELINK.recordingStatus = -1;
+verifyError(testCase, @() StartEyeLinkRecording_Part2b(E), ...
+    'StartEyeLinkRecording_Part2b:RecordingLost');
+verifyEqual(testCase, callNames(), {'CheckRecording'});
+end
+
+function testUnexpectedDummyFallbackIsRejected(testCase)
+global PART2B_TEST_EYELINK
+PART2B_TEST_EYELINK.dummy = true;
+verifyError(testCase, @() SetupEyeLink_Part2b(testCase.TestData.E), ...
+    'SetupEyeLink_Part2b:UnexpectedDummyMode');
+verifyEqual(testCase, callNames(), {'Shutdown'});
+verifyEmpty(testCase, PART2B_TEST_EYELINK.messages);
 end
 
 function names = callNames()

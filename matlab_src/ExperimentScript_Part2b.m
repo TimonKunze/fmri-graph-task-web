@@ -38,9 +38,11 @@ for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
     DrawFormattedText(E.screen.theWindow, '+', 'center', E.screen.cy, E.screen.textcolor);
     Screen('Flip', E.screen.theWindow);
     triggerSecs = waitForScannerTrigger(E);
+    % Pair this EDF marker's EyeLink timestamp with the behavioral
+    % triggerSecs (Psychtoolbox clock) for the same run.
+    SendEyeLinkMessage_Part2b(E, 'SCANNER_TRIGGER %d', runIndex);
     E.part2.scannerPulses(end + 1) = triggerSecs;
     E.part2.run(runIndex).triggerSecs = triggerSecs;
-    SendEyeLinkMessage_Part2b(E, 'SCANNER_TRIGGER R%d', runIndex);
     waitForKeyRelease();
 
     scannerOffsetDeadlineSecs = triggerSecs + E.times.scannerOffsetSec;

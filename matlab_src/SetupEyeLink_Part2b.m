@@ -11,6 +11,16 @@ if ~initOk
     error('SetupEyeLink_Part2b:InitFailed', 'EyeLink initialization failed.');
 end
 
+% A failed real connection must not silently become a dummy session.
+if dummyUsed && ~dummyMode
+    try
+        Eyelink('Shutdown');
+    catch
+    end
+    error('SetupEyeLink_Part2b:UnexpectedDummyMode', ...
+        'EyeLink entered dummy mode although real tracking was requested. Check the tracker connection.');
+end
+
 E.eye.enabled = true;
 E.eye.dummy = logical(dummyUsed);
 E.eye.initialized = true;
