@@ -65,6 +65,9 @@ The experiment saves a combination of global metadata and trial-specific fields 
 
 First deploy with:
 
+TODO: deploy in, then upload with sftp:
+/home/tk/02_AREAS/websites/sissa_personal/fmri_exp
+
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-03 npm run build:parts -- "deployment 2026-06-03"
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-10 npm run build:parts -- "deployment 2026-06-10"
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-10_2 npm run build:parts -- "deployment 2026-06-10_2"
