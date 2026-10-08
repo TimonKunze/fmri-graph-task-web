@@ -77,7 +77,10 @@ assertSuccess(results);
 - An existing file does not mask a failed transfer, and failed transfers can be retried.
 - Successful transfers are not repeated; shutdown retries a prior failed transfer and preserves failure status if it still fails.
 - Disabled and dummy modes do not record or transfer data.
-- Initialization, file-open and recording failures are reported.
+- Optional setup failures (including an invalid MEX), disabled tracking, and successful setup report their status.
+- Required tracking rejects setup failures and dummy fallback, even if Enabled is off.
+- Partial setup is cleaned up and uninitialized/disabled sessions do not attempt EDF transfer.
+- Recording failures remain errors.
 
 Run only these tests with:
 

@@ -34,9 +34,7 @@ try
     E = IniHardware_Part2b(E);
     E = PreLoadText_Part2b(E);
     E = PreLoadStim_Part2b(E);
-    if ~isfield(E, 'eye') || ~isfield(E.eye, 'enabled') || E.eye.enabled
-        E = SetupEyeLink_Part2b(E);
-    end
+    E = SetupEyeLink_Part2b(E);
 
     E = ExperimentScript_Part2b(E);
     E = CleanupPart2b(E);

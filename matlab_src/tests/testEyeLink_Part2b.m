@@ -207,6 +207,7 @@ end
 
 function testInitializationFailureIsReported(testCase)
 global PART2B_TEST_EYELINK
+testCase.TestData.E.eye.required = true;
 PART2B_TEST_EYELINK.initOk = 0;
 verifyError(testCase, @() SetupEyeLink_Part2b(testCase.TestData.E), ...
     'SetupEyeLink_Part2b:InitFailed');
@@ -214,6 +215,7 @@ end
 
 function testFileOpenFailureIsReported(testCase)
 global PART2B_TEST_EYELINK
+testCase.TestData.E.eye.required = true;
 PART2B_TEST_EYELINK.openStatus = -1;
 verifyError(testCase, @() SetupEyeLink_Part2b(testCase.TestData.E), ...
     'SetupEyeLink_Part2b:OpenFileFailed');
@@ -273,11 +275,90 @@ end
 
 function testUnexpectedDummyFallbackIsRejected(testCase)
 global PART2B_TEST_EYELINK
+testCase.TestData.E.eye.required = true;
 PART2B_TEST_EYELINK.dummy = true;
 verifyError(testCase, @() SetupEyeLink_Part2b(testCase.TestData.E), ...
     'SetupEyeLink_Part2b:UnexpectedDummyMode');
 verifyEqual(testCase, callNames(), {'Shutdown'});
 verifyEmpty(testCase, PART2B_TEST_EYELINK.messages);
+end
+
+function testOptionalMexFailureContinuesAndCleanupDoesNotTransfer(testCase)
+global PART2B_TEST_EYELINK
+PART2B_TEST_EYELINK.throwOnInit = true;
+output = evalc('E = SetupEyeLink_Part2b(testCase.TestData.E);');
+verifyFalse(testCase, E.eye.required);
+verifyFalse(testCase, E.eye.enabled);
+verifyEqual(testCase, E.eye.setupStatus, 'UNAVAILABLE');
+verifyEqual(testCase, E.eye.setupErrorIdentifier, 'EyeLinkTest:InvalidMex');
+verifyTrue(testCase, contains(output, 'Continuing without eye tracking'));
+verifyTrue(testCase, contains(output, 'Invalid MEX-file'));
+E = StartEyeLinkRecording_Part2b(E);
+E = FinalizeEyeLink_Part2b(E);
+verifyTrue(testCase, E.eye.finalizationOk);
+verifyEqual(testCase, callNames(), {'Shutdown'});
+end
+
+function testRequiredMexFailureStops(testCase)
+global PART2B_TEST_EYELINK
+PART2B_TEST_EYELINK.throwOnInit = true;
+E = testCase.TestData.E;
+E.eye.required = true;
+verifyError(testCase, @() SetupEyeLink_Part2b(E), 'EyeLinkTest:InvalidMex');
+end
+
+function testOptionalFailuresDisableTracking(testCase)
+global PART2B_TEST_EYELINK
+for failure = {'init', 'open', 'rate', 'dummy'}
+    PART2B_TEST_EYELINK.initOk = ~strcmp(failure{1}, 'init');
+    PART2B_TEST_EYELINK.openStatus = -double(strcmp(failure{1}, 'open'));
+    PART2B_TEST_EYELINK.sampleRateCommandStatus = -double(strcmp(failure{1}, 'rate'));
+    PART2B_TEST_EYELINK.dummy = strcmp(failure{1}, 'dummy');
+    PART2B_TEST_EYELINK.calls = {};
+    E = SetupEyeLink_Part2b(testCase.TestData.E);
+    verifyFalse(testCase, E.eye.enabled);
+    verifyFalse(testCase, E.eye.setupComplete);
+    verifyNotEmpty(testCase, E.eye.setupError);
+    if strcmp(failure{1}, 'rate')
+        names = callNames();
+        verifyLessThan(testCase, find(strcmp(names, 'CloseFile'), 1), ...
+            find(strcmp(names, 'Shutdown'), 1));
+    end
+    E = FinalizeEyeLink_Part2b(E);
+    verifyTrue(testCase, E.eye.finalizationOk);
+    verifyFalse(testCase, any(strcmp(callNames(), 'ReceiveFile')));
+end
+end
+
+function testDisabledSetupReportsWithoutCallingTracker(testCase)
+E = testCase.TestData.E;
+E.eye.enabled = false;
+output = evalc('E = SetupEyeLink_Part2b(E);');
+verifyTrue(testCase, contains(output, 'disabled by choice'));
+verifyEqual(testCase, E.eye.setupStatus, 'DISABLED');
+verifyEmpty(testCase, callNames());
+end
+
+function testRequiredOverridesDisabledAndRejectsDummy(testCase)
+global PART2B_TEST_EYELINK
+E = testCase.TestData.E;
+E.eye.enabled = false;
+E.eye.required = true;
+output = evalc('E = SetupEyeLink_Part2b(E);');
+verifyTrue(testCase, E.eye.enabled);
+verifyEqual(testCase, E.eye.setupStatus, 'READY');
+verifyTrue(testCase, contains(output, 'connected and setup complete'));
+E.eye.dummy = true;
+PART2B_TEST_EYELINK.dummy = true;
+verifyError(testCase, @() SetupEyeLink_Part2b(E), ...
+    'SetupEyeLink_Part2b:UnexpectedDummyMode');
+end
+
+function testCleanupBeforeSetupDoesNotAttemptTransfer(testCase)
+E = FinalizeEyeLink_Part2b(testCase.TestData.E);
+verifyTrue(testCase, E.eye.finalizationOk);
+verifyEqual(testCase, E.eye.finalizationStatus, 'NOT_INITIALIZED');
+verifyEmpty(testCase, callNames());
 end
 
 function names = callNames()

@@ -6,6 +6,12 @@ if ~isfield(E, 'eye') || ~isfield(E.eye, 'enabled') || ~E.eye.enabled
     E.eye.finalizationError = '';
     return;
 end
+if ~isfield(E.eye, 'initialized') || ~E.eye.initialized
+    E.eye.finalizationOk = true;
+    E.eye.finalizationStatus = 'NOT_INITIALIZED';
+    E.eye.finalizationError = '';
+    return;
+end
 if isfield(E.eye, 'dummy') && E.eye.dummy
     E.eye.finalizationOk = true;
     E.eye.finalizationStatus = 'DUMMY';

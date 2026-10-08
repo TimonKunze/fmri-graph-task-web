@@ -1,5 +1,5 @@
 function E = GetSubInfo_Part2b()
-prompt = {'N:'; 'Attempt:'; 'Gender:'; 'Age:'; 'Handness:'; 'Language (it/en):'; 'Debug'; 'EyeLink Enabled:'; 'Start Run:'; 'Start Trial:'};
+prompt = {'N:'; 'Attempt:'; 'Gender:'; 'Age:'; 'Handness:'; 'Language (it/en):'; 'Debug'; 'Try EyeLink (1=yes, 0=no):'; 'Start Run:'; 'Start Trial:'};
 defans = {'99'; '1'; 'f'; '25'; 'r'; 'it'; '0'; '1'; '1'; '1'};
 
 answer = inputdlg(prompt, 'Subject Info', 1, defans);
@@ -12,6 +12,7 @@ E.sbj.hand = answer{5};
 E.sbj.lang = answer{6};
 E.debugmode = logical(str2double(answer{7}));
 E.eye.enabled = logical(str2double(answer{8}));
+E.eye.required = false; % Set true to require real tracking, overriding Enabled=0.
 E.part2.startRun = parsePositiveInteger(answer{9}, 1);
 E.part2.startTrial = parsePositiveInteger(answer{10}, 1);
 end

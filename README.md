@@ -89,3 +89,17 @@ rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/e
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10_2/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot_2/
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-17/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot_3/
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-19/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot/
+
+### Optional EyeLink in MATLAB Part 2b
+
+`E.eye.required = false` in `matlab_src/GetSubInfo_Part2b.m` is the default.
+With **Try EyeLink = 1**, setup attempts to connect and calibrate. If the
+tracker/toolbox is unavailable (including an invalid EyeLink MEX), it prints the
+reason and continues without eye tracking. **Try EyeLink = 0** skips tracking.
+The MATLAB Command Window reports disabled, unavailable, dummy, or ready status;
+`E.eye.setupStatus` and `E.eye.setupError` retain the setup outcome in session state.
+
+Set `E.eye.required = true` in that file to require real EyeLink tracking.
+This overrides **Try EyeLink = 0**, rejects dummy mode, and stops on setup failure.
+Recording errors after successful setup still stop the experiment in either mode;
+EDF transfer and sample-rate verification failures still produce warnings.
