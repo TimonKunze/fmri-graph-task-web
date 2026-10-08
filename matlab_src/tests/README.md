@@ -128,3 +128,31 @@ These tests do not measure real display timing or disk-write delays, simulate a 
 - **MATLAB cannot find the tests:** Check that the current folder is the repository root.
 - **The terminal cannot find `matlab`:** Use the full path to the MATLAB executable or run the commands inside MATLAB.
 - **A test fails:** Inspect the diagnostic output for the failed assertion. Confirm that MATLAB can write to its temporary directory if the error concerns file creation.
+
+### Find restart settings after a crash
+
+Add only the source folder to the MATLAB path, then ask for a participant:
+
+```matlab
+addpath('matlab_src');
+info = FindRestartPoint_Part2b(7);
+```
+
+The helper prints **Start Run**, **Start Trial**, and a new **Attempt** number.
+It selects the highest saved attempt and its latest session date, preferring a
+full-state file over a checkpoint. It reads files without modifying them.
+Use `FindRestartPoint_Part2b(7, 2)` to inspect attempt 2 explicitly.
+Crash files are not used as progress records because their state may be stale.
+If the selected session has no checkpoint/full state, the helper reports an error
+instead of silently falling back to older data. Skipped/timed-out runs require
+manual review. Completed stimulus sequences are reported as complete.
+Unsaved presentations may repeat; resuming starts a fresh run timer and separate
+output files. If resuming at a choice, its reference image is reconstructed in
+memory, not displayed again. The participant must remember that reference.
+
+Run the helper's synthetic-file tests with:
+
+```matlab
+results = runtests('matlab_src/tests/testFindRestartPoint_Part2b.m');
+assertSuccess(results);
+```

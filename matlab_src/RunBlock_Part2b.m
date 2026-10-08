@@ -21,7 +21,8 @@ if ~isnumeric(startTrialIndex) || ~isscalar(startTrialIndex) || ...
         ~isfinite(startTrialIndex) || startTrialIndex ~= floor(startTrialIndex) || ...
         startTrialIndex < 1 || startTrialIndex > numel(runItems)
     error('RunBlock_Part2b:InvalidStartTrial', ...
-        'Start trial %d is outside the valid range for run %d.', startTrialIndex, runIndex);
+        'Start trial must be one integer from 1 to %d for run %d.', ...
+        numel(runItems), runIndex);
 end
 
 adjM = E.G.adjM;
@@ -297,8 +298,8 @@ if isnan(experimentNodeIndex)
         graphNodeIndex, rawNode);
 end
 
-imageSrc = E.Stim.nodePaths.(stimSet){experimentNodeIndex + 1};
-imageTex = E.Stim.nodeTextures.(stimSet){experimentNodeIndex + 1};
+imageSrc = indexedStimulus(E.Stim.nodePaths.(stimSet), experimentNodeIndex + 1);
+imageTex = indexedStimulus(E.Stim.nodeTextures.(stimSet), experimentNodeIndex + 1);
 
 decoded = struct( ...
     'rawNode', rawNode, ...
@@ -308,6 +309,15 @@ decoded = struct( ...
     'experimentNodeIndex', experimentNodeIndex, ...
     'imageSrc', imageSrc, ...
     'imageTex', imageTex);
+end
+
+function value = indexedStimulus(container, index)
+% Production preload uses cell arrays; timing tests may use numeric handles.
+if iscell(container)
+    value = container{index};
+else
+    value = container(index);
+end
 end
 
 function canonicalToExp = invertPermutation(expToCanonical)
