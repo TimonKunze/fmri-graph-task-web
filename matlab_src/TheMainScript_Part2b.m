@@ -59,7 +59,11 @@ catch err
     catch closeErr
         E.screenCloseError = closeErr;
     end
-    save(fullfile(E.paths.crashedDir, E.filenameCrashMat), 'E');
+    try
+        save(fullfile(E.paths.crashedDir, E.filenameCrashMat), 'E');
+    catch crashSaveErr
+        warning('Part2b:CrashSaveFailed', 'Emergency save failed: %s', crashSaveErr.message);
+    end
     try
         E = FlushResultsMat_Part2b(E, 'final');
     catch saveErr

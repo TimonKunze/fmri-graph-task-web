@@ -11,8 +11,8 @@ if strcmp(mode, 'stop')
     if isfield(E, 'part2') && isfield(E.part2, 'scannerQueueActive') && ...
             E.part2.scannerQueueActive
         r = E.part2.activeScannerRun;
-        E.part2.run(r).scannerCaptureEndSecs = GetSecs;
         KbQueueStop; % Freeze delivery BEFORE the last drain.
+        E.part2.run(r).scannerCaptureEndSecs = GetSecs;
         E = collectScannerPulses(E);
         E.part2.scannerQueueActive = false;
         % ExperimentScript's queueGuard releases this stopped/drained queue.

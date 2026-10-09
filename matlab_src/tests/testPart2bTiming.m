@@ -6,8 +6,15 @@ end
 function setup(testCase)
 testDir = fileparts(mfilename('fullpath'));
 testCase.applyFixture(matlab.unittest.fixtures.PathFixture(fileparts(testDir)));
-testCase.applyFixture(matlab.unittest.fixtures.PathFixture( ...
-    fullfile(testDir, 'helpers', 'psychtoolbox')));
+mockDir = fullfile(testDir, 'helpers', 'psychtoolbox');
+testCase.applyFixture(matlab.unittest.fixtures.PathFixture(mockDir));
+% Mixed real/simulated clocks can leave polling loops waiting indefinitely.
+for name = {'GetSecs', 'WaitSecs', 'KbCheck', 'Screen'}
+    resolved = which(name{1});
+    testCase.assertTrue(strcmpi(fileparts(resolved), mockDir), ...
+        sprintf('Timing tests require %s from %s; MATLAB selected %s.', ...
+        name{1}, mockDir, resolved));
+end
 folder = testCase.applyFixture(matlab.unittest.fixtures.TemporaryFolderFixture);
 global PART2B_TEST_CLOCK
 PART2B_TEST_CLOCK = struct('now', 0, 'reads', 0, 'keyStart', Inf, ...
@@ -234,7 +241,8 @@ end
 end
 
 function testExperimentStartsInSelectedRunThenRestartsNextRunAtOne(testCase)
-global PART2B_TEST_CLOCK
+global PART2B_TEST_CLOCK PART2B_TEST_SCANNER
+scannerQueueFixture(testCase); % Simulate scanner pulses even when PTB is installed.
 E = resumeFixture(testCase);
 E.assignment.part2RawNodeRuns = repmat(E.assignment.part2RawNodeRuns, 1, 3);
 E.assignment.part2ItiTimesFmri = repmat(E.assignment.part2ItiTimesFmri, 1, 3);
@@ -248,6 +256,9 @@ E.text = struct('part2Intro', 'Intro', 'part2Start', 'Start', ...
 PART2B_TEST_CLOCK.autoContinue = true;
 PART2B_TEST_CLOCK.keyPolls = 0;
 E = ExperimentScript_Part2b(E);
+assertFalse(testCase, isfield(E, 'err'));
+verifyEqual(testCase, PART2B_TEST_SCANNER.starts, 2);
+verifyEqual(testCase, PART2B_TEST_SCANNER.releases, 2);
 T = BuildResultsTable_Part2b(E);
 verifyEqual(testCase, unique(T.Run), [2; 3]);
 verifyEqual(testCase, E.part2.run(2).firstStoredVolumeSecs, E.part2.run(2).triggerSecs);
@@ -255,8 +266,9 @@ verifyEqual(testCase, E.part2.run(2).boldReferenceSource, 'first_trigger');
 verifyEqual(testCase, T.OnsetFromStoredVolume(T.Run == 2), ...
     T.StimulusOnsetSec(T.Run == 2) - E.part2.run(2).triggerSecs);
 verifyEqual(testCase, T.TrialIndex(1), 5);
-verifyEqual(testCase, unique(T.TrialIndex(T.Run == 2)), (5:7).');
-verifyEqual(testCase, unique(T.TrialIndex(T.Run == 3)), (1:7).');
+taskRows = ismember(T.TrialName, ["part2_fmri_picture_viewing", "part2_dual_stimulus_choice"]);
+verifyEqual(testCase, unique(T.TrialIndex(T.Run == 2 & taskRows)), (5:7).');
+verifyEqual(testCase, unique(T.TrialIndex(T.Run == 3 & taskRows)), (1:7).');
 saved = load(testCase.TestData.checkpoint, 'resultsTable');
 verifyEqual(testCase, saved.resultsTable.TrialName, T.TrialName);
 verifyEqual(testCase, saved.resultsTable.Response, T.Response);
@@ -452,6 +464,11 @@ end
 function E = scannerQueueFixture(testCase)
 helperDir = fullfile(fileparts(mfilename('fullpath')), 'helpers', 'scanner');
 testCase.applyFixture(matlab.unittest.fixtures.PathFixture(helperDir));
+for name = {'KbQueueCreate', 'KbQueueStart', 'KbQueueCheck', 'KbQueueStop', 'KbQueueRelease', 'KbEventGet'}
+    resolved = which(name{1});
+    testCase.assertTrue(strcmpi(fileparts(resolved), helperDir), ...
+        sprintf('Scanner tests require the mock %s; MATLAB selected %s.', name{1}, resolved));
+end
 global PART2B_TEST_SCANNER PART2B_TEST_SCANNER_EVENTS PART2B_TEST_CLOCK
 PART2B_TEST_SCANNER = struct('creates', 0, 'starts', 0, 'stops', 0, ...
     'releases', 0, 'started', false, 'releasedWithPending', false);
