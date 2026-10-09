@@ -136,8 +136,9 @@ end
 
 function writeFixture(testCase, rows)
 file = fullfile(testCase.TestData.fixtureRoot, 'public', 'config', 'randomization_table.csv');
-% Use the built-in writer to quote commas, embedded newlines and quotes.
-writetable(rows, file);
+% Explicit quoting keeps multiline adjacency cells intact across MATLAB
+% versions and platforms, including LF-only values on Windows.
+writetable(rows, file, 'QuoteStrings', true);
 end
 
 function rows = fixtureRows()
