@@ -1,6 +1,19 @@
 function [status, varargout] = Eyelink(command, varargin)
 % Hardware substitute: log calls and write a known payload, not a real EDF.
 global PART2B_TEST_EYELINK
+% Keep initialization separate from recording/transfer lifecycle calls.
+if any(strcmp(command, {'Initialize', 'InitializeDummy'}))
+    PART2B_TEST_EYELINK.initCall = [{command}, varargin];
+    if isfield(PART2B_TEST_EYELINK, 'throwOnInit') && PART2B_TEST_EYELINK.throwOnInit
+        error('EyeLinkTest:InvalidMex', 'Invalid MEX-file: The specified module could not be found.');
+    end
+    status = double(~PART2B_TEST_EYELINK.initOk);
+    return;
+elseif strcmp(command, 'IsConnected')
+    status = 1;
+    if PART2B_TEST_EYELINK.dummy, status = -1; end
+    return;
+end
 PART2B_TEST_EYELINK.calls{end + 1} = [{command}, varargin];
 status = 0;
 switch command

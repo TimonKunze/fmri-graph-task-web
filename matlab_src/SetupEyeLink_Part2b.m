@@ -25,14 +25,26 @@ end
 
 try
 
-    if ~exist('EyelinkInit', 'file') || ~exist('Eyelink', 'file')
+    if ~exist('Eyelink', 'file') || ~exist('EyelinkInitDefaults', 'file')
         error('SetupEyeLink_Part2b:MissingToolbox', 'The EyeLink toolbox is not available on the MATLAB path.');
     end
 
     dummyMode = isfield(E, 'eye') && isfield(E.eye, 'dummy') && E.eye.dummy;
-    [initOk, dummyUsed] = EyelinkInit(double(dummyMode), 1);
-    if ~initOk
+    % EyelinkInit offers a dummy-mode dialog after a failed connection.
+    % Initialize directly so the startup policy handles failure without a prompt.
+    initCommand = 'Initialize';
+    if dummyMode && ~E.eye.required
+        initCommand = 'InitializeDummy'; % Explicit developer testing only.
+    end
+    initStatus = Eyelink(initCommand, 'PsychEyelinkDispatchCallback');
+    if initStatus ~= 0
         error('SetupEyeLink_Part2b:InitFailed', 'EyeLink initialization failed.');
+    end
+
+    connectionStatus = Eyelink('IsConnected');
+    dummyUsed = connectionStatus == -1;
+    if connectionStatus == 0
+        error('SetupEyeLink_Part2b:InitFailed', 'EyeLink is not connected after initialization.');
     end
 
     % A failed real connection must not silently become a dummy session.

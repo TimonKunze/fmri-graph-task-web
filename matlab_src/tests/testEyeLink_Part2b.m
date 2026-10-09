@@ -34,6 +34,8 @@ end
 function testSetupOpensFileAndCalibrates(testCase)
 global PART2B_TEST_EYELINK
 E = SetupEyeLink_Part2b(testCase.TestData.E);
+verifyEqual(testCase, PART2B_TEST_EYELINK.initCall, ...
+    {'Initialize', 'PsychEyelinkDispatchCallback'});
 verifyTrue(testCase, E.eye.initialized);
 verifyTrue(testCase, E.eye.fileOpened);
 verifyTrue(testCase, E.eye.setupComplete);
