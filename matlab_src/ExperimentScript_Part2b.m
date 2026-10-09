@@ -111,6 +111,7 @@ for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
     end
 end
 
+E.eye.experimentCompleted = true; % Expected EDFs for this completed attempt.
 waitForAnyKey();
 catch err
     E.err = err;

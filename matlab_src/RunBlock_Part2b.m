@@ -45,6 +45,7 @@ runSkipped = false;
 pendingItiIndex = [];
 pendingImageIndex = [];
 nextStimulusDeadlineSecs = 0;
+preparedFixation = [];
 
 runError = [];
 try
@@ -71,12 +72,6 @@ for trialIndex = startTrialIndex:numel(runItems)
         nextStimulusDeadlineSecs = 0;
         SendEyeLinkMessage_Part2b(E, 'IMAGE_ONSET %d %d %d %d', runIndex, trialIndex, decoded.rawNode, decoded.graphNodeIndex);
         imageDeadlineSecs = imageOnsetSecs + E.times.imagePresentationMs / 1000;
-        if isfield(E.screen, 'flipinterval') && isfinite(E.screen.flipinterval) && ...
-                E.screen.flipinterval > 0
-            % The fixation flip follows this wait. Bias the deadline by half
-            % a refresh so the immediate flip lands at the requested offset.
-            imageDeadlineSecs = imageDeadlineSecs - 0.5 * E.screen.flipinterval;
-        end
         pendingImageIndex = numel(E.part2.trials) + 1;
             E.part2.trials{pendingImageIndex} = struct( ...
                 'trial_name', 'part2_fmri_picture_viewing', ...
@@ -100,7 +95,14 @@ for trialIndex = startTrialIndex:numel(runItems)
                 'timestamp_clock', imageOnsetClock, ...
                 'run_skipped', runSkipped, ...
                 'timed_out', runTimedOut);
-        [runSkipped, runTimedOut] = waitUntilSecsWithRunSkip(E, imageDeadlineSecs, runDeadlineSecs);
+        % Draw the image-offset fixation while the image is still visible,
+        % then schedule its flip for the planned end of the image period.
+        [fixSecs, fixClock, fixFlip, runSkipped, runTimedOut] = ...
+            drawFixationTrial(E, imageDeadlineSecs, runDeadlineSecs);
+        if isfinite(fixSecs)
+            preparedFixation = struct('onset', fixSecs, 'clock', fixClock, 'flip', fixFlip);
+            E = finishStimulus(E, pendingImageIndex, fixFlip.onset, fixFlip);
+        end
         E.part2.trials{pendingImageIndex}.run_skipped = runSkipped;
         E.part2.trials{pendingImageIndex}.timed_out = runTimedOut;
         SendEyeLinkMessage_Part2b(E, 'TRIAL_RESULT %d', double(runSkipped || runTimedOut));
@@ -119,7 +121,8 @@ for trialIndex = startTrialIndex:numel(runItems)
         if trialIndex < numel(runItems)
             itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, runIndex, itiIndex, E.sbj.n);
             [E, pendingItiIndex, nextStimulusDeadlineSecs, itiError] = ...
-                beginIti(E, runIndex, trialIndex, itiSeconds, false, pendingImageIndex);
+                beginIti(E, runIndex, trialIndex, itiSeconds, false, pendingImageIndex, preparedFixation);
+            preparedFixation = [];
             pendingImageIndex = [];
             if ~isempty(itiError), rethrow(itiError); end
             previousItiSeconds = itiSeconds;
@@ -249,8 +252,11 @@ end
 if runTimedOut
     % Clear the current stimulus before saving and returning to the run break.
     Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
-    [~, offsetSecs] = Screen('Flip', E.screen.theWindow);
-    E = finishStimulus(E, pendingImageIndex, offsetSecs);
+    offsetFlip = struct('scheduled', false, 'requestedOnsetSecs', 0, ...
+        'when', 0, 'submittedSecs', GetSecs);
+    [offsetFlip.vbl, offsetFlip.onset, offsetFlip.finished, offsetFlip.missed] = ...
+        Screen('Flip', E.screen.theWindow);
+    E = finishStimulus(E, pendingImageIndex, offsetFlip.onset, offsetFlip);
     timeoutSecs = GetSecs;
     SendEyeLinkMessage_Part2b(E, 'RUN_TIMEOUT %d', runIndex);
     E.part2.trials{end + 1} = struct( ...
@@ -271,8 +277,14 @@ if ~runSkipped && ~runTimedOut
             isfinite(E.times.postRunFixationSec) && E.times.postRunFixationSec >= 0
         postRunFixationSec = E.times.postRunFixationSec;
     end
-    [fixationOnsetSecs, fixationOnsetClock, fixationFlip] = drawFixationTrial(E);
-    E = finishStimulus(E, pendingImageIndex, fixationFlip.onset);
+    if isempty(preparedFixation)
+        [fixationOnsetSecs, fixationOnsetClock, fixationFlip] = drawFixationTrial(E);
+    else
+        fixationOnsetSecs = preparedFixation.onset;
+        fixationOnsetClock = preparedFixation.clock;
+        fixationFlip = preparedFixation.flip;
+    end
+    E = finishStimulus(E, pendingImageIndex, fixationFlip.onset, fixationFlip);
     SendEyeLinkMessage_Part2b(E, 'POST_RUN_FIXATION_ONSET %d %d', ...
         runIndex, round(postRunFixationSec * 1000));
     E.part2.trials{end + 1} = struct( ...
@@ -397,14 +409,20 @@ for trialIndex = 1:(startTrialIndex - 1)
 end
 end
 
-function [E, recordIndex, deadlineSecs, itiError] = beginIti(E, runIndex, trialIndex, itiSeconds, saveCheckpoint, previousImageIndex)
+function [E, recordIndex, deadlineSecs, itiError] = beginIti(E, runIndex, trialIndex, itiSeconds, saveCheckpoint, previousImageIndex, preparedFixation)
 if nargin < 6
     previousImageIndex = [];
 end
-[onsetSecs, onsetClock, fixationFlip] = drawFixationTrial(E);
+if nargin < 7 || isempty(preparedFixation)
+    [onsetSecs, onsetClock, fixationFlip] = drawFixationTrial(E);
+else
+    onsetSecs = preparedFixation.onset;
+    onsetClock = preparedFixation.clock;
+    fixationFlip = preparedFixation.flip;
+end
 deadlineSecs = onsetSecs + itiSeconds;
 SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', runIndex, trialIndex, round(itiSeconds * 1000));
-E = finishStimulus(E, previousImageIndex, fixationFlip.onset);
+E = finishStimulus(E, previousImageIndex, fixationFlip.onset, fixationFlip);
 recordIndex = numel(E.part2.trials) + 1;
 % This record denotes ITI onset, not completion. Actual duration is filled
 % after the next stimulus flips; a checkpoint taken now keeps it as NaN.
@@ -457,37 +475,28 @@ if isfinite(vbl)
 end
 end
 
-function [vbl, clockStamp, flip] = drawFixationTrial(E)
+function [vbl, clockStamp, flip, skipped, timedOut] = drawFixationTrial(E, deadlineSecs, runDeadlineSecs)
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 Screen('TextSize', E.screen.theWindow, E.screen.textsize * 2);
 DrawFormattedText(E.screen.theWindow, '+', 'center', E.screen.cy, E.screen.textcolor);
+if nargin > 1
+    [vbl, skipped, timedOut, flip] = FlipPreparedStimulus_Part2b(E, deadlineSecs, runDeadlineSecs);
+    clockStamp = '';
+    if isfinite(vbl), clockStamp = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF'); end
+    return;
+end
+skipped = false;
+timedOut = false;
+flip.scheduled = false;
+flip.requestedOnsetSecs = 0;
+flip.when = 0;
+flip.submittedSecs = GetSecs;
 [flip.vbl, flip.onset, flip.finished, flip.missed] = Screen('Flip', E.screen.theWindow);
 vbl = flip.vbl;
 if ~isfinite(vbl)
     vbl = GetSecs;
 end
 clockStamp = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
-end
-
-function [skipped, timedOut] = waitUntilSecsWithRunSkip(E, deadlineSecs, runDeadlineSecs)
-skipped = false;
-timedOut = false;
-while true
-    nowSecs = GetSecs;
-    if nowSecs >= runDeadlineSecs
-        timedOut = true;
-        break;
-    end
-    if nowSecs >= deadlineSecs
-        break;
-    end
-    [keyIsDown, ~, keyCode] = KbCheck;
-    if keyIsDown && keyCode(E.keys.enter) && any(keyCode(E.keys.shift))
-        skipped = true;
-        break;
-    end
-    WaitSecs(min([0.01, deadlineSecs - nowSecs, runDeadlineSecs - nowSecs]));
-end
 end
 
 function [skipped, timedOut] = waitSecsWithRunSkip(E, durationSecs, runDeadlineSecs)
@@ -584,10 +593,13 @@ for k = 1:nbNodes
 end
 end
 
-function E = finishStimulus(E, index, offsetSecs)
+function E = finishStimulus(E, index, offsetSecs, offsetFlip)
 if isempty(index), return; end
 t = E.part2.trials{index};
+% A later timeout clear must not replace an already observed image offset.
+if isfield(t, 'offset_flip'), return; end
 t.offset_sec = offsetSecs;
+t.offset_flip = offsetFlip;
 if isfield(t, 'flip') && isfinite(t.flip.onset) && isfinite(offsetSecs)
     t.actual_duration_ms = 1000 * (offsetSecs - t.flip.onset);
 end

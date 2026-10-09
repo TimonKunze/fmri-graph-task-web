@@ -11,6 +11,10 @@ function [value, onset, finished, missed] = Screen(command, varargin)
      if numel(varargin) >= 2
          when = varargin{2};
      end
+     PART2B_TEST_CLOCK.lastFlipSubmitted = PART2B_TEST_CLOCK.now;
+     if isfield(PART2B_TEST_CLOCK, 'flipCallDelay')
+         PART2B_TEST_CLOCK.now = PART2B_TEST_CLOCK.now + PART2B_TEST_CLOCK.flipCallDelay;
+     end
      PART2B_TEST_CLOCK.now = max(PART2B_TEST_CLOCK.now, when);
      if isfield(PART2B_TEST_CLOCK, 'refreshInterval')
          interval = PART2B_TEST_CLOCK.refreshInterval;

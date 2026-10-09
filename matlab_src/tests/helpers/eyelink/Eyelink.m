@@ -53,6 +53,19 @@ switch command
     case 'Message'
         PART2B_TEST_EYELINK.messages{end + 1} = sprintf(varargin{:});
     case 'ReceiveFile'
+        [~, base] = fileparts(varargin{1});
+        if ~isfield(PART2B_TEST_EYELINK, 'receiveCounts') || ~isfield(PART2B_TEST_EYELINK.receiveCounts, base)
+            PART2B_TEST_EYELINK.receiveCounts.(base) = 0;
+        end
+        PART2B_TEST_EYELINK.receiveCounts.(base) = PART2B_TEST_EYELINK.receiveCounts.(base) + 1;
+        metadataPath = fullfile(fileparts(fileparts(varargin{2})), [base '.reservation'], 'metadata.mat');
+        saved = load(metadataPath, 'eyeFile');
+        PART2B_TEST_EYELINK.lastAttemptMetadata = saved.eyeFile;
+        if isfield(PART2B_TEST_EYELINK, 'failuresRemaining') && ...
+                isfield(PART2B_TEST_EYELINK.failuresRemaining, base) && PART2B_TEST_EYELINK.failuresRemaining.(base) > 0
+            PART2B_TEST_EYELINK.failuresRemaining.(base) = PART2B_TEST_EYELINK.failuresRemaining.(base) - 1;
+            error('EyeLinkTest:TransientTransfer', 'Simulated transient transfer failure.');
+        end
         assert(~PART2B_TEST_EYELINK.fileOpened, 'Transfer attempted before CloseFile.');
         assert(~isfield(PART2B_TEST_EYELINK, 'recording') || ~PART2B_TEST_EYELINK.recording, ...
             'Transfer attempted during recording.');

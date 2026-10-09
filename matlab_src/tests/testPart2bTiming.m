@@ -292,7 +292,7 @@ function trials = withoutTimestamps(trials)
 for i = 1:numel(trials)
     trials{i} = rmfield(trials{i}, ...
         {'timestamp_sec', 'timestamp_rel_sec', 'timestamp_clock'});
-    timeFields = intersect(fieldnames(trials{i}), {'flip', 'offset_sec', ...
+    timeFields = intersect(fieldnames(trials{i}), {'flip', 'offset_flip', 'offset_sec', ...
         'onset_from_trigger', 'onset_from_task_start', 'presentation_deadline_secs', ...
         'response_timestamp_sec'});
     trials{i} = rmfield(trials{i}, timeFields);
@@ -604,7 +604,7 @@ recovered = load(testCase.TestData.checkpoint, 'E');
 verifyEqual(testCase, recovered.E.part2.run(1).scannerTriggerSecs, expected, 'AbsTol', 1e-9);
 end
 
-function E = threeRunEyeLinkFixture(testCase)
+function E = threeRunEyeLinkFixture(testCase, startRun)
 global PART2B_TEST_EYELINK
 E = scannerQueueFixture(testCase);
 E.assignment.part2RawNodeRuns = repmat(E.assignment.part2RawNodeRuns(1), 1, 3);
@@ -626,6 +626,7 @@ E.eye.enabled = true;
 E.eye.required = true;
 E.screen.res = [800 600];
 E.paths.eyeDir = fullfile(E.paths.dataDir, 'sourcedata', 'eyelink');
+if nargin > 1, E.part2.startRun = startRun; end
 E = SetupEyeLink_Part2b(E);
 end
 
@@ -682,6 +683,9 @@ verifyTrue(testCase, E.eye.files{2}.fileTransferred);
 verifyTrue(testCase, E.eye.files{3}.fileTransferred);
 E = CleanupPart2b(E);
 verifyEqual(testCase, E.eye.failedTransferRuns, 1);
+verifyEqual(testCase, E.eye.files{1}.transferAttempts, 6);
+verifyEqual(testCase, E.eye.files{2}.transferAttempts, 1);
+verifyEqual(testCase, E.eye.files{3}.transferAttempts, 1);
 PART2B_TEST_EYELINK.failReceiveFile = '';
 recovered = RetryEyeLinkTransfer_Part2b(E.eye.files{1}.metadataPath);
 verifyTrue(testCase, recovered.fileTransferred);
@@ -698,6 +702,8 @@ verifyEqual(testCase, E.err.identifier, 'Part2bTest:Interrupted');
 E = CleanupPart2b(E);
 verifyEqual(testCase, E.err.identifier, 'Part2bTest:Interrupted');
 verifyTrue(testCase, E.eye.files{1}.fileTransferred);
+verifyEqual(testCase, E.eye.expectedTransferRuns, 1);
+verifyEmpty(testCase, E.eye.failedTransferRuns);
 verifyTrue(testCase, E.eye.shutdown);
 verifyFalse(testCase, PART2B_TEST_EYELINK.connected);
 verifyEqual(testCase, PART2B_TEST_SCANNER.releases, 1);
@@ -715,4 +721,178 @@ verifyFalse(testCase, E.eye.files{1}.fileTransferred);
 verifyNotEmpty(testCase, E.eye.files{1}.transferError);
 verifyTrue(testCase, isfield(PART2B_TEST_EYELINK.hostFiles, 'P00101R1'));
 verifyFalse(testCase, PART2B_TEST_EYELINK.connected);
+end
+
+function testFirstRunTransientFailureRecoversDuringBreak(testCase)
+global PART2B_TEST_EYELINK
+E = threeRunEyeLinkFixture(testCase);
+PART2B_TEST_EYELINK.failuresRemaining.P00101R1 = 1;
+E = ExperimentScript_Part2b(E);
+assertFalse(testCase, isfield(E, 'err'));
+verifyTrue(testCase, E.eye.files{1}.fileTransferred);
+verifyEqual(testCase, E.eye.files{1}.transferAttempts, 2);
+calls = PART2B_TEST_EYELINK.calls;
+receives = find(cellfun(@(c) strcmp(c{1}, 'ReceiveFile') && strcmp(c{2}, 'P00101R1.edf'), calls));
+verifyEqual(testCase, numel(receives), 2);
+T = BuildResultsTable_Part2b(E);
+fixation = T(T.Run == 1 & T.TrialName == "part2_fmri_post_run_fixation", :);
+verifyGreaterThanOrEqual(testCase, PART2B_TEST_EYELINK.callTimes(receives(1)), fixation.StimulusOffsetSec);
+verifyLessThan(testCase, PART2B_TEST_EYELINK.callTimes(receives(end)), E.part2.run(2).triggerSecs);
+E = FinalizeEyeLink_Part2b(E);
+verifyTrue(testCase, E.eye.allFilesTransferred);
+end
+
+function testSecondRunFailureRecoversAtShutdownWithoutReopening(testCase)
+global PART2B_TEST_EYELINK
+E = threeRunEyeLinkFixture(testCase);
+PART2B_TEST_EYELINK.failuresRemaining.P00101R2 = 3;
+E = ExperimentScript_Part2b(E);
+assertFalse(testCase, isfield(E, 'err'));
+verifyFalse(testCase, E.eye.files{2}.fileTransferred);
+verifyEqual(testCase, E.eye.files{2}.transferAttempts, 3);
+E = FinalizeEyeLink_Part2b(E);
+verifyTrue(testCase, E.eye.allFilesTransferred);
+verifyTrue(testCase, E.eye.files{2}.fileTransferred);
+verifyEqual(testCase, E.eye.files{2}.transferAttempts, 4);
+verifyEmpty(testCase, E.eye.failedTransferRuns);
+names = cellfun(@(c) c{1}, PART2B_TEST_EYELINK.calls, 'UniformOutput', false);
+verifyEqual(testCase, sum(strcmp(names, 'OpenFile')), 3);
+verifyEqual(testCase, sum(strcmp(names, 'StartRecording')), 3);
+verifyEqual(testCase, sum(strcmp(names, 'CloseFile')), 3);
+verifyLessThan(testCase, find(strcmp(names, 'ReceiveFile'), 1, 'last'), find(strcmp(names, 'Shutdown'), 1));
+end
+
+function testCompletedExperimentMissingRunRecordFailsFinalization(testCase)
+E = threeRunEyeLinkFixture(testCase);
+E = ExperimentScript_Part2b(E);
+assertFalse(testCase, isfield(E, 'err'));
+E.eye.files{2} = []; % Completed run must not disappear from expected files.
+output = evalc('E = FinalizeEyeLink_Part2b(E);');
+verifyFalse(testCase, E.eye.allFilesTransferred);
+verifyFalse(testCase, E.eye.finalizationOk);
+verifyEqual(testCase, E.eye.failedTransferRuns, 2);
+verifyTrue(testCase, contains(output, 'Run 2: TRANSFER FAILED'));
+verifyTrue(testCase, contains(output, 'Manual recovery required'));
+verifyTrue(testCase, isfile(E.eye.files{1}.localEdfPath));
+verifyTrue(testCase, isfile(E.eye.files{3}.localEdfPath));
+end
+
+function testRestartAttemptRequiresOnlySelectedAndLaterRuns(testCase)
+E = threeRunEyeLinkFixture(testCase, 2);
+E = ExperimentScript_Part2b(E);
+assertFalse(testCase, isfield(E, 'err'));
+E = FinalizeEyeLink_Part2b(E);
+verifyEqual(testCase, E.eye.expectedTransferRuns, [2 3]);
+verifyTrue(testCase, E.eye.allFilesTransferred);
+verifyEmpty(testCase, E.eye.failedTransferRuns);
+verifyEmpty(testCase, E.eye.files{1});
+end
+
+function testScheduledFlipSubmittedEarlySurvivesDriverDelay(testCase)
+global PART2B_TEST_CLOCK
+E = testCase.TestData.E;
+E.screen.flipinterval = 1 / 120;
+PART2B_TEST_CLOCK.refreshInterval = E.screen.flipinterval;
+PART2B_TEST_CLOCK.flipCallDelay = 0.006; % Longer than half a 120-Hz refresh.
+[onset, skipped, expired, flip] = FlipPreparedStimulus_Part2b(E, 1, 10);
+verifyEqual(testCase, onset, 1, 'AbsTol', 1e-9);
+verifyGreaterThanOrEqual(testCase, flip.when - flip.submittedSecs, E.screen.flipinterval - 1e-9);
+verifyFalse(testCase, skipped);
+verifyFalse(testCase, expired);
+end
+
+function testImageOffsetFixationScheduledBeforeDeadline(testCase)
+global PART2B_TEST_CLOCK
+E = testCase.TestData.E;
+E.debugmode = true;
+E.screen.flipinterval = 1 / 120;
+PART2B_TEST_CLOCK.refreshInterval = E.screen.flipinterval;
+PART2B_TEST_CLOCK.flipCallDelay = 0.006;
+E = RunBlock_Part2b(E, 1);
+T = BuildResultsTable_Part2b(E);
+images = T.TrialName == "part2_fmri_picture_viewing";
+verifyEqual(testCase, T.ActualDurationMs(images), [100; 100], 'AbsTol', 1e-6);
+verifyTrue(testCase, T.FlipScheduled(2)); % Image -> ITI fixation.
+verifyTrue(testCase, T.FlipScheduled(end)); % Final image -> final fixation.
+verifyEqual(testCase, T.FlipOnsetErrorSec([2 end]), [0; 0], 'AbsTol', 1e-9);
+verifyEqual(testCase, T.OffsetFlipRequestedOnsetSec(images), T.PresentationDeadlineSec(images), 'AbsTol', 1e-9);
+verifyEqual(testCase, T.StimulusOffsetSec(images), T.OffsetFlipRequestedOnsetSec(images), 'AbsTol', 1e-9);
+verifyGreaterThanOrEqual(testCase, T.OffsetFlipWhenSec(images) - T.OffsetFlipSubmittedSec(images), repmat(E.screen.flipinterval - 1e-9, 2, 1));
+verifyEqual(testCase, T.OffsetFlipMissedSec(images), [-0.001; -0.001]);
+verifyEqual(testCase, T.OffsetFlipTimestampSec(images), T.StimulusOffsetSec(images));
+verifyTrue(testCase, all(isfinite(T.FlipSubmittedSec(images))));
+verifyEqual(testCase, PART2B_TEST_CLOCK.fixationDrawTimes(1), T.StimulusOnsetSec(1), 'AbsTol', 1e-9);
+verifyEqual(testCase, E.part2.trials{1}.offset_flip, E.part2.trials{2}.flip);
+verifyEqual(testCase, E.part2.trials{end - 1}.offset_flip, E.part2.trials{end}.flip);
+end
+
+function testSkipBeforeEarlySubmissionDoesNotFlip(testCase)
+global PART2B_TEST_CLOCK
+E = testCase.TestData.E;
+E.screen.flipinterval = 1 / 120;
+PART2B_TEST_CLOCK.keyStart = 0.5;
+PART2B_TEST_CLOCK.keyEnd = 2;
+PART2B_TEST_CLOCK.keys = [3 4];
+[onset, skipped, expired] = FlipPreparedStimulus_Part2b(E, 1, 10);
+verifyTrue(testCase, isnan(onset));
+verifyTrue(testCase, skipped);
+verifyFalse(testCase, expired);
+verifyFalse(testCase, isfield(PART2B_TEST_CLOCK, 'lastFlipWhen'));
+end
+
+function testEarlySubmissionDoesNotPresentBeyondRunDeadline(testCase)
+global PART2B_TEST_CLOCK
+E = testCase.TestData.E;
+E.screen.flipinterval = 1 / 120;
+[onset, skipped, expired] = FlipPreparedStimulus_Part2b(E, 1, 0.999);
+verifyTrue(testCase, isnan(onset));
+verifyFalse(testCase, skipped);
+verifyTrue(testCase, expired);
+verifyFalse(testCase, isfield(PART2B_TEST_CLOCK, 'lastFlipWhen'));
+end
+
+function testScheduledImagesPreserveItiAndFinalFixation(testCase)
+global PART2B_TEST_CLOCK
+E = testCase.TestData.E;
+E.screen.flipinterval = 1 / 120;
+E.assignment.part2RawNodeRuns = {{0, 1}};
+E.assignment.part2ItiTimesFmri = {[0.05]};
+E.times.postRunFixationSec = 0.2;
+PART2B_TEST_CLOCK.refreshInterval = E.screen.flipinterval;
+PART2B_TEST_CLOCK.flipCallDelay = 0.006;
+E = RunBlock_Part2b(E, 1);
+assertFalse(testCase, isfield(E, 'err'));
+T = BuildResultsTable_Part2b(E);
+verifyEqual(testCase, height(T), 4);
+verifyEqual(testCase, T.ITIActualSec(2), 0.05, 'AbsTol', 1e-9);
+verifyEqual(testCase, T.ActualDurationMs([1 3]), [100; 100], 'AbsTol', 1e-6);
+verifyEqual(testCase, T.FlipRequestedOnsetSec(3), T.ITIDeadlineSec(2), 'AbsTol', 1e-9);
+verifyGreaterThanOrEqual(testCase, T.FlipWhenSec(3) - T.FlipSubmittedSec(3), E.screen.flipinterval - 1e-9);
+verifyEqual(testCase, PART2B_TEST_CLOCK.now - T.StimulusOnsetSec(4), 0.2, 'AbsTol', 1e-9);
+end
+
+function testSkipDuringScheduledImageCancelsOffset(testCase)
+global PART2B_TEST_CLOCK
+E = testCase.TestData.E;
+E.screen.flipinterval = 1 / 120;
+PART2B_TEST_CLOCK.keyStart = 0.02;
+PART2B_TEST_CLOCK.keyEnd = 1;
+PART2B_TEST_CLOCK.keys = [3 4];
+E = RunBlock_Part2b(E, 1);
+verifyEqual(testCase, E.part2.run(1).status, 'skipped');
+verifyEqual(testCase, numel(E.part2.trials), 1);
+verifyFalse(testCase, isfield(E.part2.trials{1}, 'offset_flip'));
+verifyEqual(testCase, PART2B_TEST_CLOCK.lastFlipWhen, 0);
+end
+
+function testTimeoutDuringScheduledImageRecordsImmediateClear(testCase)
+E = testCase.TestData.E;
+E.screen.flipinterval = 1 / 120;
+E.times.runTimeoutSec = 0.05;
+E = RunBlock_Part2b(E, 1);
+verifyEqual(testCase, E.part2.run(1).status, 'timed_out');
+verifyEqual(testCase, numel(E.part2.trials), 2);
+verifyEqual(testCase, E.part2.trials{1}.offset_sec, 0.05, 'AbsTol', 1e-9);
+verifyFalse(testCase, E.part2.trials{1}.offset_flip.scheduled);
+verifyEqual(testCase, E.part2.trials{1}.offset_flip.submittedSecs, 0.05, 'AbsTol', 1e-9);
 end

@@ -105,7 +105,7 @@ The MATLAB Command Window reports the outcome; `E.eye.setupStatus` and
 remains available for developer testing when tracking is not required.
 
 Recording errors after successful setup still stop the experiment in either mode;
-EDF transfer and sample-rate verification failures still produce warnings.
+EDF transfer failures are reported with the affected run and Host filename.
 
 
 ### Per-run EyeLink EDF files
@@ -128,7 +128,7 @@ history and using distinct participant/attempt numbers for other experiments or
 computers sharing the Host. Do not reuse a Host name from another acquisition.
 
 `E.eye.files{run}` stores the Host filename, local destination, transfer status,
-errors, and sample-rate verification for each run. Final results MAT/CSV exports
+errors, cumulative attempt count, and successfully received byte count for each run. Final results MAT/CSV exports
 include the run-specific EDF filename, destination and transfer result. Failed
 or partial downloads stay in temporary staging folders and never replace a
 completed EDF. Host originals are not deleted.
@@ -155,3 +155,27 @@ reservations, partial/cancelled transfers, recovery, and interrupted cleanup.
 Real EDF readability, gaze/sample-rate content, Host offline/close behavior,
 transfer duration, and scanner/display synchronization still require a hardware
 check on the acquisition computer.
+
+
+### EDF transfer retries and final status
+
+Each run break allows at most **three transfer attempts** (one initial attempt
+plus two retries). Retries only receive the already closed Host EDF; they never
+restart recording or reopen it. The latest transfer metadata is saved before and
+after each attempt. Shutdown retries every still-outstanding run with at most
+three additional attempts per file, then checks the actual local file sizes,
+prints a per-run summary, and disconnects. Earlier run failures remain recoverable
+while later runs record normally. Existing EDFs are never overwritten.
+
+`E.eye.allFilesTransferred`, `E.eye.failedTransferRuns`, and the transfer-only
+`finalizationOk`/`finalizationStatus` describe the final outcome. Completed
+attempts require every planned run (including missing run records); interrupted
+attempts require files only through the last attempted run and report later runs
+as `NOT STARTED`. Restart attempts begin at their selected start run.
+
+The tracker is still explicitly configured for **1000 Hz**, and command rejection
+is still checked. There is **no automatic sample-rate QC or edf2asc dependency**
+in acquisition or finalization. `VerifyEdfSampleRate_Part2b` remains an optional,
+independent offline QC utility. Its verification-only fields and export columns
+are no longer populated by acquisition. Recovery records from older sessions
+remain readable by `RetryEyeLinkTransfer_Part2b`.

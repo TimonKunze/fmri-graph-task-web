@@ -95,8 +95,9 @@ for status = [0 -1]
     PART2B_TEST_EYELINK.writeFile = false;
     E = StopEyeLinkRecording_Part2b(E);
     verifyFalse(testCase, E.eye.fileTransferred);
-    verifyEqual(testCase, E.eye.transferStatus, status);
-    verifyNotEmpty(testCase, E.eye.transferError);
+    verifyTrue(testCase, contains(E.eye.transferError, 'Refusing to overwrite'));
+    verifyEqual(testCase, sum(strcmp(callNames(), 'ReceiveFile')), 1);
+    verifyEqual(testCase, readBytes(E.eye.localEdfPath), PART2B_TEST_EYELINK.payload);
 end
 end
 
@@ -433,4 +434,107 @@ verifyError(testCase, @() StartEyeLinkRecording_Part2b(E), ...
 E = ShutdownEyeLink_Part2b(E);
 verifyTrue(testCase, E.eye.fileTransferred);
 verifyFalse(testCase, PART2B_TEST_EYELINK.recording);
+end
+
+function testTransientTransferRetriesOnlyReceiveAndPersistsEveryAttempt(testCase)
+global PART2B_TEST_EYELINK
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+E = StartEyeLinkRecording_Part2b(E);
+PART2B_TEST_EYELINK.failuresRemaining.P00701R1 = 1;
+E = StopEyeLinkRecording_Part2b(E);
+verifyTrue(testCase, E.eye.fileTransferred);
+verifyEqual(testCase, E.eye.transferAttempts, 2);
+verifyEqual(testCase, E.eye.receivedBytes, numel(PART2B_TEST_EYELINK.payload));
+verifyEqual(testCase, PART2B_TEST_EYELINK.lastAttemptMetadata.transferAttempts, 2);
+verifyEqual(testCase, PART2B_TEST_EYELINK.lastAttemptMetadata.transferStatusText, 'TRANSFERRING');
+S = load(E.eye.metadataPath, 'eyeFile');
+verifyEqual(testCase, S.eyeFile.transferAttempts, 2);
+verifyTrue(testCase, S.eyeFile.fileTransferred);
+names = callNames();
+verifyEqual(testCase, sum(strcmp(names, 'OpenFile')), 1);
+verifyEqual(testCase, sum(strcmp(names, 'StartRecording')), 1);
+verifyEqual(testCase, sum(strcmp(names, 'StopRecording')), 1);
+verifyEqual(testCase, sum(strcmp(names, 'CloseFile')), 1);
+verifyEqual(testCase, sum(strcmp(names, 'ReceiveFile')), 2);
+end
+
+function testPermanentFailureHasBoundedRetriesAndSavedError(testCase)
+global PART2B_TEST_EYELINK
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+PART2B_TEST_EYELINK.throwOnReceive = true;
+E = StopEyeLinkRecording_Part2b(E);
+verifyEqual(testCase, E.eye.transferAttempts, 3);
+verifyFalse(testCase, E.eye.fileTransferred);
+S = load(E.eye.metadataPath, 'eyeFile');
+verifyEqual(testCase, S.eyeFile.transferAttempts, 3);
+verifyEqual(testCase, S.eyeFile.transferStatusText, 'FAILED');
+verifyNotEmpty(testCase, S.eyeFile.transferError);
+E = FinalizeEyeLink_Part2b(E);
+verifyEqual(testCase, E.eye.files{1}.transferAttempts, 6);
+verifyFalse(testCase, E.eye.allFilesTransferred);
+verifyEqual(testCase, E.eye.failedTransferRuns, 1);
+FinalizeEyeLink_Part2b(E);
+verifyEqual(testCase, sum(strcmp(callNames(), 'ReceiveFile')), 6); % No unbounded shutdown retries.
+end
+
+function testTransferOnlyFinalizationDoesNotRequireSampleRateQc(testCase)
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+output = evalc('E = FinalizeEyeLink_Part2b(E);');
+verifyTrue(testCase, E.eye.allFilesTransferred);
+verifyTrue(testCase, E.eye.finalizationOk);
+verifyEqual(testCase, E.eye.finalizationStatus, 'TRANSFERRED');
+verifyEmpty(testCase, E.eye.failedTransferRuns);
+verifyTrue(testCase, contains(output, 'Run 1: TRANSFERRED'));
+verifyFalse(testCase, contains(lower(output), 'sample-rate'));
+verifyFalse(testCase, isfield(E.eye, 'sampleRateVerified'));
+verifyFalse(testCase, isfield(E.eye.files{1}, 'sampleRateVerificationStatus'));
+verifyEqual(testCase, E.eye.requestedSampleRateHz, 1000);
+end
+
+function testFinalizationRejectsMissingOrTruncatedLocalEdf(testCase)
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+E = FinalizeEyeLink_Part2b(E);
+assertTrue(testCase, E.eye.allFilesTransferred);
+% Simulate loss after shutdown: cached flags cannot certify this copy.
+delete(E.eye.localEdfPath);
+E = FinalizeEyeLink_Part2b(E);
+verifyFalse(testCase, E.eye.allFilesTransferred);
+verifyEqual(testCase, E.eye.failedTransferRuns, 1);
+fid = fopen(E.eye.localEdfPath, 'wb');
+fwrite(fid, uint8('short'), 'uint8');
+fclose(fid);
+E = FinalizeEyeLink_Part2b(E);
+verifyFalse(testCase, E.eye.finalizationOk);
+verifyEqual(testCase, readBytes(E.eye.localEdfPath), uint8('short'));
+end
+
+function testNoRetryWhileScannerCaptureIsActive(testCase)
+global PART2B_TEST_EYELINK
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+E.part2.scannerQueueActive = true;
+verifyError(testCase, @() StopEyeLinkRecording_Part2b(E), ...
+    'StopEyeLinkRecording_Part2b:ActiveAcquisition');
+verifyError(testCase, @() ShutdownEyeLink_Part2b(E), ...
+    'ShutdownEyeLink_Part2b:ActiveAcquisition');
+verifyFalse(testCase, any(strcmp(callNames(), 'ReceiveFile')));
+verifyTrue(testCase, PART2B_TEST_EYELINK.fileOpened);
+end
+
+function testDummyAndDisabledFinalizationExpectNoEdfs(testCase)
+global PART2B_TEST_EYELINK
+E = testCase.TestData.E;
+E.eye.enabled = false;
+E = FinalizeEyeLink_Part2b(E);
+verifyEqual(testCase, E.eye.finalizationStatus, 'DISABLED');
+verifyTrue(testCase, E.eye.allFilesTransferred);
+verifyEmpty(testCase, E.eye.failedTransferRuns);
+E = testCase.TestData.E;
+E.eye.dummy = true;
+PART2B_TEST_EYELINK.dummy = true;
+E = SetupEyeLink_Part2b(E);
+E = FinalizeEyeLink_Part2b(E);
+verifyEqual(testCase, E.eye.finalizationStatus, 'DUMMY');
+verifyTrue(testCase, E.eye.finalizationOk);
+verifyEmpty(testCase, E.eye.expectedTransferRuns);
+verifyFalse(testCase, any(strcmp(callNames(), 'ReceiveFile')));
 end

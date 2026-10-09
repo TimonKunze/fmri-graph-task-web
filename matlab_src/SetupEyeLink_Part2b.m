@@ -61,9 +61,6 @@ try
     E.eye.fileTransferred = false;
     E.eye.shutdown = false;
     E.eye.requestedSampleRateHz = 1000;
-    E.eye.actualSampleRateHz = NaN;
-    E.eye.sampleRateVerified = false;
-    E.eye.sampleRateVerificationStatus = 'NOT_VERIFIED';
     E.eye.trackerVersion = NaN;
     E.eye.trackerVersionString = '';
     E.eye.defaults = EyelinkInitDefaults(E.screen.theWindow);

@@ -4,11 +4,13 @@ if ~isfield(E, 'eye') || ~isfield(E.eye, 'enabled') || ~E.eye.enabled || ...
         (isfield(E.eye, 'dummy') && E.eye.dummy) || ~isfield(E.eye, 'edfBaseName')
     return;
 end
-if E.eye.fileTransferred, return; end
-E.eye.transferError = '';
+if isfield(E, 'part2') && isfield(E.part2, 'scannerQueueActive') && E.part2.scannerQueueActive
+    error('StopEyeLinkRecording_Part2b:ActiveAcquisition', 'Cannot transfer EDFs during scanner acquisition.');
+end
 E.eye.cleanupError = '';
 try
     if E.eye.fileOpened || E.eye.recording
+        E.eye.transferError = '';
         % Also stop when StartRecording threw before returning its updated E.
         SendEyeLinkMessage_Part2b(E, 'RECORDING_STOP %d', E.sbj.n);
         try
@@ -31,64 +33,14 @@ catch err
     E.eye.transferError = ['EDF stop/close failed: ' err.message];
 end
 
-if isempty(E.eye.transferError)
-    E.eye.transferAttempts = E.eye.transferAttempts + 1;
-    E.eye.transferStatus = NaN;
-    try
-        if exist(E.eye.localEdfPath, 'file')
-            error('StopEyeLinkRecording_Part2b:ExistingDestination', ...
-                'Refusing to overwrite existing EDF: %s', E.eye.localEdfPath);
-        end
-        % Receive into a fresh staging directory. Failed/partial downloads
-        % remain there; they never replace a verified EDF or block a retry.
-        stagingDir = tempname(fileparts(E.eye.localEdfPath));
-        mkdir(stagingDir);
-        stagingFile = fullfile(stagingDir, E.eye.hostEdfFile);
-        status = Eyelink('ReceiveFile', E.eye.hostEdfFile, stagingFile, 0);
-        E.eye.transferStatus = status;
-        info = dir(stagingFile);
-        if ~isnumeric(status) || ~isscalar(status) || ~isfinite(status) || ...
-                status <= 0 || numel(info) ~= 1 || info.isdir || info.bytes ~= status
-            error('StopEyeLinkRecording_Part2b:TransferFailed', ...
-                'EDF transfer failed or received file is empty/incomplete (status %g).', status);
-        end
-        if exist(E.eye.localEdfPath, 'file')
-            error('StopEyeLinkRecording_Part2b:ExistingDestination', ...
-                'Refusing to overwrite existing EDF: %s', E.eye.localEdfPath);
-        end
-        [ok, message] = movefile(stagingFile, E.eye.localEdfPath);
-        if ~ok, error('StopEyeLinkRecording_Part2b:CommitFailed', '%s', message); end
-        E.eye.fileTransferred = true;
-        E.eye.transferStatusText = 'TRANSFERRED';
-        fprintf('EyeLink: run %d EDF saved to %s\n', E.eye.runIndex, E.eye.localEdfPath);
-        % Verification failure does not invalidate an otherwise complete copy.
-        try
-            E = VerifyEdfSampleRate_Part2b(E);
-        catch err
-            E.eye.sampleRateVerificationStatus = 'VERIFICATION_ERROR';
-            E.eye.sampleRateVerificationOutput = err.message;
-        end
-    catch err
-        E.eye.transferError = err.message;
-    end
-end
-if ~E.eye.fileTransferred
-    E.eye.transferStatusText = 'FAILED';
-    fprintf(2, 'EyeLink: run %d EDF not transferred: %s\nHost file retained: %s\n', ...
-        E.eye.runIndex, E.eye.transferError, E.eye.hostEdfFile);
-end
-% Snapshot each run independently; later files must not replace its outcome.
+% Reuse the same bounded transfer routine for run breaks and recovery.
 eyeFile = E.eye.files{E.eye.runIndex};
 names = fieldnames(eyeFile);
-for i = 1:numel(names), eyeFile.(names{i}) = E.eye.(names{i}); end
-E.eye.files{E.eye.runIndex} = eyeFile;
-try
-    tempMetadata = [eyeFile.metadataPath '.tmp'];
-    save(tempMetadata, 'eyeFile');
-    [ok, message] = movefile(tempMetadata, eyeFile.metadataPath, 'f');
-    if ~ok, error('StopEyeLinkRecording_Part2b:MetadataFailed', '%s', message); end
-catch err
-    E.eye.metadataSaveError = err.message;
-    fprintf(2, 'EyeLink: could not save transfer metadata: %s\n', err.message);
+for i = 1:numel(names)
+    if isfield(E.eye, names{i}), eyeFile.(names{i}) = E.eye.(names{i}); end
 end
+eyeFile = RetryEyeLinkTransfer_Part2b(eyeFile, true);
+E.eye.files{E.eye.runIndex} = eyeFile;
+names = fieldnames(eyeFile);
+for i = 1:numel(names), E.eye.(names{i}) = eyeFile.(names{i}); end
 end

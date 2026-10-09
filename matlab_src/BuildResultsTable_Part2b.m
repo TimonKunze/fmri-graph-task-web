@@ -10,9 +10,6 @@ if strlength(edfBaseName) > 0
     EdfFileName(:) = edfBaseName + ".edf";
 end
 RequestedSampleRateHz = repmat(trialField(E.eye, 'requestedSampleRateHz', NaN), n, 1);
-ActualSampleRateHz = repmat(trialField(E.eye, 'actualSampleRateHz', NaN), n, 1);
-SampleRateVerified = repmat(logical(trialField(E.eye, 'sampleRateVerified', false)), n, 1);
-SampleRateVerificationStatus = repmat(string(trialField(E.eye, 'sampleRateVerificationStatus', "NOT_VERIFIED")), n, 1);
 TrackerVersion = repmat(trialField(E.eye, 'trackerVersion', NaN), n, 1);
 TrackerVersionString = repmat(string(trialField(E.eye, 'trackerVersionString', "")), n, 1);
 Run = nan(n, 1);
@@ -64,9 +61,6 @@ for i = 1:n
         end
         EdfFileName(i) = string(trialField(eyeFile, 'hostEdfFile', ""));
         RequestedSampleRateHz(i) = trialField(eyeFile, 'requestedSampleRateHz', NaN);
-        ActualSampleRateHz(i) = trialField(eyeFile, 'actualSampleRateHz', NaN);
-        SampleRateVerified(i) = trialField(eyeFile, 'sampleRateVerified', false);
-        SampleRateVerificationStatus(i) = string(trialField(eyeFile, 'sampleRateVerificationStatus', 'NOT_VERIFIED'));
     end
     TrialIndex(i) = trialField(t, 'trial_index', NaN);
     TrialName(i) = string(trialField(t, 'trial_name', ""));
@@ -106,7 +100,7 @@ for i = 1:n
     OnsetFromTaskStart(i) = trialField(t, 'onset_from_task_start', NaN);
 end
 
-T = table(Subject, EdfFileName, RequestedSampleRateHz, ActualSampleRateHz, SampleRateVerified, SampleRateVerificationStatus, TrackerVersion, TrackerVersionString, Run, TrialIndex, TrialName, Response, ResponseSide, RT, ResponseTimestampSec, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, ReferenceExperimentNode, ReferenceGraphNode, LeftRawNode, RightRawNode, LeftGraphNode, RightGraphNode, LeftExperimentNode, RightExperimentNode, PathLengthLeft, PathLengthRight, LeftImageSrc, RightImageSrc, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec, OnsetFromTrigger, OnsetFromTaskStart);
+T = table(Subject, EdfFileName, RequestedSampleRateHz, TrackerVersion, TrackerVersionString, Run, TrialIndex, TrialName, Response, ResponseSide, RT, ResponseTimestampSec, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, ReferenceExperimentNode, ReferenceGraphNode, LeftRawNode, RightRawNode, LeftGraphNode, RightGraphNode, LeftExperimentNode, RightExperimentNode, PathLengthLeft, PathLengthRight, LeftImageSrc, RightImageSrc, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec, OnsetFromTrigger, OnsetFromTaskStart);
 % Additive export columns; legacy TimestampSec/RT/row definitions are unchanged.
 T.EdfLocalPath = strings(n, 1);
 T.EdfTransferred = false(n, 1);
@@ -130,6 +124,17 @@ T.StimulusOnsetSec = nan(n, 1);
 T.StimulusOffsetSec = nan(n, 1);
 T.FlipTimestampSec = nan(n, 1);
 T.FlipMissedSec = nan(n, 1);
+T.FlipWhenSec = nan(n, 1);
+T.FlipSubmittedSec = nan(n, 1);
+T.OffsetFlipRequestedOnsetSec = nan(n, 1);
+T.OffsetFlipWhenSec = nan(n, 1);
+T.OffsetFlipSubmittedSec = nan(n, 1);
+T.OffsetFlipTimestampSec = nan(n, 1);
+T.OffsetFlipMissedSec = nan(n, 1);
+T.FlipScheduled = false(n, 1);
+T.FlipRequestedOnsetSec = nan(n, 1);
+T.FlipSubmissionLeadSec = nan(n, 1);
+T.FlipOnsetErrorSec = nan(n, 1);
 T.Accuracy = nan(n, 1);
 T.Interrupted = false(n, 1);
 T.OnsetFromStoredVolume = nan(n, 1);
@@ -147,6 +152,21 @@ for i = 1:n
     T.StimulusOffsetSec(i) = trialField(t, 'offset_sec', NaN);
     T.FlipTimestampSec(i) = trialField(flip, 'finished', NaN);
     T.FlipMissedSec(i) = trialField(flip, 'missed', NaN);
+    offsetFlip = trialField(t, 'offset_flip', struct());
+    T.FlipWhenSec(i) = trialField(flip, 'when', NaN);
+    T.FlipSubmittedSec(i) = trialField(flip, 'submittedSecs', NaN);
+    T.OffsetFlipRequestedOnsetSec(i) = trialField(offsetFlip, 'requestedOnsetSecs', NaN);
+    T.OffsetFlipWhenSec(i) = trialField(offsetFlip, 'when', NaN);
+    T.OffsetFlipSubmittedSec(i) = trialField(offsetFlip, 'submittedSecs', NaN);
+    T.OffsetFlipTimestampSec(i) = trialField(offsetFlip, 'finished', NaN);
+    T.OffsetFlipMissedSec(i) = trialField(offsetFlip, 'missed', NaN);
+    T.FlipRequestedOnsetSec(i) = trialField(flip, 'requestedOnsetSecs', NaN);
+    T.FlipScheduled(i) = logical(trialField(flip, 'scheduled', false));
+    if T.FlipScheduled(i)
+        T.FlipRequestedOnsetSec(i) = trialField(flip, 'requestedOnsetSecs', NaN);
+        T.FlipSubmissionLeadSec(i) = trialField(flip, 'when', NaN) - trialField(flip, 'submittedSecs', NaN);
+        T.FlipOnsetErrorSec(i) = T.StimulusOnsetSec(i) - T.FlipRequestedOnsetSec(i);
+    end
     T.Interrupted(i) = logical(trialField(t, 'interrupted', false));
     if isfinite(Response(i)) && isfinite(CorrectChoice(i))
         T.Accuracy(i) = double(Response(i) == CorrectChoice(i));

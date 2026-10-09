@@ -44,7 +44,7 @@ try
     E = FlushResultsMat_Part2b(E, 'final');
 
     if isfield(E, 'eye') && isfield(E.eye, 'finalizationOk') && ~E.eye.finalizationOk
-        warning('The EyeLink EDF was not finalized successfully. Review E.eye.finalizationError before closing the session.');
+        warning('EyeLink EDF transfer incomplete. Review E.eye.failedTransferRuns and E.eye.files before closing the session.');
     end
     ThankYou_Part2b(E);
     Screen('CloseAll');

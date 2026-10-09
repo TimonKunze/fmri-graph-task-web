@@ -1,5 +1,6 @@
 function E = VerifyEdfSampleRate_Part2b(E)
 %VERIFYEDF SAMPLERATE_PART2B Read the sample rate reported for a received EDF.
+% Offline QC utility only: never called by acquisition or finalization.
 % Requires SR Research's edf2asc utility on PATH. Failure is recorded as
 % unverified rather than being mistaken for confirmation of the request.
 E.eye.actualSampleRateHz = NaN;
