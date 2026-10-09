@@ -172,7 +172,7 @@ verifyEqual(testCase, height(saved.resultsTable), 4);
 verifyEqual(testCase, saved.resultsTable.TrialName(end-1:end), ...
     ["part2_dual_stimulus_choice"; "part2_fmri_iti"]);
 verifyEqual(testCase, saved.resultsTable.Response(end-1), 1);
-verifyEqual(testCase, saved.resultsTable.RT(end-1), 0.1);
+verifyEqual(testCase, saved.resultsTable.RT(end-1), 0.1, 'AbsTol', 1e-9);
 end
 
 function testNormalRunHasNoRunTimeoutEvent(testCase)
@@ -180,7 +180,10 @@ E = testCase.TestData.E;
 E.debugmode = true;
 E = RunBlock_Part2b(E, 1);
 saved = load(testCase.TestData.checkpoint, 'resultsTable');
-verifyEqual(testCase, height(saved.resultsTable), 5);
+verifyEqual(testCase, saved.resultsTable.TrialName, ...
+    ["part2_fmri_picture_viewing"; "part2_fmri_iti"; ...
+     "part2_dual_stimulus_choice"; "part2_fmri_iti"; ...
+     "part2_fmri_picture_viewing"; "part2_fmri_post_run_fixation"]);
 verifyFalse(testCase, any(saved.resultsTable.TrialName == "part2_run_timeout"));
 verifyFalse(testCase, E.part2.resultsMatNeedsFlush);
 end

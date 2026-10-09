@@ -14,7 +14,9 @@ if nargin < 3
 end
 files = [dir(fullfile(dataDir, sprintf('part2b_subj%d_A*_*.mat', subject))); ...
     dir(fullfile(fileparts(dataDir), 'Crashed', sprintf('part2b_subj%d_A*_*.mat', subject)))];
-pattern = sprintf('^part2b_subj%d_A(\d+)_(\d{8})_(checkpoint|fullstate|results|crash)\.mat$', subject);
+% Keep regex escapes outside sprintf's format-string processing.
+pattern = [sprintf('^part2b_subj%d_A', subject) ...
+    '(\d+)_(\d{8})_(checkpoint|fullstate|results|crash)\.mat$'];
 attempts = []; dates = []; kinds = {}; paths = {};
 for i = 1:numel(files)
     token = regexp(files(i).name, pattern, 'tokens', 'once');
