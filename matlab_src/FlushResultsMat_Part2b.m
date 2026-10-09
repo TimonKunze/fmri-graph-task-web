@@ -33,6 +33,7 @@ if strcmp(mode, 'final')
     % Raw results plus synchronization metadata; do not duplicate E in results.mat.
     results = rmfield(E.part2, 'resultsTable');
     results.subject = E.sbj;
+    if isfield(E, 'eye') && isfield(E.eye, 'files'), results.eyeFiles = E.eye.files; end
     if isfield(E, 'times'), results.timingParameters = E.times; end
     save(fullfile(E.paths.dataDir, E.filenameFullStateMat), 'E');
     save(fullfile(E.paths.dataDir, E.filenameResultsMat), 'resultsTable', 'results');

@@ -27,6 +27,14 @@ if isfield(E.eye, 'sampleRateVerificationStatus')
 end
 verificationOk = strcmp(verificationStatus, 'VERIFIED');
 
+if isfield(E.eye, 'files')
+    files = E.eye.files(~cellfun(@isempty, E.eye.files));
+    transferOk = all(cellfun(@(f) f.fileTransferred, files));
+    verificationOk = all(cellfun(@(f) f.sampleRateVerified, files));
+    failedRuns = cellfun(@(f) f.runIndex, files(~cellfun(@(f) f.fileTransferred, files)));
+    E.eye.failedTransferRuns = failedRuns;
+    verificationStatus = 'See E.eye.files for per-run verification';
+end
 E.eye.finalizationOk = transferOk && verificationOk;
 if E.eye.finalizationOk
     E.eye.finalizationStatus = 'VERIFIED';

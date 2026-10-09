@@ -6,6 +6,7 @@ E = GetSubInfo_Part2b();
 E.paths.scriptDir = fileparts(mfilename('fullpath'));
 E.paths.repoRoot = fileparts(E.paths.scriptDir);
 E.paths.dataDir = fullfile(E.paths.scriptDir, 'Data');
+E.paths.eyeDir = fullfile(E.paths.repoRoot, 'sourcedata', 'eyelink');
 E.paths.crashedDir = fullfile(E.paths.scriptDir, 'Crashed');
 
 dateTag = datestr(now, 'yyyymmdd');

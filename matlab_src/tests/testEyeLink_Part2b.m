@@ -21,6 +21,7 @@ PART2B_TEST_EYELINK.payload = uint8('synthetic tracker data for transfer testing
 PART2B_TEST_EYELINK.receiveStatus = numel(PART2B_TEST_EYELINK.payload);
 E.sbj.n = 7;
 E.paths.dataDir = folder.Folder;
+E.paths.eyeDir = fullfile(folder.Folder, 'sourcedata', 'eyelink');
 E.screen.theWindow = 1;
 E.screen.res = [800 600];
 E.eye.enabled = true;
@@ -40,7 +41,7 @@ verifyTrue(testCase, E.eye.initialized);
 verifyTrue(testCase, E.eye.fileOpened);
 verifyTrue(testCase, E.eye.setupComplete);
 verifyFalse(testCase, E.eye.fileTransferred);
-verifyEqual(testCase, E.eye.edfBaseName, 'P007A01');
+verifyEqual(testCase, E.eye.edfBaseName, 'P00701R1');
 verifyEqual(testCase, PART2B_TEST_EYELINK.calibrations, 1);
 verifyTrue(testCase, any(strcmp(PART2B_TEST_EYELINK.messages, 'EXPERIMENT_START 7')));
 verifyEqual(testCase, E.eye.requestedSampleRateHz, 1000);
@@ -56,8 +57,8 @@ function testAttemptIsEncodedInUniqueEdfName(testCase)
 E = testCase.TestData.E;
 E.part2.attempt = 2;
 E = SetupEyeLink_Part2b(E);
-verifyEqual(testCase, E.eye.edfBaseName, 'P007A02');
-verifyEqual(testCase, E.eye.localEdfPath, fullfile(E.paths.dataDir, 'P007A02.edf'));
+verifyEqual(testCase, E.eye.edfBaseName, 'P00702R1');
+verifyEqual(testCase, E.eye.localEdfPath, fullfile(E.paths.eyeDir, 'P00702R1.edf'));
 end
 
 function testRecordingStopsClosesAndSavesExactPayload(testCase)
@@ -77,7 +78,9 @@ verifyLessThan(testCase, find(strcmp(commands, 'CloseFile'), 1), find(strcmp(com
 verifyTrue(testCase, any(strcmp(PART2B_TEST_EYELINK.messages, 'RECORDING_START 7')));
 verifyTrue(testCase, any(strcmp(PART2B_TEST_EYELINK.messages, 'RECORDING_STOP 7')));
 transfer = PART2B_TEST_EYELINK.calls{find(strcmp(commands, 'ReceiveFile'), 1)};
-verifyEqual(testCase, transfer(2:end), {'P007A01.edf', E.eye.localEdfPath, 0});
+verifyEqual(testCase, transfer{2}, 'P00701R1.edf');
+verifyEqual(testCase, transfer{4}, 0);
+verifyNotEqual(testCase, transfer{3}, E.eye.localEdfPath); % Staged first.
 end
 
 function testCancellationAndNegativeStatusRejectExistingFile(testCase)
@@ -113,8 +116,7 @@ for bytes = [0 3]
     PART2B_TEST_EYELINK.payload = zeros(1, bytes, 'uint8');
     E = StopEyeLinkRecording_Part2b(E);
     verifyFalse(testCase, E.eye.fileTransferred);
-    info = dir(E.eye.localEdfPath);
-    verifyEqual(testCase, info.bytes, bytes);
+    verifyFalse(testCase, isfile(E.eye.localEdfPath)); % Partial copies stay in staging.
 end
 end
 
@@ -204,7 +206,7 @@ E = SetupEyeLink_Part2b(E);
 E = StartEyeLinkRecording_Part2b(E);
 StopEyeLinkRecording_Part2b(E);
 verifyEmpty(testCase, PART2B_TEST_EYELINK.calls);
-verifyFalse(testCase, isfile(E.eye.localEdfPath));
+verifyFalse(testCase, isfield(E.eye, 'localEdfPath'));
 end
 
 function testInitializationFailureIsReported(testCase)
@@ -317,7 +319,9 @@ for failure = {'init', 'open', 'rate', 'dummy'}
     PART2B_TEST_EYELINK.sampleRateCommandStatus = -double(strcmp(failure{1}, 'rate'));
     PART2B_TEST_EYELINK.dummy = strcmp(failure{1}, 'dummy');
     PART2B_TEST_EYELINK.calls = {};
-    E = SetupEyeLink_Part2b(testCase.TestData.E);
+    input = testCase.TestData.E;
+    input.part2.attempt = find(strcmp(failure{1}, {'init', 'open', 'rate', 'dummy'}));
+    E = SetupEyeLink_Part2b(input);
     verifyFalse(testCase, E.eye.enabled);
     verifyFalse(testCase, E.eye.setupComplete);
     verifyNotEmpty(testCase, E.eye.setupError);
@@ -373,4 +377,60 @@ fid = fopen(path, 'rb');
 assert(fid ~= -1, 'Expected transferred file is missing.');
 cleanup = onCleanup(@() fclose(fid)); %#ok<NASGU>
 bytes = fread(fid, Inf, '*uint8').';
+end
+
+function testRunNamesAndReservationsPreventReuse(testCase)
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+E = StopEyeLinkRecording_Part2b(E);
+verifyError(testCase, @() SetupEyeLink_Part2b(testCase.TestData.E), ...
+    'OpenEyeLinkFile_Part2b:ExistingFile');
+E = OpenEyeLinkFile_Part2b(E, 2);
+verifyEqual(testCase, E.eye.edfBaseName, 'P00701R2');
+verifyEqual(testCase, E.eye.files{1}.hostEdfFile, 'P00701R1.edf');
+verifyTrue(testCase, E.eye.files{1}.fileTransferred);
+verifyNotEmpty(testCase, regexp(E.eye.edfBaseName, '^[A-Za-z0-9]{1,8}$', 'once'));
+end
+
+function testCloseFailureBlocksTransferAndCanBeRetried(testCase)
+global PART2B_TEST_EYELINK
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+E = StartEyeLinkRecording_Part2b(E);
+PART2B_TEST_EYELINK.closeStatus = -1;
+E = StopEyeLinkRecording_Part2b(E);
+verifyTrue(testCase, E.eye.fileOpened);
+verifyFalse(testCase, E.eye.fileTransferred);
+verifyNotEmpty(testCase, E.eye.cleanupError);
+verifyFalse(testCase, any(strcmp(callNames(), 'ReceiveFile')));
+PART2B_TEST_EYELINK.closeStatus = 0;
+E = StopEyeLinkRecording_Part2b(E);
+verifyTrue(testCase, E.eye.fileTransferred);
+end
+
+function testCancelledTransferRetriesWithoutReopeningHostFile(testCase)
+global PART2B_TEST_EYELINK
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+PART2B_TEST_EYELINK.receiveStatus = 0;
+E = StopEyeLinkRecording_Part2b(E);
+verifyFalse(testCase, E.eye.fileTransferred);
+verifyFalse(testCase, isfile(E.eye.localEdfPath));
+verifyTrue(testCase, isfield(PART2B_TEST_EYELINK.hostFiles, E.eye.edfBaseName));
+E = ShutdownEyeLink_Part2b(E);
+PART2B_TEST_EYELINK.receiveStatus = numel(PART2B_TEST_EYELINK.payload);
+file = RetryEyeLinkTransfer_Part2b(E.eye.metadataPath);
+verifyTrue(testCase, file.fileTransferred);
+verifyEqual(testCase, readBytes(file.localEdfPath), PART2B_TEST_EYELINK.payload);
+verifyEqual(testCase, sum(strcmp(callNames(), 'OpenFile')), 1);
+verifyFalse(testCase, PART2B_TEST_EYELINK.connected);
+end
+
+function testFailedStartStillStopsAndTransfersDuringCleanup(testCase)
+global PART2B_TEST_EYELINK
+E = SetupEyeLink_Part2b(testCase.TestData.E);
+PART2B_TEST_EYELINK.recordingStatus = -1;
+verifyError(testCase, @() StartEyeLinkRecording_Part2b(E), ...
+    'StartEyeLinkRecording_Part2b:RecordingLost');
+% E.recording is still false because Start threw before returning.
+E = ShutdownEyeLink_Part2b(E);
+verifyTrue(testCase, E.eye.fileTransferred);
+verifyFalse(testCase, PART2B_TEST_EYELINK.recording);
 end

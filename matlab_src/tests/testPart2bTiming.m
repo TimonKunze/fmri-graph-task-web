@@ -43,7 +43,7 @@ testCase.TestData.checkpoint = fullfile(folder.Folder, E.filenameResultsCheckpoi
 end
 
 function teardown(~)
-clear global PART2B_TEST_CLOCK
+clear global PART2B_TEST_CLOCK PART2B_TEST_EYELINK
 end
 
 function testProductionAndDebugTimingDefaults(testCase)
@@ -602,4 +602,117 @@ PART2B_TEST_CLOCK.failSaveNumber = Inf;
 E = FlushResultsMat_Part2b(E);
 recovered = load(testCase.TestData.checkpoint, 'E');
 verifyEqual(testCase, recovered.E.part2.run(1).scannerTriggerSecs, expected, 'AbsTol', 1e-9);
+end
+
+function E = threeRunEyeLinkFixture(testCase)
+global PART2B_TEST_EYELINK
+E = scannerQueueFixture(testCase);
+E.assignment.part2RawNodeRuns = repmat(E.assignment.part2RawNodeRuns(1), 1, 3);
+E.assignment.part2ItiTimesFmri = repmat(E.assignment.part2ItiTimesFmri(1), 1, 3);
+helperDir = fullfile(fileparts(mfilename('fullpath')), 'helpers', 'eyelink');
+testCase.applyFixture(matlab.unittest.fixtures.PathFixture(helperDir));
+% The EyeLink WaitSecs mock advances the same simulated PTB clock.
+PART2B_TEST_EYELINK = struct('initOk', 1, 'dummy', false, ...
+    'openStatus', 0, 'startStatus', 0, 'recordingStatus', 0, ...
+    'sampleRateCommandStatus', 0, 'trackerVersion', 5, ...
+    'trackerVersionString', '1000 Plus', 'writeFile', true, ...
+    'throwOnReceive', false, 'calibrations', 0);
+PART2B_TEST_EYELINK.calls = {};
+PART2B_TEST_EYELINK.callTimes = [];
+PART2B_TEST_EYELINK.messages = {};
+PART2B_TEST_EYELINK.payload = uint8('synthetic tracker data');
+PART2B_TEST_EYELINK.receiveStatus = numel(PART2B_TEST_EYELINK.payload);
+E.eye.enabled = true;
+E.eye.required = true;
+E.screen.res = [800 600];
+E.paths.eyeDir = fullfile(E.paths.dataDir, 'sourcedata', 'eyelink');
+E = SetupEyeLink_Part2b(E);
+end
+
+function testThreeRunsTransferOnlyAfterFinalFixationAndBeforeNextTrigger(testCase)
+global PART2B_TEST_EYELINK PART2B_TEST_SCANNER
+E = threeRunEyeLinkFixture(testCase);
+E = ExperimentScript_Part2b(E);
+assertFalse(testCase, isfield(E, 'err'));
+verifyEqual(testCase, numel(E.eye.files), 3);
+verifyEqual(testCase, PART2B_TEST_EYELINK.calibrations, 3); % Initial + existing run breaks.
+verifyEqual(testCase, PART2B_TEST_SCANNER.releases, 3);
+calls = PART2B_TEST_EYELINK.calls;
+names = cellfun(@(c) c{1}, calls, 'UniformOutput', false);
+opens = find(strcmp(names, 'OpenFile'));
+starts = find(strcmp(names, 'StartRecording'));
+stops = find(strcmp(names, 'StopRecording'));
+closes = find(strcmp(names, 'CloseFile'));
+receives = find(strcmp(names, 'ReceiveFile'));
+verifyEqual(testCase, [numel(opens) numel(starts) numel(stops) numel(closes) numel(receives)], [3 3 3 3 3]);
+T = BuildResultsTable_Part2b(E);
+for r = 1:3
+    file = E.eye.files{r};
+    verifyEqual(testCase, file.hostEdfFile, sprintf('P00101R%d.edf', r));
+    verifyTrue(testCase, file.fileTransferred);
+    info = dir(file.localEdfPath);
+    verifyEqual(testCase, info.bytes, PART2B_TEST_EYELINK.receiveStatus);
+    verifyLessThan(testCase, starts(r), stops(r));
+    verifyLessThan(testCase, stops(r), closes(r));
+    verifyLessThan(testCase, closes(r), receives(r));
+    fixation = T(T.Run == r & T.TrialName == "part2_fmri_post_run_fixation", :);
+    verifyEqual(testCase, fixation.ActualDurationMs, E.times.postRunFixationSec * 1000, 'AbsTol', 1e-6);
+    verifyGreaterThanOrEqual(testCase, PART2B_TEST_EYELINK.callTimes(stops(r)), fixation.StimulusOffsetSec);
+    verifyLessThan(testCase, PART2B_TEST_EYELINK.callTimes(starts(r)), E.part2.run(r).triggerSecs);
+    verifyEqual(testCase, unique(T.EdfFileName(T.Run == r)), string(file.hostEdfFile));
+    verifyTrue(testCase, all(T.EdfTransferred(T.Run == r)));
+    if r < 3
+        verifyLessThan(testCase, receives(r), opens(r + 1));
+        verifyLessThan(testCase, PART2B_TEST_EYELINK.callTimes(receives(r)), E.part2.run(r + 1).triggerSecs);
+    end
+end
+E = CleanupPart2b(E);
+verifyTrue(testCase, E.eye.shutdown);
+verifyFalse(testCase, PART2B_TEST_EYELINK.connected);
+end
+
+function testFailedFirstRunTransferAllowsLaterRunsAndStandaloneRecovery(testCase)
+global PART2B_TEST_EYELINK
+E = threeRunEyeLinkFixture(testCase);
+PART2B_TEST_EYELINK.failReceiveFile = 'P00101R1.edf';
+E = ExperimentScript_Part2b(E);
+assertFalse(testCase, isfield(E, 'err'));
+verifyFalse(testCase, E.eye.files{1}.fileTransferred);
+verifyTrue(testCase, E.eye.files{2}.fileTransferred);
+verifyTrue(testCase, E.eye.files{3}.fileTransferred);
+E = CleanupPart2b(E);
+verifyEqual(testCase, E.eye.failedTransferRuns, 1);
+PART2B_TEST_EYELINK.failReceiveFile = '';
+recovered = RetryEyeLinkTransfer_Part2b(E.eye.files{1}.metadataPath);
+verifyTrue(testCase, recovered.fileTransferred);
+verifyTrue(testCase, isfile(recovered.localEdfPath));
+end
+
+function testInterruptedRunTransfersPartialEdfWithoutHidingExperimentError(testCase)
+global PART2B_TEST_CLOCK PART2B_TEST_EYELINK PART2B_TEST_SCANNER
+E = threeRunEyeLinkFixture(testCase);
+PART2B_TEST_CLOCK.failOnDraw = 4;
+E = ExperimentScript_Part2b(E);
+assertTrue(testCase, isfield(E, 'err'));
+verifyEqual(testCase, E.err.identifier, 'Part2bTest:Interrupted');
+E = CleanupPart2b(E);
+verifyEqual(testCase, E.err.identifier, 'Part2bTest:Interrupted');
+verifyTrue(testCase, E.eye.files{1}.fileTransferred);
+verifyTrue(testCase, E.eye.shutdown);
+verifyFalse(testCase, PART2B_TEST_EYELINK.connected);
+verifyEqual(testCase, PART2B_TEST_SCANNER.releases, 1);
+end
+
+function testInterruptedTransferFailurePreservesOriginalError(testCase)
+global PART2B_TEST_CLOCK PART2B_TEST_EYELINK
+E = threeRunEyeLinkFixture(testCase);
+PART2B_TEST_CLOCK.failOnDraw = 4;
+PART2B_TEST_EYELINK.throwOnReceive = true;
+E = ExperimentScript_Part2b(E);
+E = CleanupPart2b(E);
+verifyEqual(testCase, E.err.identifier, 'Part2bTest:Interrupted');
+verifyFalse(testCase, E.eye.files{1}.fileTransferred);
+verifyNotEmpty(testCase, E.eye.files{1}.transferError);
+verifyTrue(testCase, isfield(PART2B_TEST_EYELINK.hostFiles, 'P00101R1'));
+verifyFalse(testCase, PART2B_TEST_EYELINK.connected);
 end

@@ -56,6 +56,18 @@ OnsetFromTaskStart = nan(n, 1);
 for i = 1:n
     t = trials{i};
     Run(i) = trialField(t, 'run_index', NaN);
+    if isfield(E.eye, 'files')
+        eyeFile = struct();
+        r = Run(i);
+        if isfinite(r) && r >= 1 && r == floor(r) && numel(E.eye.files) >= r
+            eyeFile = E.eye.files{r};
+        end
+        EdfFileName(i) = string(trialField(eyeFile, 'hostEdfFile', ""));
+        RequestedSampleRateHz(i) = trialField(eyeFile, 'requestedSampleRateHz', NaN);
+        ActualSampleRateHz(i) = trialField(eyeFile, 'actualSampleRateHz', NaN);
+        SampleRateVerified(i) = trialField(eyeFile, 'sampleRateVerified', false);
+        SampleRateVerificationStatus(i) = string(trialField(eyeFile, 'sampleRateVerificationStatus', 'NOT_VERIFIED'));
+    end
     TrialIndex(i) = trialField(t, 'trial_index', NaN);
     TrialName(i) = string(trialField(t, 'trial_name', ""));
     Response(i) = trialField(t, 'response', NaN);
@@ -96,6 +108,18 @@ end
 
 T = table(Subject, EdfFileName, RequestedSampleRateHz, ActualSampleRateHz, SampleRateVerified, SampleRateVerificationStatus, TrackerVersion, TrackerVersionString, Run, TrialIndex, TrialName, Response, ResponseSide, RT, ResponseTimestampSec, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, ReferenceExperimentNode, ReferenceGraphNode, LeftRawNode, RightRawNode, LeftGraphNode, RightGraphNode, LeftExperimentNode, RightExperimentNode, PathLengthLeft, PathLengthRight, LeftImageSrc, RightImageSrc, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec, OnsetFromTrigger, OnsetFromTaskStart);
 % Additive export columns; legacy TimestampSec/RT/row definitions are unchanged.
+T.EdfLocalPath = strings(n, 1);
+T.EdfTransferred = false(n, 1);
+T.EdfTransferError = strings(n, 1);
+for i = 1:n
+    r = Run(i);
+    if isfield(E.eye, 'files') && isfinite(r) && r >= 1 && r == floor(r) && numel(E.eye.files) >= r
+        eyeFile = E.eye.files{r};
+        T.EdfLocalPath(i) = string(trialField(eyeFile, 'localEdfPath', ''));
+        T.EdfTransferred(i) = trialField(eyeFile, 'fileTransferred', false);
+        T.EdfTransferError(i) = string(trialField(eyeFile, 'transferError', ''));
+    end
+end
 T.ImageSrc = strings(n, 1);
 T.ObjectID = nan(n, 1);
 T.LeftObjectID = nan(n, 1);

@@ -106,3 +106,52 @@ remains available for developer testing when tracking is not required.
 
 Recording errors after successful setup still stop the experiment in either mode;
 EDF transfer and sample-rate verification failures still produce warnings.
+
+
+### Per-run EyeLink EDF files
+
+Each scanner run closes and transfers its EDF after the final fixation, while
+showing the break/final screen and before waiting for the next scanner trigger.
+The tracker connection stays open between runs; the existing between-run
+calibration and recording restart remain in place.
+
+Original EDFs are saved under `sourcedata/eyelink/` at the repository root.
+For example, participant 7, attempt 1, runs 1–3 produce `P00701R1.edf`,
+`P00701R2.edf`, and `P00701R3.edf`. These Host basenames have eight alphanumeric
+characters (participant 0–999, attempt 1–99, run 1–9).
+
+Each name is reserved in a sibling `<basename>.reservation/` directory before
+opening it on the Host. Keep these directories, including after a crash; choose
+a new attempt number when restarting. EyeLink cannot reliably reject an existing
+Host filename. Protection therefore depends on retaining this local reservation
+history and using distinct participant/attempt numbers for other experiments or
+computers sharing the Host. Do not reuse a Host name from another acquisition.
+
+`E.eye.files{run}` stores the Host filename, local destination, transfer status,
+errors, and sample-rate verification for each run. Final results MAT/CSV exports
+include the run-specific EDF filename, destination and transfer result. Failed
+or partial downloads stay in temporary staging folders and never replace a
+completed EDF. Host originals are not deleted.
+
+To retry a failed transfer **outside an active experiment**, with the same Host
+available and no active MATLAB EyeLink connection:
+
+```matlab
+addpath('matlab_src');
+eyeFile = RetryEyeLinkTransfer_Part2b( ...
+    fullfile('sourcedata', 'eyelink', 'P00701R1.reservation', 'metadata.mat'));
+```
+
+This reconnects only for recovery, receives the existing Host file without
+opening/recreating it, and updates its recovery metadata. It does not rewrite
+previous experiment exports; retain the returned `eyeFile` with the recovery
+record. Caught experiment errors attempt to transfer the incomplete current run.
+A hard MATLAB/computer crash cannot execute cleanup; the reservation metadata
+provides the Host filename for later recovery.
+
+Run `results = runtests('matlab_src/tests'); assertSuccess(results);` in MATLAB.
+Mock tests cover three-run transfer ordering, final-fixation coverage, filename
+reservations, partial/cancelled transfers, recovery, and interrupted cleanup.
+Real EDF readability, gaze/sample-rate content, Host offline/close behavior,
+transfer duration, and scanner/display synchronization still require a hardware
+check on the acquisition computer.

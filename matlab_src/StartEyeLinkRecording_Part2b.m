@@ -3,6 +3,10 @@ if ~isfield(E, 'eye') || ~isfield(E.eye, 'enabled') || ~E.eye.enabled || (isfiel
     return;
 end
 
+if ~isfield(E.eye, 'fileOpened') || ~E.eye.fileOpened
+    error('StartEyeLinkRecording_Part2b:NoOpenFile', 'Open the run EDF before recording.');
+end
+
 if isfield(E.eye, 'recording') && E.eye.recording
     verifyRecording();
     return;

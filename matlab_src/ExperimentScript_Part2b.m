@@ -87,22 +87,39 @@ for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
     E.part2.scannerQueueActive = false;
     clear queueGuard % Release before EyeLink calibration or the next run.
     if ~isempty(runError), rethrow(runError); end
+    % Remove the final fixation before transfer so disk/network time does
+    % not extend its presentation. This is the existing break/final screen.
     if runIndex < numel(E.assignment.part2RawNodeRuns)
         offsetSecs = showRunBreak(E, runIndex, numel(E.assignment.part2RawNodeRuns));
-        E = finishRunDisplay(E, offsetSecs);
+    else
+        DrawFormattedText(E.screen.theWindow, E.text.part2Final, 'center', 'center', E.screen.textcolor);
+        [~, offsetSecs] = Screen('Flip', E.screen.theWindow);
+    end
+    E = finishRunDisplay(E, offsetSecs);
+    % RunBlock includes the full final fixation and ends scanner capture.
+    % All EDF I/O is here in the run break, before the next trigger gate.
+    E = StopEyeLinkRecording_Part2b(E);
+    if isfield(E.eye, 'fileOpened') && E.eye.fileOpened
+        error('ExperimentScript_Part2b:EdfCloseFailed', ...
+            'Cannot start another run while the previous Host EDF is still open.');
+    end
+    if runIndex < numel(E.assignment.part2RawNodeRuns)
         waitForSpecificKey(E.times.continueKey);
         waitForKeyRelease();
+        E = OpenEyeLinkFile_Part2b(E, runIndex + 1);
         E = RecalibrateAndValidateEyeLink_Part2b(E, runIndex);
     end
 end
 
-E = StopEyeLinkRecording_Part2b(E);
-DrawFormattedText(E.screen.theWindow, E.text.part2Final, 'center', 'center', E.screen.textcolor);
-[~, offsetSecs] = Screen('Flip', E.screen.theWindow);
-E = finishRunDisplay(E, offsetSecs);
 waitForAnyKey();
 catch err
     E.err = err;
+    % Remove any interrupted stimulus before cleanup performs EDF/disk I/O.
+    try
+        Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
+        Screen('Flip', E.screen.theWindow);
+    catch
+    end
     try
         E = FlushResultsMat_Part2b(E, 'stop');
     catch scannerErr
