@@ -120,3 +120,94 @@ trial = struct('trial_name', 'part2_fmri_iti', ...
     'part', 2, 'run_index', 1, 'trial_index', index, ...
     'iti_seconds', 2, 'run_skipped', false);
 end
+
+function testFinalExportsKeepLegacyTableAndRawResults(testCase)
+E = testCase.TestData.E;
+E.filenameFullStateMat = 'part2b_subj7_fullstate.mat';
+E.filenameResultsMat = 'part2b_subj7_results.mat';
+E.part2.trials = {choiceTrial(2, 0, 0.75, false)};
+E.part2.trials{1}.interrupted = true;
+E.part2.run = struct('scannerTriggerSecs', [10 12 14], ...
+    'firstStoredVolumeSecs', NaN, 'status', 'interrupted');
+E = FlushResultsMat_Part2b(E, 'final');
+full = load(fullfile(E.paths.dataDir, E.filenameFullStateMat));
+mat = load(fullfile(E.paths.dataDir, E.filenameResultsMat));
+csv = readtable(fullfile(E.paths.dataDir, 'part2b_subj7_results.csv'));
+verifyEqual(testCase, full.E.part2.trials, E.part2.trials);
+verifyEqual(testCase, mat.resultsTable, E.part2.resultsTable);
+verifyEqual(testCase, mat.results.trials, E.part2.trials);
+verifyEqual(testCase, mat.results.run.scannerTriggerSecs, [10 12 14]);
+verifyFalse(testCase, isfield(mat, 'E'));
+verifyFalse(testCase, isfield(mat.results, 'resultsTable'));
+verifyEqual(testCase, csv.Response, mat.resultsTable.Response);
+verifyEqual(testCase, csv.RT, mat.resultsTable.RT);
+verifyTrue(testCase, mat.resultsTable.Interrupted);
+verifyTrue(testCase, isnan(mat.resultsTable.ActualDurationMs));
+files = dir(E.paths.dataDir);
+verifyEqual(testCase, sum(~[files.isdir]), 3);
+end
+
+function testScannerCollectionPreservesEveryPressWithoutDummyAssumption(testCase)
+sourceDir = fileparts(mfilename('fullpath'));
+testCase.applyFixture(matlab.unittest.fixtures.PathFixture( ...
+    fullfile(sourceDir, 'helpers', 'scanner')));
+global PART2B_TEST_SCANNER_EVENTS
+PART2B_TEST_SCANNER_EVENTS = {struct('Pressed', 1, 'Keycode', 7, 'Time', 10), ...
+    struct('Pressed', 0, 'Keycode', 7, 'Time', 10.1), ...
+    struct('Pressed', 1, 'Keycode', 7, 'Time', 12), ...
+    struct('Pressed', 1, 'Keycode', 7, 'Time', 14)};
+E = testCase.TestData.E;
+E.keys.trigger = 7;
+E.times.scannerOffsetSec = 12;
+E.times.scannerDummyVolumes = 2; % Deliberately must NOT determine the anchor.
+E.part2.scannerQueueActive = true;
+E.part2.activeScannerRun = 1;
+E.part2.run = struct('scannerTriggerSecs', [], 'firstStoredVolumeSecs', NaN);
+E = FlushResultsMat_Part2b(E, 'collect');
+verifyEqual(testCase, E.part2.run.scannerTriggerSecs, [10 12 14]);
+verifyTrue(testCase, isnan(E.part2.run.firstStoredVolumeSecs));
+% Draining again must not duplicate pulses or create an assumed reference.
+E = FlushResultsMat_Part2b(E, 'collect');
+verifyEqual(testCase, E.part2.run.scannerTriggerSecs, [10 12 14]);
+verifyTrue(testCase, isnan(E.part2.run.firstStoredVolumeSecs));
+clear global PART2B_TEST_SCANNER_EVENTS
+end
+
+function testScannerPulseQCFlagsIntervalsWithoutChangingData(testCase)
+E = testCase.TestData.E;
+E.part2.activeScannerRun = 1;
+E.part2.scannerQueueActive = false;
+% TR=1: normal, likely missing, likely duplicate, irregular, normal.
+pulses = [10 11 13 13.1 14.4 15.4];
+E.part2.run = struct('scannerTriggerSecs', pulses, 'triggerSecs', 10, ...
+    'scannerPulseRecording', 'all_queued');
+E = FlushResultsMat_Part2b(E, 'stop');
+qc = E.part2.run.scannerPulseQC;
+verifyEqual(testCase, E.part2.run.scannerTriggerSecs, pulses);
+verifyEqual(testCase, qc.expectedTRSec, 1);
+verifyEqual(testCase, qc.suspectedMissingBeforePulseIndices, 3);
+verifyEqual(testCase, qc.suspectedDuplicatePulseIndices, 4);
+verifyEqual(testCase, qc.unusualIntervalPulseIndices, [3 4 5]);
+verifyEqual(testCase, qc.estimatedMissingCount, 1);
+verifyTrue(testCase, qc.firstTriggerLoggedOnce);
+verifyEqual(testCase, qc.status, 'flagged');
+end
+
+function testScannerCollectionRejectsEventsOutsideRunWindow(testCase)
+helperDir = fullfile(fileparts(mfilename('fullpath')), 'helpers', 'scanner');
+testCase.applyFixture(matlab.unittest.fixtures.PathFixture(helperDir));
+global PART2B_TEST_SCANNER_EVENTS
+PART2B_TEST_SCANNER_EVENTS = arrayfun(@(t) struct( ...
+    'Pressed', 1, 'Keycode', 7, 'Time', t), 9:13, 'UniformOutput', false);
+E = testCase.TestData.E;
+E.keys.trigger = 7;
+E.part2.scannerQueueActive = true;
+E.part2.activeScannerRun = 1;
+E.part2.run = struct('scannerTriggerSecs', [], 'triggerSecs', 10, ...
+    'scannerCaptureEndSecs', 12);
+E = FlushResultsMat_Part2b(E, 'collect');
+verifyEqual(testCase, E.part2.run.scannerTriggerSecs, [10 11 12]);
+E = FlushResultsMat_Part2b(E, 'collect');
+verifyEqual(testCase, E.part2.run.scannerTriggerSecs, [10 11 12]);
+clear global PART2B_TEST_SCANNER_EVENTS
+end

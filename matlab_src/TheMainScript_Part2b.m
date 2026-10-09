@@ -37,13 +37,10 @@ try
     E = SetupEyeLink_Part2b(E);
 
     E = ExperimentScript_Part2b(E);
+    if isfield(E, 'err'), rethrow(E.err); end
     E = CleanupPart2b(E);
 
-    save(fullfile(E.paths.dataDir, E.filenameFullStateMat), 'E');
-
-    E.part2.resultsTable = BuildResultsTable_Part2b(E);
-    resultsTable = E.part2.resultsTable;
-    save(fullfile(E.paths.dataDir, E.filenameResultsMat), 'resultsTable');
+    E = FlushResultsMat_Part2b(E, 'final');
 
     if isfield(E, 'eye') && isfield(E.eye, 'finalizationOk') && ~E.eye.finalizationOk
         warning('The EyeLink EDF was not finalized successfully. Review E.eye.finalizationError before closing the session.');
@@ -57,8 +54,17 @@ catch err
         E.cleanupError = cleanupErr;
     end
     E.err = err;
+    try
+        Screen('CloseAll');
+    catch closeErr
+        E.screenCloseError = closeErr;
+    end
     save(fullfile(E.paths.crashedDir, E.filenameCrashMat), 'E');
-    Screen('CloseAll');
+    try
+        E = FlushResultsMat_Part2b(E, 'final');
+    catch saveErr
+        warning('Part2b:ExportFailed', 'Interrupted-run export failed: %s', saveErr.message);
+    end
     rethrow(err);
 end
 

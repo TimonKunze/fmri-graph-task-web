@@ -1,4 +1,4 @@
-function value = Screen(command, varargin)
+function [value, onset, finished, missed] = Screen(command, varargin)
  global PART2B_TEST_CLOCK
  if ischar(command) && strcmpi(command, 'DrawTexture')
      PART2B_TEST_CLOCK.draws = PART2B_TEST_CLOCK.draws + 1;
@@ -19,4 +19,7 @@ function value = Screen(command, varargin)
      PART2B_TEST_CLOCK.lastFlipWhen = when;
  end
  value = PART2B_TEST_CLOCK.now;
+ onset = value;
+ finished = value;
+ missed = -0.001;
 end

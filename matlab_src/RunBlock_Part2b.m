@@ -1,4 +1,4 @@
-function E = RunBlock_Part2b(E, runIndex, startTrialIndex)
+function [E, runError] = RunBlock_Part2b(E, runIndex, startTrialIndex)
 if nargin < 3 || isempty(startTrialIndex)
     startTrialIndex = 1;
 end
@@ -46,7 +46,10 @@ pendingItiIndex = [];
 pendingImageIndex = [];
 nextStimulusDeadlineSecs = 0;
 
+runError = [];
+try
 for trialIndex = startTrialIndex:numel(runItems)
+    E = FlushResultsMat_Part2b(E, 'collect'); % Nonblocking; no file I/O.
     runTimedOut = runTimedOut || GetSecs >= runDeadlineSecs;
     if runSkipped || runTimedOut
         break;
@@ -57,7 +60,7 @@ for trialIndex = startTrialIndex:numel(runItems)
         decoded = decodeFmriNode(item, size(adjM, 1), canonicalToExp, E);
         SendEyeLinkMessage_Part2b(E, 'TRIALID R%d_T%d', runIndex, trialIndex);
         SendEyeLinkMessage_Part2b(E, 'TRIAL_VAR RAW_NODE %d GRAPH_NODE %d', decoded.rawNode, decoded.graphNodeIndex);
-        [imageOnsetSecs, imageOnsetClock, runSkipped, runTimedOut] = ...
+        [imageOnsetSecs, imageOnsetClock, runSkipped, runTimedOut, imageFlip] = ...
             drawSingleImageTrial(E, decoded.imageTex, nextStimulusDeadlineSecs, runDeadlineSecs);
         if ~isfinite(imageOnsetSecs)
             SendEyeLinkMessage_Part2b(E, 'TRIAL_RESULT 1');
@@ -74,7 +77,6 @@ for trialIndex = startTrialIndex:numel(runItems)
             % a refresh so the immediate flip lands at the requested offset.
             imageDeadlineSecs = imageDeadlineSecs - 0.5 * E.screen.flipinterval;
         end
-        [runSkipped, runTimedOut] = waitUntilSecsWithRunSkip(E, imageDeadlineSecs, runDeadlineSecs);
         pendingImageIndex = numel(E.part2.trials) + 1;
             E.part2.trials{pendingImageIndex} = struct( ...
                 'trial_name', 'part2_fmri_picture_viewing', ...
@@ -86,6 +88,8 @@ for trialIndex = startTrialIndex:numel(runItems)
             'layout_type', decoded.layoutType, ...
             'stim_set', decoded.stimSet, ...
             'image_src', decoded.imageSrc, ...
+            'object_id', getObjectId(E, decoded), ...
+            'flip', imageFlip, ...
             'duration_ms', E.times.imagePresentationMs, ...
             'actual_duration_ms', NaN, ...
             'presentation_deadline_secs', imageDeadlineSecs, ...
@@ -96,6 +100,9 @@ for trialIndex = startTrialIndex:numel(runItems)
                 'timestamp_clock', imageOnsetClock, ...
                 'run_skipped', runSkipped, ...
                 'timed_out', runTimedOut);
+        [runSkipped, runTimedOut] = waitUntilSecsWithRunSkip(E, imageDeadlineSecs, runDeadlineSecs);
+        E.part2.trials{pendingImageIndex}.run_skipped = runSkipped;
+        E.part2.trials{pendingImageIndex}.timed_out = runTimedOut;
         SendEyeLinkMessage_Part2b(E, 'TRIAL_RESULT %d', double(runSkipped || runTimedOut));
 
         previousNodeIndex = decoded.experimentNodeIndex;
@@ -111,9 +118,10 @@ for trialIndex = startTrialIndex:numel(runItems)
         end
         if trialIndex < numel(runItems)
             itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, runIndex, itiIndex, E.sbj.n);
-            [E, pendingItiIndex, nextStimulusDeadlineSecs] = ...
+            [E, pendingItiIndex, nextStimulusDeadlineSecs, itiError] = ...
                 beginIti(E, runIndex, trialIndex, itiSeconds, false, pendingImageIndex);
             pendingImageIndex = [];
+            if ~isempty(itiError), rethrow(itiError); end
             previousItiSeconds = itiSeconds;
             itiIndex = itiIndex + 1;
         end
@@ -156,8 +164,9 @@ for trialIndex = startTrialIndex:numel(runItems)
             'rightPathLength', rightPathLength, ...
             'correctChoice', correctChoice);
 
-        [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRunChoice, runTimedOut, responseTimestampSecs] = GetKeyResp_Part2b(E, leftNode.imageTex, rightNode.imageTex, trialInfo, runDeadlineSecs, nextStimulusDeadlineSecs);
+        [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRunChoice, runTimedOut, responseTimestampSecs, choiceFlip, responseError] = GetKeyResp_Part2b(E, leftNode.imageTex, rightNode.imageTex, trialInfo, runDeadlineSecs, nextStimulusDeadlineSecs);
         if ~isfinite(choiceOnsetSecs)
+            if ~isempty(responseError), rethrow(responseError); end
             runSkipped = skipRunChoice;
             SendEyeLinkMessage_Part2b(E, 'TRIAL_RESULT 1');
             break;
@@ -187,6 +196,12 @@ for trialIndex = startTrialIndex:numel(runItems)
             'layout_type', leftNode.layoutType, ...
             'left_image_src', leftNode.imageSrc, ...
             'right_image_src', rightNode.imageSrc, ...
+            'left_object_id', getObjectId(E, leftNode), ...
+            'right_object_id', getObjectId(E, rightNode), ...
+            'right_layout_type', rightNode.layoutType, ...
+            'right_stim_set', rightNode.stimSet, ...
+            'flip', choiceFlip, ...
+            'interrupted', ~isempty(responseError), ...
             'response', response, ...
             'response_side', responseSide, ...
             'rt_seconds', rtSecs, ...
@@ -198,6 +213,8 @@ for trialIndex = startTrialIndex:numel(runItems)
             'onset_from_task_start', choiceOnsetSecs - E.part2.run(runIndex).taskStartSecs, ...
             'timestamp_clock', choiceOnsetClock, ...
             'run_skipped', skipRunChoice);
+        pendingImageIndex = numel(E.part2.trials); % Active picture OR choice.
+        if ~isempty(responseError), rethrow(responseError); end
         SendEyeLinkMessage_Part2b(E, 'TRIAL_RESULT %d', double(skipRunChoice || runTimedOut));
         E.part2.resultsMatNeedsFlush = true;
 
@@ -215,8 +232,10 @@ for trialIndex = startTrialIndex:numel(runItems)
         end
         if trialIndex < numel(runItems)
             itiSeconds = getItiSeconds(E, E.assignment.part2ItiTimesFmri, runIndex, itiIndex, E.sbj.n);
-            [E, pendingItiIndex, nextStimulusDeadlineSecs] = ...
-                beginIti(E, runIndex, trialIndex, itiSeconds, true);
+            [E, pendingItiIndex, nextStimulusDeadlineSecs, itiError] = ...
+                beginIti(E, runIndex, trialIndex, itiSeconds, true, pendingImageIndex);
+            pendingImageIndex = [];
+            if ~isempty(itiError), rethrow(itiError); end
             previousItiSeconds = itiSeconds;
             itiIndex = itiIndex + 1;
         end
@@ -230,7 +249,8 @@ end
 if runTimedOut
     % Clear the current stimulus before saving and returning to the run break.
     Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
-    Screen('Flip', E.screen.theWindow);
+    [~, offsetSecs] = Screen('Flip', E.screen.theWindow);
+    E = finishStimulus(E, pendingImageIndex, offsetSecs);
     timeoutSecs = GetSecs;
     SendEyeLinkMessage_Part2b(E, 'RUN_TIMEOUT %d', runIndex);
     E.part2.trials{end + 1} = struct( ...
@@ -251,25 +271,50 @@ if ~runSkipped && ~runTimedOut
             isfinite(E.times.postRunFixationSec) && E.times.postRunFixationSec >= 0
         postRunFixationSec = E.times.postRunFixationSec;
     end
-    [fixationOnsetSecs, fixationOnsetClock] = drawFixationTrial(E);
+    [fixationOnsetSecs, fixationOnsetClock, fixationFlip] = drawFixationTrial(E);
+    E = finishStimulus(E, pendingImageIndex, fixationFlip.onset);
     SendEyeLinkMessage_Part2b(E, 'POST_RUN_FIXATION_ONSET %d %d', ...
         runIndex, round(postRunFixationSec * 1000));
-    WaitSecs(postRunFixationSec);
     E.part2.trials{end + 1} = struct( ...
         'trial_name', 'part2_fmri_post_run_fixation', ...
         'part', 2, 'run_index', runIndex, ...
         'trial_index', numel(runItems) + 1, ...
         'duration_sec', postRunFixationSec, ...
+        'flip', fixationFlip, ...
         'timestamp_sec', fixationOnsetSecs, ...
         'timestamp_rel_sec', fixationOnsetSecs - E.begintime, ...
         'onset_from_trigger', fixationOnsetSecs - E.part2.run(runIndex).triggerSecs, ...
         'onset_from_task_start', fixationOnsetSecs - E.part2.run(runIndex).taskStartSecs, ...
         'timestamp_clock', fixationOnsetClock, ...
         'run_skipped', false, 'timed_out', false);
+    pendingImageIndex = [];
+    pendingItiIndex = numel(E.part2.trials);
+    WaitSecs(postRunFixationSec);
+    pendingItiIndex = [];
 end
+E.part2.run(runIndex).status = 'completed';
+if runSkipped, E.part2.run(runIndex).status = 'skipped'; end
+if runTimedOut, E.part2.run(runIndex).status = 'timed_out'; end
 SendEyeLinkMessage_Part2b(E, 'RUN_END %d', runIndex);
+% Final fixation above is part of the run; capture stops only after its wait.
+E = FlushResultsMat_Part2b(E, 'stop'); % End capture before checkpoint I/O.
 E = FlushResultsMat_Part2b(E);
 E.part2.resultsMatNeedsFlush = false;
+catch err
+    runError = err;
+    E.part2.run(runIndex).status = 'interrupted';
+    E.part2.run(runIndex).errorIdentifier = err.identifier;
+    E.part2.run(runIndex).errorMessage = err.message;
+    if ~isempty(pendingImageIndex)
+        E.part2.trials{pendingImageIndex}.interrupted = true;
+    end
+    if ~isempty(pendingItiIndex)
+        E.part2.trials{pendingItiIndex}.interrupted = true;
+    end
+    % No disk I/O while an experimental stimulus is being presented.
+    % Production returns partial E to the outer cleanup/export path.
+    if nargout < 2, rethrow(err); end
+end
 
 end
 
@@ -352,17 +397,14 @@ for trialIndex = 1:(startTrialIndex - 1)
 end
 end
 
-function [E, recordIndex, deadlineSecs] = beginIti(E, runIndex, trialIndex, itiSeconds, saveCheckpoint, previousImageIndex)
+function [E, recordIndex, deadlineSecs, itiError] = beginIti(E, runIndex, trialIndex, itiSeconds, saveCheckpoint, previousImageIndex)
 if nargin < 6
     previousImageIndex = [];
 end
-[onsetSecs, onsetClock] = drawFixationTrial(E);
+[onsetSecs, onsetClock, fixationFlip] = drawFixationTrial(E);
 deadlineSecs = onsetSecs + itiSeconds;
 SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', runIndex, trialIndex, round(itiSeconds * 1000));
-if ~isempty(previousImageIndex)
-    E.part2.trials{previousImageIndex}.actual_duration_ms = ...
-        (onsetSecs - E.part2.trials{previousImageIndex}.timestamp_sec) * 1000;
-end
+E = finishStimulus(E, previousImageIndex, fixationFlip.onset);
 recordIndex = numel(E.part2.trials) + 1;
 % This record denotes ITI onset, not completion. Actual duration is filled
 % after the next stimulus flips; a checkpoint taken now keeps it as NaN.
@@ -370,17 +412,25 @@ E.part2.trials{recordIndex} = struct( ...
     'trial_name', 'part2_fmri_iti', 'part', 2, ...
     'run_index', runIndex, 'trial_index', trialIndex, ...
     'iti_seconds', itiSeconds, 'iti_deadline_sec', deadlineSecs, ...
+    'flip', fixationFlip, ...
     'iti_actual_seconds', NaN, 'iti_lateness_seconds', NaN, ...
     'checkpoint_save_seconds', NaN, ...
     'timestamp_sec', onsetSecs, 'timestamp_rel_sec', onsetSecs - E.begintime, ...
     'onset_from_trigger', onsetSecs - E.part2.run(runIndex).triggerSecs, ...
     'onset_from_task_start', onsetSecs - E.part2.run(runIndex).taskStartSecs, ...
     'timestamp_clock', onsetClock, 'run_skipped', false);
+itiError = [];
 if saveCheckpoint
     saveStartedSecs = GetSecs;
-    E = FlushResultsMat_Part2b(E);
-    E.part2.resultsMatNeedsFlush = false;
-    E.part2.trials{recordIndex}.checkpoint_save_seconds = GetSecs - saveStartedSecs;
+    try
+        E = FlushResultsMat_Part2b(E, 'collect');
+        % Separate assignment retains these pulses if the disk write throws.
+        E = FlushResultsMat_Part2b(E);
+        E.part2.resultsMatNeedsFlush = false;
+        E.part2.trials{recordIndex}.checkpoint_save_seconds = GetSecs - saveStartedSecs;
+    catch err
+        itiError = err;
+    end
 end
 end
 
@@ -394,24 +444,25 @@ iti.iti_lateness_seconds = max(0, nextOnsetSecs - iti.iti_deadline_sec);
 E.part2.trials{recordIndex} = iti;
 end
 
-function [vbl, clockStamp, skipped, timedOut] = drawSingleImageTrial(E, imageTex, deadlineSecs, runDeadlineSecs)
+function [vbl, clockStamp, skipped, timedOut, flip] = drawSingleImageTrial(E, imageTex, deadlineSecs, runDeadlineSecs)
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 imageWidth = 320;
 imageHeight = 320;
 rect = CenterRectOnPointd([0 0 imageWidth imageHeight], E.screen.cx, E.screen.cy);
 Screen('DrawTexture', E.screen.theWindow, imageTex, [], rect);
-[vbl, skipped, timedOut] = FlipPreparedStimulus_Part2b(E, deadlineSecs, runDeadlineSecs);
+[vbl, skipped, timedOut, flip] = FlipPreparedStimulus_Part2b(E, deadlineSecs, runDeadlineSecs);
 clockStamp = '';
 if isfinite(vbl)
     clockStamp = datestr(now, 'yyyy-mm-dd HH:MM:SS.FFF');
 end
 end
 
-function [vbl, clockStamp] = drawFixationTrial(E)
+function [vbl, clockStamp, flip] = drawFixationTrial(E)
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 Screen('TextSize', E.screen.theWindow, E.screen.textsize * 2);
 DrawFormattedText(E.screen.theWindow, '+', 'center', E.screen.cy, E.screen.textcolor);
-vbl = Screen('Flip', E.screen.theWindow);
+[flip.vbl, flip.onset, flip.finished, flip.missed] = Screen('Flip', E.screen.theWindow);
+vbl = flip.vbl;
 if ~isfinite(vbl)
     vbl = GetSecs;
 end
@@ -507,6 +558,8 @@ error('RunBlock_Part2b:InvalidITIContainer', 'Unsupported ITI container for run 
 end
 
 function objectId = getObjectId(E, decoded)
+objectId = NaN;
+if ~isfield(E.assignment, 'objectToNodes'), return; end
 objectOffset = strcmp(decoded.stimSet, 'set2') * 8;
 objectId = E.assignment.objectToNodes(decoded.experimentNodeIndex + 1 + objectOffset);
 end
@@ -529,4 +582,14 @@ for k = 1:nbNodes
         end
     end
 end
+end
+
+function E = finishStimulus(E, index, offsetSecs)
+if isempty(index), return; end
+t = E.part2.trials{index};
+t.offset_sec = offsetSecs;
+if isfield(t, 'flip') && isfinite(t.flip.onset) && isfinite(offsetSecs)
+    t.actual_duration_ms = 1000 * (offsetSecs - t.flip.onset);
+end
+E.part2.trials{index} = t;
 end

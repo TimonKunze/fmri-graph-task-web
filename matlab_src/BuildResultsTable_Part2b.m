@@ -3,6 +3,7 @@ trials = E.part2.trials;
 n = numel(trials);
 
 Subject = repmat(E.sbj.n, n, 1);
+if ~isfield(E, 'eye'), E.eye = struct(); end
 edfBaseName = string(trialField(E.eye, 'edfBaseName', ""));
 EdfFileName = repmat("", n, 1);
 if strlength(edfBaseName) > 0
@@ -94,6 +95,47 @@ for i = 1:n
 end
 
 T = table(Subject, EdfFileName, RequestedSampleRateHz, ActualSampleRateHz, SampleRateVerified, SampleRateVerificationStatus, TrackerVersion, TrackerVersionString, Run, TrialIndex, TrialName, Response, ResponseSide, RT, ResponseTimestampSec, TimedOut, RunSkipped, TimestampSec, TimestampRelSec, TimestampClock, RawNode, GraphNode, ReferenceExperimentNode, ReferenceGraphNode, LeftRawNode, RightRawNode, LeftGraphNode, RightGraphNode, LeftExperimentNode, RightExperimentNode, PathLengthLeft, PathLengthRight, LeftImageSrc, RightImageSrc, StimSet, LayoutType, CorrectChoice, ITIDeadlineSec, ITIActualSec, ITILatenessSec, CheckpointSaveSec, ActualDurationMs, PresentationDeadlineSec, OnsetFromTrigger, OnsetFromTaskStart);
+% Additive export columns; legacy TimestampSec/RT/row definitions are unchanged.
+T.ImageSrc = strings(n, 1);
+T.ObjectID = nan(n, 1);
+T.LeftObjectID = nan(n, 1);
+T.RightObjectID = nan(n, 1);
+T.RightLayoutType = strings(n, 1);
+T.RightStimSet = strings(n, 1);
+T.StimulusOnsetSec = nan(n, 1);
+T.StimulusOffsetSec = nan(n, 1);
+T.FlipTimestampSec = nan(n, 1);
+T.FlipMissedSec = nan(n, 1);
+T.Accuracy = nan(n, 1);
+T.Interrupted = false(n, 1);
+T.OnsetFromStoredVolume = nan(n, 1);
+T.BOLDReferenceSource = repmat("unverified", n, 1);
+for i = 1:n
+    t = trials{i};
+    T.ImageSrc(i) = string(trialField(t, 'image_src', ""));
+    T.ObjectID(i) = trialField(t, 'object_id', NaN);
+    T.LeftObjectID(i) = trialField(t, 'left_object_id', NaN);
+    T.RightObjectID(i) = trialField(t, 'right_object_id', NaN);
+    T.RightLayoutType(i) = string(trialField(t, 'right_layout_type', ""));
+    T.RightStimSet(i) = string(trialField(t, 'right_stim_set', ""));
+    flip = trialField(t, 'flip', struct());
+    T.StimulusOnsetSec(i) = trialField(flip, 'onset', NaN);
+    T.StimulusOffsetSec(i) = trialField(t, 'offset_sec', NaN);
+    T.FlipTimestampSec(i) = trialField(flip, 'finished', NaN);
+    T.FlipMissedSec(i) = trialField(flip, 'missed', NaN);
+    T.Interrupted(i) = logical(trialField(t, 'interrupted', false));
+    if isfinite(Response(i)) && isfinite(CorrectChoice(i))
+        T.Accuracy(i) = double(Response(i) == CorrectChoice(i));
+    end
+    r = Run(i);
+    if isfinite(r) && r >= 1 && isfield(E.part2, 'run') && numel(E.part2.run) >= r
+        run = E.part2.run(r);
+        anchor = trialField(run, 'firstStoredVolumeSecs', NaN);
+        T.OnsetFromStoredVolume(i) = T.StimulusOnsetSec(i) - anchor;
+        T.BOLDReferenceSource(i) = string(trialField(run, 'boldReferenceSource', 'unverified'));
+    end
+end
+
 end
 
 function value = trialField(t, fieldName, defaultValue)

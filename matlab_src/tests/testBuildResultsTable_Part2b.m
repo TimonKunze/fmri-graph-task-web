@@ -51,3 +51,30 @@ verifyEqual(testCase, T.TimestampSec(1), 15);
 verifyEqual(testCase, T.TimestampRelSec(1), 5);
 verifyEqual(testCase, T.TimestampClock(1), "2026-01-01 12:00:00.000");
 end
+
+function testMeasuredTimingAndVerifiedBoldReference(testCase)
+E.sbj.n = 7;
+E.part2.run = struct('firstStoredVolumeSecs', 12, ...
+    'boldReferenceSource', 'verified acquisition protocol');
+E.part2.trials = {struct('trial_name', 'part2_dual_stimulus_choice', ...
+    'run_index', 1, 'timestamp_sec', 10.9, ...
+    'flip', struct('vbl', 10.9, 'onset', 11, 'finished', 11.001, 'missed', 0.02), ...
+    'offset_sec', 12.5, 'actual_duration_ms', 1500, ...
+    'left_object_id', 42, 'right_object_id', 43, ...
+    'left_image_src', 'left.png', 'right_image_src', 'right.png', ...
+    'response', 1, 'correct_choice', 1, 'rt_seconds', 0.7)};
+T = BuildResultsTable_Part2b(E);
+verifyEqual(testCase, T.TimestampSec, 10.9); % Legacy VBL stays unchanged.
+verifyEqual(testCase, T.StimulusOnsetSec, 11);
+verifyEqual(testCase, T.OnsetFromStoredVolume, -1); % Negative BIDS onsets valid.
+verifyEqual(testCase, T.ActualDurationMs, 1500);
+verifyEqual(testCase, T.FlipMissedSec, 0.02);
+verifyEqual(testCase, T.LeftObjectID, 42);
+verifyEqual(testCase, T.Accuracy, 1);
+verifyEqual(testCase, T.RT, 0.7);
+E.part2.run.firstStoredVolumeSecs = NaN;
+E.part2.trials{1} = rmfield(E.part2.trials{1}, {'offset_sec', 'actual_duration_ms'});
+T = BuildResultsTable_Part2b(E);
+verifyTrue(testCase, isnan(T.OnsetFromStoredVolume));
+verifyTrue(testCase, isnan(T.ActualDurationMs)); % Never substitute RT or planned duration.
+end

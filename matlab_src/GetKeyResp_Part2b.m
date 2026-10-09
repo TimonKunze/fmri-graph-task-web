@@ -1,4 +1,4 @@
-function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRun, runTimedOut, responseTimestampSecs] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo, runDeadlineSecs, stimulusDeadlineSecs)
+function [response, responseSide, rtSecs, choiceOnsetSecs, choiceOnsetClock, skipRun, runTimedOut, responseTimestampSecs, flip, responseError] = GetKeyResp_Part2b(E, leftTex, rightTex, trialInfo, runDeadlineSecs, stimulusDeadlineSecs)
 if nargin < 5
     runDeadlineSecs = Inf;
 end
@@ -10,12 +10,18 @@ rtSecs = NaN;
 choiceOnsetClock = '';
 runTimedOut = false;
 responseTimestampSecs = NaN;
+choiceOnsetSecs = NaN;
+responseSide = '';
+skipRun = false;
+flip = struct('vbl', NaN, 'onset', NaN, 'finished', NaN, 'missed', NaN);
+responseError = [];
+try
 Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
 leftRect = CenterRectOnPointd([0 0 220 220], E.screen.cx - 160, E.screen.cy);
 rightRect = CenterRectOnPointd([0 0 220 220], E.screen.cx + 160, E.screen.cy);
 Screen('DrawTexture', E.screen.theWindow, leftTex, [], leftRect);
 Screen('DrawTexture', E.screen.theWindow, rightTex, [], rightRect);
-[choiceOnsetSecs, skipRun, runTimedOut] = ...
+[choiceOnsetSecs, skipRun, runTimedOut, flip] = ...
     FlipPreparedStimulus_Part2b(E, stimulusDeadlineSecs, runDeadlineSecs);
 if ~isfinite(choiceOnsetSecs)
     if skipRun
@@ -92,8 +98,6 @@ while true
             SendEyeLinkMessage_Part2b(E, 'RESPONSE %d %d %d %d', getTrialInfoField(trialInfo, 'runIndex', -1), getTrialInfoField(trialInfo, 'trialIndex', -1), response, round(rtSecs * 1000));
             break;
         elseif keyCode(E.keys.escape)
-            CleanupPart2b(E);
-            Screen('CloseAll');
             error('Part2b:Aborted', 'Escape was pressed.');
         end
     end
@@ -110,6 +114,10 @@ while true
         break;
     end
     WaitSecs(0.01);
+end
+catch err
+    responseError = err;
+    if nargout < 10, rethrow(err); end
 end
 end
 

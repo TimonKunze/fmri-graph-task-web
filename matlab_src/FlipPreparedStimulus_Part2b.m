@@ -1,7 +1,8 @@
-function [onsetSecs, skipped, timedOut] = FlipPreparedStimulus_Part2b(E, deadlineSecs, runDeadlineSecs)
+function [onsetSecs, skipped, timedOut, flip] = FlipPreparedStimulus_Part2b(E, deadlineSecs, runDeadlineSecs)
 % Present an already drawn stimulus at the refresh nearest the ITI deadline.
 % Poll while fixation remains visible so run skipping and timeouts still work.
 onsetSecs = NaN;
+flip = struct('vbl', NaN, 'onset', NaN, 'finished', NaN, 'missed', NaN);
 skipped = false;
 timedOut = false;
 flipWhen = deadlineSecs;
@@ -30,7 +31,9 @@ while true
     end
     WaitSecs(max(0, min(0.01, waitUntil - nowSecs)));
 end
-onsetSecs = Screen('Flip', E.screen.theWindow, max(0, flipWhen));
+[flip.vbl, flip.onset, flip.finished, flip.missed] = ...
+    Screen('Flip', E.screen.theWindow, max(0, flipWhen));
+onsetSecs = flip.vbl;
 if ~isfinite(onsetSecs)
     onsetSecs = GetSecs;
 end
