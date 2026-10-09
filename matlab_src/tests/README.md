@@ -2,6 +2,8 @@
 
 These tests use MATLAB's built-in unit testing framework. Psychtoolbox, an eye tracker, and experiment hardware are not required.
 
+Maybe the sample rate verification is not necessary? What do you think?
+
 ## Run in MATLAB
 
 Set MATLAB's current folder to the repository root (the folder containing `matlab_src`), then run:
