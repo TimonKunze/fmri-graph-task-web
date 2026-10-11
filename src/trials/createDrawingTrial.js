@@ -28,7 +28,7 @@ export function createDrawingTrial(
     ? PATHS.nodeImages2Small
     : PATHS.nodeImages1Small);
   const stimSet = getStimSet(type);
-  const nodeMapping = getNodeMappingForStimSet(stimSet, nodePos.length);
+  const nodeMapping = getNodeMappingForStimSet(secondStimSet ? "set2" : "set1", nodePos.length);
   const recordedType = dataTypeOverride ?? type;
 
   let trialEnded = false;

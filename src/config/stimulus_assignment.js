@@ -1,4 +1,4 @@
-import { CONFIG } from "../config.js";
+import { getSubjectAssignment } from "../state/subjectAssignment.js";
 
 export const STIMULUS_CONDITION_MAP = {
   rotational: "set1",
@@ -18,5 +18,7 @@ export function useSecondStimSet(typeOrLayout) {
 }
 
 export function getStimSet(typeOrLayout) {
-  return useSecondStimSet(typeOrLayout) ? "set2" : "set1";
+  const layoutCode = useSecondStimSet(typeOrLayout) ? 1 : 0;
+  const order = getSubjectAssignment().part1LayoutOrder ?? [0, 1];
+  return order[0] === layoutCode ? "set1" : "set2";
 }

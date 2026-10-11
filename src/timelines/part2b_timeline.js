@@ -1,3 +1,4 @@
+import { getStimSet } from "../config/stimulus_assignment.js";
 import { CONFIG } from "../config.js";
 import { G } from "../config/graphState.js";
 import { PATHS } from "../config/paths.js";
@@ -34,8 +35,8 @@ export function makePart2bTimeline() {
     }
 
     const graphNodeIndex = rawNode % G.nbNodes;
-    const stimSet = rawNode < G.nbNodes ? "set1" : "set2";
-    const layoutType = stimSet === "set1" ? "rotational" : "random";
+    const layoutType = rawNode < G.nbNodes ? "rotational" : "random";
+    const stimSet = getStimSet(layoutType);
     const experimentNodeIndex = canonicalToExp[graphNodeIndex];
 
     if (!Number.isInteger(experimentNodeIndex)) {
@@ -50,7 +51,7 @@ export function makePart2bTimeline() {
       layoutType,
       graphNodeIndex,
       experimentNodeIndex,
-      imageSrc: stimSet === "set2"
+      imageSrc: layoutType === "random"
         ? PATHS.nodeImages2(experimentNodeIndex)
         : PATHS.nodeImages1(experimentNodeIndex),
     };

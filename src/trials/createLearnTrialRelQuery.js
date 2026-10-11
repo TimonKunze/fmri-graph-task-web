@@ -25,7 +25,7 @@ export function createLearnTrialRelQuery(rel, known, trialInd, type) {
   const [startNode, endNode] = rel;
   const isKnown = !!known;
   const stimSet = getStimSet(type);
-  const nodeMapping = getNodeMappingForStimSet(stimSet);
+  const nodeMapping = getNodeMappingForStimSet(secondStimSet ? "set2" : "set1");
 
   const imgStyle = `width:${STIM_SIZE}px;height:${STIM_SIZE}px;object-fit:contain;`;
   const rowStyle = `display:flex;align-items:center;justify-content:center;gap:12px;`;

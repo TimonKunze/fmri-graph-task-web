@@ -358,6 +358,15 @@ end
 imageSrc = indexedStimulus(E.Stim.nodePaths.(stimSet), experimentNodeIndex + 1);
 imageTex = indexedStimulus(E.Stim.nodeTextures.(stimSet), experimentNodeIndex + 1);
 
+% Export set numbers in learning order; image banks above remain layout based.
+if isfield(E.assignment, 'part1LayoutOrder') && E.assignment.part1LayoutOrder(1) == 1
+    if strcmp(stimSet, 'set1')
+        stimSet = 'set2';
+    else
+        stimSet = 'set1';
+    end
+end
+
 decoded = struct( ...
     'rawNode', rawNode, ...
     'stimSet', stimSet, ...
@@ -569,7 +578,7 @@ end
 function objectId = getObjectId(E, decoded)
 objectId = NaN;
 if ~isfield(E.assignment, 'objectToNodes'), return; end
-objectOffset = strcmp(decoded.stimSet, 'set2') * 8;
+objectOffset = strcmp(decoded.layoutType, 'random') * 8;
 objectId = E.assignment.objectToNodes(decoded.experimentNodeIndex + 1 + objectOffset);
 end
 
