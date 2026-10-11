@@ -345,7 +345,7 @@ if rawNode < nbNodes
     layoutType = 'rotational';
 else
     stimSet = 'set2';
-    layoutType = 'unconstrained';
+    layoutType = 'random';
 end
 
 experimentNodeIndex = canonicalToExp(graphNodeIndex + 1);

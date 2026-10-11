@@ -35,7 +35,7 @@ export function makePart2bTimeline() {
 
     const graphNodeIndex = rawNode % G.nbNodes;
     const stimSet = rawNode < G.nbNodes ? "set1" : "set2";
-    const layoutType = stimSet === "set1" ? "rotational" : "unconstrained";
+    const layoutType = stimSet === "set1" ? "rotational" : "random";
     const experimentNodeIndex = canonicalToExp[graphNodeIndex];
 
     if (!Number.isInteger(experimentNodeIndex)) {

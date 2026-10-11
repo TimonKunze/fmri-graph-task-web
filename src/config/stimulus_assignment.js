@@ -2,12 +2,12 @@ import { CONFIG } from "../config.js";
 
 export const STIMULUS_CONDITION_MAP = {
   rotational: "set1",
-  unconstrained: "set2",
+  random: "set2",
 };
 
 export function getLayoutType(typeOrLayout) {
   if (typeof typeOrLayout !== "string") return "rotational";
-  if (typeOrLayout.startsWith("unconstrained")) return "unconstrained";
+  if (typeOrLayout.startsWith("random")) return "random";
   if (typeOrLayout.startsWith("rotational")) return "rotational";
   return typeOrLayout;
 }

@@ -87,11 +87,11 @@ function getLearnLayoutOrderFromConfig() {
   const csvStartsWithUnconstrained = Array.isArray(currentAssignment.part1LayoutOrder)
     && currentAssignment.part1LayoutOrder.length > 0
     && Number(currentAssignment.part1LayoutOrder[0]) === 1;
-  const firstLayout = csvStartsWithUnconstrained ? "unconstrained" : "rotational";
-  const secondLayout = firstLayout === "rotational" ? "unconstrained" : "rotational";
+  const firstLayout = csvStartsWithUnconstrained ? "random" : "rotational";
+  const secondLayout = firstLayout === "rotational" ? "random" : "rotational";
   const counts = {
     rotational: rotationalCount,
-    unconstrained: unconstrainedCount,
+    random: unconstrainedCount,
   };
   const expandedOrder = [];
 
@@ -221,7 +221,7 @@ export function getTestLayoutOrder() {
   }
 
   return currentAssignment.part3LayoutOrder.map((item) =>
-    Number(item) === 0 ? "rotational" : "unconstrained"
+    Number(item) === 0 ? "rotational" : "random"
   );
 }
 
