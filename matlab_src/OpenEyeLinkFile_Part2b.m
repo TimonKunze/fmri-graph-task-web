@@ -16,7 +16,7 @@ validateattributes(runIndex, {'numeric'}, {'scalar','integer','>=',1,'<=',9});
 % Eight alphanumeric characters: participant, attempt, run (e.g. P00701R1).
 base = sprintf('P%03d%02dR%d', subject, attempt, runIndex);
 if ~isfield(E.paths, 'eyeDir')
-    E.paths.eyeDir = fullfile(E.paths.repoRoot, 'sourcedata', 'eyelink');
+    E.paths.eyeDir = fullfile(fileparts(mfilename('fullpath')), 'Eyelink');
 end
 if ~exist(E.paths.eyeDir, 'dir'), mkdir(E.paths.eyeDir); end
 localPath = fullfile(E.paths.eyeDir, [base '.edf']);

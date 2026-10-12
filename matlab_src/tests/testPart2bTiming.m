@@ -626,7 +626,7 @@ PART2B_TEST_EYELINK.receiveStatus = numel(PART2B_TEST_EYELINK.payload);
 E.eye.enabled = true;
 E.eye.required = true;
 E.screen.res = [800 600];
-E.paths.eyeDir = fullfile(E.paths.dataDir, 'sourcedata', 'eyelink');
+E.paths.eyeDir = fullfile(E.paths.dataDir, 'Eyelink');
 if nargin > 1, E.part2.startRun = startRun; end
 E = SetupEyeLink_Part2b(E);
 end

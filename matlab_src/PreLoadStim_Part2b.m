@@ -20,12 +20,14 @@ for i = 1:8
         error('PreLoadStim_Part2b:MissingStimulus', ...
             'Could not find stimulus image for object IDs %d and %d.', objectToNodes(i), objectToNodes(8 + i));
     end
-    E.Stim.nodeTextures.set1{i} = Screen('MakeTexture', E.screen.theWindow, flattenPngOnWhite(E.Stim.nodePaths.set1{i}));
-    E.Stim.nodeTextures.set2{i} = Screen('MakeTexture', E.screen.theWindow, flattenPngOnWhite(E.Stim.nodePaths.set2{i}));
+    E.Stim.nodeTextures.set1{i} = Screen('MakeTexture', E.screen.theWindow, ...
+        flattenPngOnBackground(E.Stim.nodePaths.set1{i}, E.screen.bckgrnd));
+    E.Stim.nodeTextures.set2{i} = Screen('MakeTexture', E.screen.theWindow, ...
+        flattenPngOnBackground(E.Stim.nodePaths.set2{i}, E.screen.bckgrnd));
 end
 end
 
-function rgb = flattenPngOnWhite(imagePath)
+function rgb = flattenPngOnBackground(imagePath, backgroundColor)
 [img, ~, alpha] = imread(imagePath);
 img = double(img);
 
@@ -39,5 +41,6 @@ if size(img, 3) == 4
     img = img(:, :, 1:3);
 end
 
-rgb = uint8(round(img .* alpha + 255 .* (1 - alpha)));
+backgroundColor = reshape(double(backgroundColor(1:3)), 1, 1, 3);
+rgb = uint8(round(img .* alpha + backgroundColor .* (1 - alpha)));
 end

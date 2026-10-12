@@ -117,7 +117,9 @@ showing the break/final screen and before waiting for the next scanner trigger.
 The tracker connection stays open between runs; the existing between-run
 calibration and recording restart remain in place.
 
-Original EDFs are saved under `sourcedata/eyelink/` at the repository root.
+Original EDFs are saved in `matlab_src/Eyelink/`.
+Keep any offline ASC conversions in this same directory; acquisition does not
+automatically generate ASC files.
 For example, participant 7, attempt 1, runs 1–3 produce `P00701R1.edf`,
 `P00701R2.edf`, and `P00701R3.edf`. These Host basenames have eight alphanumeric
 characters (participant 0–999, attempt 1–99, run 1–9).
@@ -141,7 +143,7 @@ available and no active MATLAB EyeLink connection:
 ```matlab
 addpath('matlab_src');
 eyeFile = RetryEyeLinkTransfer_Part2b( ...
-    fullfile('sourcedata', 'eyelink', 'P00701R1.reservation', 'metadata.mat'));
+    fullfile('matlab_src', 'Eyelink', 'P00701R1.reservation', 'metadata.mat'));
 ```
 
 This reconnects only for recovery, receives the existing Host file without
