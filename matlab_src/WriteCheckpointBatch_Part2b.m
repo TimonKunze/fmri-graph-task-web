@@ -18,7 +18,7 @@ try
     end
     temporary = [filename '.' char(java.util.UUID.randomUUID()) '.tmp'];
     save(temporary, 'batch', batch.matVersion);
-    check = load(temporary, 'batch');
+    check = load(temporary, '-mat', 'batch');
     if ~isequaln(check.batch, batch)
         error('Part2b:CheckpointVerification', 'Checkpoint read-back did not match: %s', temporary);
     end
@@ -26,7 +26,7 @@ try
     receipt.writeSeconds = toc(started);
     receipt.completedAtPosix = posixtime(datetime('now'));
     save(temporary, 'receipt', '-append');
-    check = load(temporary, 'receipt');
+    check = load(temporary, '-mat', 'receipt');
     if ~isequaln(check.receipt, receipt)
         error('Part2b:CheckpointVerification', 'Checkpoint receipt did not match: %s', temporary);
     end

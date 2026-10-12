@@ -8,8 +8,6 @@ Screen('Flip', E.screen.theWindow);
 waitForSpecificKey(E.times.continueKey);
 waitForKeyRelease();
 
-DrawFormattedText(E.screen.theWindow, E.text.part2Start, 'center', 'center', E.screen.textcolor);
-Screen('Flip', E.screen.theWindow);
 E.part2.trials = {};
 E.part2.resultsMatNeedsFlush = false;
 E.part2.scannerPulses = [];
