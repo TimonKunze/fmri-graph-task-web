@@ -302,7 +302,7 @@ for i = 1:numel(trials)
         {'timestamp_sec', 'timestamp_rel_sec', 'timestamp_clock'});
     timeFields = intersect(fieldnames(trials{i}), {'flip', 'offset_flip', 'offset_sec', ...
         'onset_from_trigger', 'onset_from_task_start', 'presentation_deadline_secs', ...
-        'response_timestamp_sec'});
+        'response_timestamp_sec', 'checkpoint_active_at_onset'});
     trials{i} = rmfield(trials{i}, timeFields);
     if isfield(trials{i}, 'iti_deadline_sec')
         trials{i} = rmfield(trials{i}, 'iti_deadline_sec');
@@ -377,12 +377,17 @@ global PART2B_TEST_CLOCK
 useDelayedSave(testCase, 5);
 E = testCase.TestData.E;
 E.debugmode = true;
-E.times.runTimeoutSec = 0.24;
+% The next picture starts at 0.24 s; expire inside its presentation,
+% not exactly at onset (where the run-deadline guard may suppress it).
+E.times.runTimeoutSec = 0.26;
 E = runAndSave(E, 1);
 % Background time must not consume the run deadline before picture onset.
 verifyEqual(testCase, PART2B_TEST_CLOCK.draws, 4);
 verifyEqual(testCase, E.part2.trials{5}.trial_name, 'part2_fmri_picture_viewing');
+verifyEqual(testCase, E.part2.trials{5}.timestamp_sec, 0.24, 'AbsTol', 1e-9);
+verifyTrue(testCase, E.part2.trials{5}.checkpoint_active_at_onset);
 verifyEqual(testCase, E.part2.trials{end}.trial_name, 'part2_run_timeout');
+verifyEqual(testCase, E.part2.trials{end}.timestamp_sec, 0.26, 'AbsTol', 1e-9);
 end
 
 function testSkipDuringRemainingItiDoesNotPresentNextStimulus(testCase)
