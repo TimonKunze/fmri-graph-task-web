@@ -24,7 +24,10 @@ if strcmp(action, 'init')
     validateattributes(cfg.maxPulses, {'numeric'}, {'scalar','integer','positive'});
     validateattributes(cfg.boundaryTimeoutSec, {'numeric'}, {'scalar','positive','finite'});
     validateattributes(cfg.workerDelaySec, {'numeric'}, {'scalar','nonnegative','finite'});
-    validateattributes(cfg.workerDelaySequences, {'numeric'}, {'vector','integer','nonnegative'});
+    if ~isempty(cfg.workerDelaySequences)
+        validateattributes(cfg.workerDelaySequences, {'numeric'}, ...
+            {'vector','integer','nonnegative'});
+    end
     validateattributes(cfg.minSubmissionLeadSec, {'numeric'}, {'scalar','nonnegative','finite'});
     assert(any(strcmp(cfg.matVersion, {'-v7','-v7.3'})), 'Part2b:CheckpointConfig', 'Use -v7 or -v7.3.');
     runtime = CheckpointWorker_Part2b('start');
