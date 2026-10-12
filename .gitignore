@@ -30,3 +30,4 @@ local-rg/
 # Participant data and crash files
 matlab_src/Data/
 matlab_src/Crashed/
+matlab_src/Eyelink/
