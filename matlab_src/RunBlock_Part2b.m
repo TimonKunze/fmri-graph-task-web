@@ -25,6 +25,11 @@ if ~isnumeric(startTrialIndex) || ~isscalar(startTrialIndex) || ...
         numel(runItems), runIndex);
 end
 
+% Direct callers also preflight before any timed presentation starts.
+if ~isfield(E, 'part2') || ~isfield(E.part2, 'checkpoint')
+    E = FlushResultsMat_Part2b(E, 'async_init');
+end
+
 adjM = E.G.adjM;
 shortestPathDistanceMatrix = createShortestPathDistanceMatrix(adjM);
 canonicalToExp = invertPermutation(E.assignment.experimentNodeToGraphNode);
@@ -48,6 +53,7 @@ nextStimulusDeadlineSecs = 0;
 preparedFixation = [];
 
 runError = [];
+E.part2.checkpointTimingActive = true;
 try
 for trialIndex = startTrialIndex:numel(runItems)
     E = FlushResultsMat_Part2b(E, 'collect'); % Nonblocking; no file I/O.
@@ -94,7 +100,8 @@ for trialIndex = startTrialIndex:numel(runItems)
                 'onset_from_task_start', imageOnsetSecs - E.part2.run(runIndex).taskStartSecs, ...
                 'timestamp_clock', imageOnsetClock, ...
                 'run_skipped', runSkipped, ...
-                'timed_out', runTimedOut);
+                'timed_out', runTimedOut, ...
+                'checkpoint_active_at_onset', checkpointActive(E));
         % Draw the image-offset fixation while the image is still visible,
         % then schedule its flip for the planned end of the image period.
         [fixSecs, fixClock, fixFlip, runSkipped, runTimedOut] = ...
@@ -310,9 +317,10 @@ if runTimedOut, E.part2.run(runIndex).status = 'timed_out'; end
 SendEyeLinkMessage_Part2b(E, 'RUN_END %d', runIndex);
 % Final fixation above is part of the run; capture stops only after its wait.
 E = FlushResultsMat_Part2b(E, 'stop'); % End capture before checkpoint I/O.
-E = FlushResultsMat_Part2b(E);
-E.part2.resultsMatNeedsFlush = false;
+E.part2.checkpointTimingActive = false;
+% ExperimentScript removes the final display before draining in the break.
 catch err
+    E.part2.checkpointTimingActive = false;
     runError = err;
     E.part2.run(runIndex).status = 'interrupted';
     E.part2.run(runIndex).errorIdentifier = err.identifier;
@@ -434,7 +442,7 @@ SendEyeLinkMessage_Part2b(E, 'ITI_ONSET %d %d %d', runIndex, trialIndex, round(i
 E = finishStimulus(E, previousImageIndex, fixationFlip.onset, fixationFlip);
 recordIndex = numel(E.part2.trials) + 1;
 % This record denotes ITI onset, not completion. Actual duration is filled
-% after the next stimulus flips; a checkpoint taken now keeps it as NaN.
+% after the next stimulus flips; the next batch upserts this trailing record.
 E.part2.trials{recordIndex} = struct( ...
     'trial_name', 'part2_fmri_iti', 'part', 2, ...
     'run_index', runIndex, 'trial_index', trialIndex, ...
@@ -447,17 +455,16 @@ E.part2.trials{recordIndex} = struct( ...
     'onset_from_task_start', onsetSecs - E.part2.run(runIndex).taskStartSecs, ...
     'timestamp_clock', onsetClock, 'run_skipped', false);
 itiError = [];
-if saveCheckpoint
-    saveStartedSecs = GetSecs;
-    try
+try
+    if saveCheckpoint
         E = FlushResultsMat_Part2b(E, 'collect');
-        % Separate assignment retains these pulses if the disk write throws.
-        E = FlushResultsMat_Part2b(E);
-        E.part2.resultsMatNeedsFlush = false;
-        E.part2.trials{recordIndex}.checkpoint_save_seconds = GetSecs - saveStartedSecs;
-    catch err
-        itiError = err;
+        E = FlushResultsMat_Part2b(E, 'async_request', runIndex, deadlineSecs);
+    else
+        % Poll only here, just after ITI onset, never in the pre-flip loop.
+        E = FlushResultsMat_Part2b(E, 'async_service', runIndex, deadlineSecs);
     end
+catch err
+    itiError = err;
 end
 end
 
@@ -613,4 +620,18 @@ if isfield(t, 'flip') && isfinite(t.flip.onset) && isfinite(offsetSecs)
     t.actual_duration_ms = 1000 * (offsetSecs - t.flip.onset);
 end
 E.part2.trials{index} = t;
+end
+
+function active = checkpointActive(E)
+active = false;
+if isfield(E, 'part2') && isfield(E.part2, 'checkpoint') && ...
+        isfield(E.part2.checkpoint, 'inFlight') && ~isempty(E.part2.checkpoint.inFlight)
+    try
+        status = CheckpointWorker_Part2b('status');
+        active = status.active;
+    catch
+        % Diagnostics must never disturb stimulus recording.
+        active = true;
+    end
+end
 end

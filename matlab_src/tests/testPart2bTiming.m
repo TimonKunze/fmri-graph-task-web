@@ -1,5 +1,5 @@
 function tests = testPart2bTiming
-% Uses the real run loop, response handler and MAT writer with fake hardware.
+% Real run loop/MAT writer; deterministic fake hardware and asynchronous transport.
 tests = functiontests(localfunctions);
 end
 
@@ -8,6 +8,11 @@ testDir = fileparts(mfilename('fullpath'));
 testCase.applyFixture(matlab.unittest.fixtures.PathFixture(fileparts(testDir)));
 mockDir = fullfile(testDir, 'helpers', 'psychtoolbox');
 testCase.applyFixture(matlab.unittest.fixtures.PathFixture(mockDir));
+workerDir = fullfile(testDir, 'helpers', 'checkpoint');
+testCase.applyFixture(matlab.unittest.fixtures.PathFixture(workerDir));
+testCase.assertEqual(fileparts(which('CheckpointWorker_Part2b')), workerDir);
+global PART2B_TEST_WRITER
+PART2B_TEST_WRITER = [];
 % Mixed real/simulated clocks can leave polling loops waiting indefinitely.
 for name = {'GetSecs', 'WaitSecs', 'KbCheck', 'Screen'}
     resolved = which(name{1});
@@ -44,7 +49,7 @@ testCase.TestData.checkpoint = fullfile(folder.Folder, E.filenameResultsCheckpoi
 end
 
 function teardown(~)
-clear global PART2B_TEST_CLOCK PART2B_TEST_EYELINK
+clear global PART2B_TEST_CLOCK PART2B_TEST_EYELINK PART2B_TEST_WRITER
 end
 
 function testProductionAndDebugTimingDefaults(testCase)
@@ -125,7 +130,7 @@ end
 function testRunDeadlineInterruptsImageAndSaves(testCase)
 E = testCase.TestData.E;
 E.times.runTimeoutSec = 0.05;
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 verifyTimeoutCheckpoint(testCase, E, 'part2_fmri_picture_viewing', 2);
 verifyTrue(testCase, E.part2.trials{1}.timed_out);
 verifyFalse(testCase, E.part2.trials{1}.run_skipped);
@@ -137,7 +142,7 @@ E = testCase.TestData.E;
 PART2B_TEST_CLOCK.keyStart = 0.02;
 PART2B_TEST_CLOCK.keyEnd = 1;
 PART2B_TEST_CLOCK.keys = [3 4];
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 verifyEqual(testCase, E.part2.trials{1}.trial_name, 'part2_fmri_picture_viewing');
 verifyTrue(testCase, E.part2.trials{1}.run_skipped);
 verifyFalse(testCase, E.part2.trials{1}.timed_out);
@@ -146,14 +151,14 @@ end
 function testRunDeadlineInterruptsItiAndSaves(testCase)
 E = testCase.TestData.E;
 E.times.runTimeoutSec = 0.12;
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 verifyTimeoutCheckpoint(testCase, E, 'part2_fmri_iti', 3);
 end
 
 function testRunDeadlineInterruptsChoiceAndSaves(testCase)
 E = testCase.TestData.E;
 E.times.runTimeoutSec = 0.2;
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 verifyTimeoutCheckpoint(testCase, E, 'part2_dual_stimulus_choice', 4);
 saved = load(testCase.TestData.checkpoint, 'resultsTable');
 verifyTrue(testCase, saved.resultsTable.TimedOut(end - 1));
@@ -164,22 +169,23 @@ function testChoiceItiCheckpointExistsBeforeRunEnd(testCase)
 global PART2B_TEST_CLOCK
 E = testCase.TestData.E;
 E.debugmode = true;
-% Image, two choice textures, then deliberately fail at the next image.
-% The normal end-of-run save cannot execute, so only the ITI save can pass.
 PART2B_TEST_CLOCK.failOnDraw = 4;
-verifyError(testCase, @() RunBlock_Part2b(E, 1), 'Part2bTest:Interrupted');
-saved = load(testCase.TestData.checkpoint, 'E', 'resultsTable');
-verifyEqual(testCase, height(saved.resultsTable), 4);
-verifyEqual(testCase, saved.resultsTable.TrialName(end-1:end), ...
-    ["part2_dual_stimulus_choice"; "part2_fmri_iti"]);
-verifyEqual(testCase, saved.resultsTable.Response(end-1), 1);
-verifyEqual(testCase, saved.resultsTable.RT(end-1), 0.1, 'AbsTol', 1e-9);
+[E, err] = RunBlock_Part2b(E, 1);
+verifyEqual(testCase, err.identifier, 'Part2bTest:Interrupted');
+% A submitted task can finish even if the client exits before acknowledging.
+CheckpointWorker_Part2b('wait', 60);
+CheckpointWorker_Part2b('poll');
+saved = RecoverCheckpoint_Part2b(E.paths.dataDir, E.fileStem);
+verifyEqual(testCase, height(saved.part2.resultsTable), 4);
+verifyEqual(testCase, saved.part2.resultsTable.Response(3), 1);
+verifyEqual(testCase, saved.part2.resultsTable.RT(3), 0.1, 'AbsTol', 1e-9);
+verifyTrue(testCase, isnan(saved.part2.resultsTable.ITIActualSec(4)));
 end
 
 function testNormalRunHasNoRunTimeoutEvent(testCase)
 E = testCase.TestData.E;
 E.debugmode = true;
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 saved = load(testCase.TestData.checkpoint, 'resultsTable');
 verifyEqual(testCase, saved.resultsTable.TrialName, ...
     ["part2_fmri_picture_viewing"; "part2_fmri_iti"; ...
@@ -192,13 +198,14 @@ end
 function testEveryStartPositionMatchesUninterruptedRun(testCase)
 global PART2B_TEST_CLOCK
 base = resumeFixture(testCase);
-full = RunBlock_Part2b(base, 1);
+full = runAndSave(base, 1);
 allIndices = cellfun(@(t) t.trial_index, full.part2.trials);
 for startTrial = 1:numel(base.assignment.part2RawNodeRuns{1})
     PART2B_TEST_CLOCK.now = 0;
     PART2B_TEST_CLOCK.reads = 0;
     PART2B_TEST_CLOCK.draws = 0;
-    resumed = RunBlock_Part2b(base, 1, startTrial);
+    base.fileStem = sprintf('%s_S%02d', testCase.TestData.E.fileStem, startTrial);
+    resumed = runAndSave(base, 1, startTrial);
     expected = full.part2.trials(allIndices >= startTrial);
     verifyEqual(testCase, withoutTimestamps(resumed.part2.trials), ...
         withoutTimestamps(expected), 'AbsTol', 1e-9);
@@ -214,7 +221,7 @@ end
 
 function testResumeChoiceRestoresReferenceAndIti(testCase)
 E = resumeFixture(testCase);
-E = RunBlock_Part2b(E, 1, 3);
+E = runAndSave(E, 1, 3);
 choice = E.part2.trials{1};
 verifyEqual(testCase, choice.trial_name, 'part2_dual_stimulus_choice');
 verifyEqual(testCase, choice.reference_experiment_node_index, 1);
@@ -228,7 +235,7 @@ end
 
 function testResumeConsecutiveChoiceClearsReference(testCase)
 E = resumeFixture(testCase);
-E = RunBlock_Part2b(E, 1, 6);
+E = runAndSave(E, 1, 6);
 choice = E.part2.trials{1};
 verifyEmpty(testCase, choice.reference_experiment_node_index);
 verifyTrue(testCase, all(isnan(choice.path_lengths)));
@@ -239,7 +246,7 @@ end
 function testInvalidStartTrialsAreRejected(testCase)
 E = resumeFixture(testCase);
 for index = {0, -1, 8, 1.5, NaN, Inf, [1 2]}
-    verifyError(testCase, @() RunBlock_Part2b(E, 1, index{1}), ...
+    verifyError(testCase, @() runAndSave(E, 1, index{1}), ...
         'RunBlock_Part2b:InvalidStartTrial');
 end
 end
@@ -306,7 +313,7 @@ end
 function testImageDurationUsesFlipToNextFixation(testCase)
 E = testCase.TestData.E;
 E.debugmode = true;
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 image = E.part2.trials{1};
 verifyEqual(testCase, image.duration_ms, 100);
 verifyEqual(testCase, image.actual_duration_ms, 100, 'AbsTol', 1e-9);
@@ -316,33 +323,36 @@ verifyEqual(testCase, saved.resultsTable.ActualDurationMs(1), 100, 'AbsTol', 1e-
 end
 
 function testSavingFitsInsideItiWithoutExtendingIt(testCase)
-global PART2B_TEST_CLOCK
+global PART2B_TEST_WRITER
 useDelayedSave(testCase, 0.01);
 E = testCase.TestData.E;
 E.debugmode = true;
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 iti = E.part2.trials{4};
-verifyEqual(testCase, PART2B_TEST_CLOCK.saveStarts(1), iti.timestamp_sec, 'AbsTol', 1e-9);
-verifyEqual(testCase, iti.checkpoint_save_seconds, 0.01, 'AbsTol', 1e-9);
+verifyTrue(testCase, isnan(iti.checkpoint_save_seconds)); % Legacy column is not submission time.
 verifyEqual(testCase, iti.iti_actual_seconds, 0.02, 'AbsTol', 1e-9);
 verifyEqual(testCase, iti.iti_lateness_seconds, 0, 'AbsTol', 1e-9);
 verifyEqual(testCase, E.part2.trials{5}.timestamp_sec, iti.iti_deadline_sec, 'AbsTol', 1e-9);
-saved = load(testCase.TestData.checkpoint, 'resultsTable');
-verifyEqual(testCase, saved.resultsTable.CheckpointSaveSec(4), 0.01, 'AbsTol', 1e-9);
-verifyEqual(testCase, saved.resultsTable.ITIActualSec(4), 0.02, 'AbsTol', 1e-9);
+verifyGreaterThan(testCase, PART2B_TEST_WRITER.submissions, 1);
 end
 
-function testSlowSaveReportsOverrunWithoutAnotherFullItiWait(testCase)
-useDelayedSave(testCase, 0.05);
+function testFiveSecondBackgroundSaveDoesNotDelayNextPicture(testCase)
+global PART2B_TEST_WRITER
+useDelayedSave(testCase, 5);
 E = testCase.TestData.E;
 E.debugmode = true;
-E = RunBlock_Part2b(E, 1);
+[E, err] = RunBlock_Part2b(E, 1); % Do not drain until timing has been checked.
+verifyEmpty(testCase, err);
 iti = E.part2.trials{4};
-verifyEqual(testCase, iti.checkpoint_save_seconds, 0.05, 'AbsTol', 1e-9);
-verifyEqual(testCase, iti.iti_actual_seconds, 0.05, 'AbsTol', 1e-9);
-verifyEqual(testCase, iti.iti_lateness_seconds, 0.03, 'AbsTol', 1e-9);
-saved = load(testCase.TestData.checkpoint, 'resultsTable');
-verifyEqual(testCase, saved.resultsTable.ITILatenessSec(4), 0.03, 'AbsTol', 1e-9);
+verifyEqual(testCase, iti.iti_actual_seconds, 0.02, 'AbsTol', 1e-9);
+verifyEqual(testCase, iti.iti_lateness_seconds, 0, 'AbsTol', 1e-9);
+verifyEqual(testCase, E.part2.trials{5}.timestamp_sec, iti.iti_deadline_sec, 'AbsTol', 1e-9);
+verifyEqual(testCase, E.part2.checkpoint.lastCommitted, 0);
+verifyEqual(testCase, PART2B_TEST_WRITER.waits, 1); % Initialization only.
+E = FlushResultsMat_Part2b(E, 'async_drain', 1);
+recovered = RecoverCheckpoint_Part2b(E.paths.dataDir, E.fileStem);
+verifyEqual(testCase, recovered.part2.trials, E.part2.trials);
+verifyEqual(testCase, E.part2.checkpoint.diagnostics{1}.writeSeconds, 5);
 end
 
 function testCheckpointDuringItiDoesNotClaimItiCompleted(testCase)
@@ -351,27 +361,28 @@ useDelayedSave(testCase, 0.01);
 E = testCase.TestData.E;
 E.debugmode = true;
 PART2B_TEST_CLOCK.failOnDraw = 4;
-verifyError(testCase, @() RunBlock_Part2b(E, 1), 'Part2bTest:Interrupted');
-saved = load(testCase.TestData.checkpoint, 'E', 'resultsTable');
-verifyEqual(testCase, height(saved.resultsTable), 4);
-verifyEqual(testCase, saved.resultsTable.Response(3), 1);
-verifyTrue(testCase, isnan(saved.resultsTable.ITIActualSec(4)));
-verifyTrue(testCase, isnan(saved.resultsTable.ITILatenessSec(4)));
-verifyLessThan(testCase, PART2B_TEST_CLOCK.now, saved.resultsTable.ITIDeadlineSec(4));
+[E, err] = RunBlock_Part2b(E, 1);
+verifyEqual(testCase, err.identifier, 'Part2bTest:Interrupted');
+CheckpointWorker_Part2b('wait', 60);
+CheckpointWorker_Part2b('poll');
+saved = RecoverCheckpoint_Part2b(E.paths.dataDir, E.fileStem);
+verifyEqual(testCase, height(saved.part2.resultsTable), 4);
+verifyEqual(testCase, saved.part2.resultsTable.Response(3), 1);
+verifyTrue(testCase, isnan(saved.part2.resultsTable.ITIActualSec(4)));
+verifyTrue(testCase, isnan(saved.part2.resultsTable.ITILatenessSec(4)));
 end
 
-function testRunLimitReachedDuringSavePreventsNextStimulus(testCase)
+function testBackgroundSaveDoesNotPrematurelyConsumeRunDeadline(testCase)
 global PART2B_TEST_CLOCK
-useDelayedSave(testCase, 0.05);
+useDelayedSave(testCase, 5);
 E = testCase.TestData.E;
 E.debugmode = true;
 E.times.runTimeoutSec = 0.24;
-E = RunBlock_Part2b(E, 1);
-verifyEqual(testCase, PART2B_TEST_CLOCK.draws, 3);
+E = runAndSave(E, 1);
+% Background time must not consume the run deadline before picture onset.
+verifyEqual(testCase, PART2B_TEST_CLOCK.draws, 4);
+verifyEqual(testCase, E.part2.trials{5}.trial_name, 'part2_fmri_picture_viewing');
 verifyEqual(testCase, E.part2.trials{end}.trial_name, 'part2_run_timeout');
-verifyEqual(testCase, numel(E.part2.trials), 5);
-saved = load(testCase.TestData.checkpoint, 'resultsTable');
-verifyEqual(testCase, saved.resultsTable.TrialName(end), "part2_run_timeout");
 end
 
 function testSkipDuringRemainingItiDoesNotPresentNextStimulus(testCase)
@@ -382,7 +393,7 @@ E.debugmode = true;
 PART2B_TEST_CLOCK.keyStart = 0.225;
 PART2B_TEST_CLOCK.keyEnd = 1;
 PART2B_TEST_CLOCK.keys = [3 4];
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 verifyEqual(testCase, numel(E.part2.trials), 4);
 verifyTrue(testCase, E.part2.trials{4}.run_skipped);
 verifyTrue(testCase, isnan(E.part2.trials{4}.iti_actual_seconds));
@@ -400,12 +411,10 @@ verifyFalse(testCase, skipped);
 verifyFalse(testCase, expired);
 end
 
-function useDelayedSave(testCase, duration)
-global PART2B_TEST_CLOCK
-folder = fullfile(fileparts(mfilename('fullpath')), 'helpers', 'delayed_save');
-testCase.applyFixture(matlab.unittest.fixtures.PathFixture(folder));
-PART2B_TEST_CLOCK.saveStarts = [];
-PART2B_TEST_CLOCK.saveDelay = duration;
+function useDelayedSave(~, duration)
+global PART2B_TEST_WRITER
+CheckpointWorker_Part2b('start');
+PART2B_TEST_WRITER.delay = duration;
 end
 
 function verifyTimeoutCheckpoint(testCase, E, interruptedName, rowCount)
@@ -424,7 +433,7 @@ end
 function testFinalPictureAndChoiceHaveExplicitOffsets(testCase)
 E = testCase.TestData.E;
 E.debugmode = true;
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 for index = [1 3 5]
     t = E.part2.trials{index};
     verifyTrue(testCase, isfinite(t.offset_sec));
@@ -439,7 +448,7 @@ E = testCase.TestData.E;
 PART2B_TEST_CLOCK.keyStart = 0.16;
 PART2B_TEST_CLOCK.keyEnd = 0.18;
 PART2B_TEST_CLOCK.keys = E.keys.escape;
-[E, err] = RunBlock_Part2b(E, 1);
+[E, err] = runAndSave(E, 1);
 verifyEqual(testCase, err.identifier, 'Part2b:Aborted');
 verifyEqual(testCase, numel(E.part2.trials), 3);
 choice = E.part2.trials{3};
@@ -456,7 +465,7 @@ global PART2B_TEST_CLOCK
 E = testCase.TestData.E;
 E.debugmode = true;
 PART2B_TEST_CLOCK.failOnDraw = 4;
-[E, err] = RunBlock_Part2b(E, 1);
+[E, err] = runAndSave(E, 1);
 verifyEqual(testCase, err.identifier, 'Part2bTest:Interrupted');
 verifyEqual(testCase, numel(E.part2.trials), 4);
 verifyEqual(testCase, E.part2.trials{3}.response, 1);
@@ -556,53 +565,40 @@ clear global PART2B_TEST_SCANNER PART2B_TEST_SCANNER_EVENTS
 end
 
 function testCheckpointFailurePreservesDrainedAndNewPulsesOnRetry(testCase)
-global PART2B_TEST_SCANNER PART2B_TEST_CLOCK
+global PART2B_TEST_SCANNER PART2B_TEST_WRITER
 E = scannerQueueFixture(testCase);
 useDelayedSave(testCase, 2.2);
-PART2B_TEST_CLOCK.failSaveNumber = 1;
+PART2B_TEST_WRITER.failSequence = 1;
 E = ExperimentScript_Part2b(E);
-verifyEqual(testCase, E.err.identifier, 'Part2bTest:SaveFailed');
+verifyEqual(testCase, E.err.identifier, 'Part2b:CheckpointFailed');
 verifyEqual(testCase, PART2B_TEST_SCANNER.stops, 1);
 verifyEqual(testCase, PART2B_TEST_SCANNER.releases, 1);
 verifyFalse(testCase, PART2B_TEST_SCANNER.releasedWithPending);
-% First pulse was drained before the failed save; later pulses arrived during it.
 expected = E.part2.run(1).triggerSecs + (0:2);
 verifyEqual(testCase, E.part2.run(1).scannerTriggerSecs, expected, 'AbsTol', 1e-9);
-verifyTrue(testCase, E.part2.run(1).scannerPulseQC.firstTriggerLoggedOnce);
-verifyEqual(testCase, numel(E.part2.run), 1); % No next run was started.
-
-% Retry using returned E after cleanup, with no persistent pulse buffer.
-PART2B_TEST_CLOCK.failSaveNumber = Inf;
-E = FlushResultsMat_Part2b(E);
+verifyEqual(testCase, numel(E.part2.run), 1);
+verifyEqual(testCase, E.part2.checkpoint.committedPulses(1), 0);
 saved = load(testCase.TestData.checkpoint, 'E');
 verifyEqual(testCase, saved.E.part2.run(1).scannerTriggerSecs, expected, 'AbsTol', 1e-9);
-E = FlushResultsMat_Part2b(E, 'stop'); % Repeated cleanup is idempotent.
-E = FlushResultsMat_Part2b(E);
-saved = load(testCase.TestData.checkpoint, 'E');
-verifyEqual(testCase, saved.E.part2.run(1).scannerTriggerSecs, expected, 'AbsTol', 1e-9);
+E = FlushResultsMat_Part2b(E, 'stop');
 verifyEqual(testCase, PART2B_TEST_SCANNER.stops, 1);
-verifyEqual(testCase, PART2B_TEST_SCANNER.releases, 1);
 end
 
 function testFinalCheckpointFailureRetainsPulsesThroughFinalFixation(testCase)
-global PART2B_TEST_SCANNER PART2B_TEST_CLOCK
+global PART2B_TEST_SCANNER PART2B_TEST_WRITER
 E = scannerQueueFixture(testCase);
 useDelayedSave(testCase, 0);
-PART2B_TEST_CLOCK.failSaveNumber = 2; % ITI succeeds; final checkpoint fails.
+PART2B_TEST_WRITER.failSequence = 2;
 E = ExperimentScript_Part2b(E);
-verifyEqual(testCase, E.err.identifier, 'Part2bTest:SaveFailed');
+verifyEqual(testCase, E.err.identifier, 'Part2b:CheckpointFailed');
 expected = E.part2.run(1).triggerSecs + (0:2);
 verifyEqual(testCase, E.part2.run(1).scannerTriggerSecs, expected, 'AbsTol', 1e-9);
 verifyEqual(testCase, PART2B_TEST_SCANNER.stops, 1);
 verifyEqual(testCase, PART2B_TEST_SCANNER.releases, 1);
 verifyFalse(testCase, PART2B_TEST_SCANNER.releasedWithPending);
-% The previous good checkpoint remains readable while the current E is complete.
-previous = load(testCase.TestData.checkpoint, 'E');
-verifyEqual(testCase, previous.E.part2.run(1).scannerTriggerSecs, expected(1));
-PART2B_TEST_CLOCK.failSaveNumber = Inf;
-E = FlushResultsMat_Part2b(E);
-recovered = load(testCase.TestData.checkpoint, 'E');
-verifyEqual(testCase, recovered.E.part2.run(1).scannerTriggerSecs, expected, 'AbsTol', 1e-9);
+verifyEqual(testCase, E.part2.checkpoint.lastCommitted, 1);
+recovered = RecoverCheckpoint_Part2b(E.paths.dataDir, E.fileStem);
+verifyEqual(testCase, recovered.part2.run(1).scannerTriggerSecs, expected, 'AbsTol', 1e-9);
 end
 
 function E = threeRunEyeLinkFixture(testCase, startRun)
@@ -819,7 +815,7 @@ E.debugmode = true;
 E.screen.flipinterval = 1 / 120;
 PART2B_TEST_CLOCK.refreshInterval = E.screen.flipinterval;
 PART2B_TEST_CLOCK.flipCallDelay = 0.006;
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 T = BuildResultsTable_Part2b(E);
 images = T.TrialName == "part2_fmri_picture_viewing";
 verifyEqual(testCase, T.ActualDurationMs(images), [100; 100], 'AbsTol', 1e-6);
@@ -871,7 +867,7 @@ E.assignment.part2ItiTimesFmri = {[0.05]};
 E.times.postRunFixationSec = 0.2;
 PART2B_TEST_CLOCK.refreshInterval = E.screen.flipinterval;
 PART2B_TEST_CLOCK.flipCallDelay = 0.006;
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 assertFalse(testCase, isfield(E, 'err'));
 T = BuildResultsTable_Part2b(E);
 verifyEqual(testCase, height(T), 4);
@@ -889,7 +885,7 @@ E.screen.flipinterval = 1 / 120;
 PART2B_TEST_CLOCK.keyStart = 0.02;
 PART2B_TEST_CLOCK.keyEnd = 1;
 PART2B_TEST_CLOCK.keys = [3 4];
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 verifyEqual(testCase, E.part2.run(1).status, 'skipped');
 verifyEqual(testCase, numel(E.part2.trials), 1);
 verifyFalse(testCase, isfield(E.part2.trials{1}, 'offset_flip'));
@@ -900,10 +896,24 @@ function testTimeoutDuringScheduledImageRecordsImmediateClear(testCase)
 E = testCase.TestData.E;
 E.screen.flipinterval = 1 / 120;
 E.times.runTimeoutSec = 0.05;
-E = RunBlock_Part2b(E, 1);
+E = runAndSave(E, 1);
 verifyEqual(testCase, E.part2.run(1).status, 'timed_out');
 verifyEqual(testCase, numel(E.part2.trials), 2);
 verifyEqual(testCase, E.part2.trials{1}.offset_sec, 0.05, 'AbsTol', 1e-9);
 verifyFalse(testCase, E.part2.trials{1}.offset_flip.scheduled);
 verifyEqual(testCase, E.part2.trials{1}.offset_flip.submittedSecs, 0.05, 'AbsTol', 1e-9);
+end
+
+
+function [E, err] = runAndSave(E, run, varargin)
+% Test-only adapter for direct RunBlock callers: production does this after
+% switching to the run-break screen, in ExperimentScript.
+[E, err] = RunBlock_Part2b(E, run, varargin{:});
+if isempty(err)
+    E = FlushResultsMat_Part2b(E, 'async_drain', run);
+    E = FlushResultsMat_Part2b(E);
+    E.part2.resultsMatNeedsFlush = false;
+elseif nargout < 2
+    rethrow(err);
+end
 end

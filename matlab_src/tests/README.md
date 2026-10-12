@@ -58,8 +58,8 @@ Each test uses a separate temporary directory that MATLAB cleans up afterward. E
 - A checkpoint during the ITI after a choice, before the run ends. This test interrupts the simulated run before the next image, preventing the final run save from masking a missing ITI save.
 
 - Image durations measured from image flip to the next fixation flip, with requested and actual durations stored separately.
-- Saving inside the ITI: a simulated 10-ms save fits within a 20-ms ITI without extending it; a 50-ms save produces a measured 30-ms overrun instead of another full wait.
-- Checkpoints taken before ITI completion, run deadlines crossed during saving, skipping during the remaining ITI, and refresh-aligned scheduled flips.
+- Asynchronous ITI checkpoints: a simulated five-second writer delay leaves the next picture at its scheduled onset; waits occur only at the untimed boundary.
+- Checkpoints taken before ITI completion, run deadlines independent of background saving, skipping during the remaining ITI, and refresh-aligned scheduled flips.
 
 The timing suite runs the real response handler and run loop with a simulated clock and keyboard/display stubs. It advances simulated time without waiting in real time; run-deadline tests use shortened limits. Stubs in `helpers/psychtoolbox` are added to the path only by the test fixture. Do not add that folder to your normal experiment path or use `addpath(genpath('matlab_src'))`, which would include these stubs.
 
@@ -174,3 +174,7 @@ rolling updates; and rejection of permanent checkpoint/final-export replacement.
 The checkpoint suite also checks three cumulative run snapshots, byte-for-byte
 preservation of prior snapshots, rolling and final exports, rejected repeat saves,
 retained temporary files, write failures, and interrupted/active-run rejection.
+
+## Asynchronous checkpoint validation
+
+See `matlab_src/ASYNC_CHECKPOINTS.md` for the journal, recovery process, diagnostics, and stress-test output. The regular suite uses a deterministic worker transport with the real batch writer and recovery logic. Keep `helpers/checkpoint` off the production path. Run `testAsyncCheckpointTiming` separately on the experiment PC for real Psychtoolbox flips and process-worker delays.

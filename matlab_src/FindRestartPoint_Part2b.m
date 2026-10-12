@@ -16,7 +16,7 @@ files = [dir(fullfile(dataDir, sprintf('part2b_subj%d_A*_*.mat', subject))); ...
     dir(fullfile(fileparts(dataDir), 'Crashed', sprintf('part2b_subj%d_A*_*.mat', subject)))];
 % Keep regex escapes outside sprintf's format-string processing.
 pattern = [sprintf('^part2b_subj%d_A', subject) ...
-    '(\d+)_(\d{8})_(checkpoint|fullstate|results|crash)\.mat$'];
+    '(\d+)_(\d{8})_(checkpoint|checkpoint_base|run\d+_checkpoint|fullstate|results|crash)\.mat$'];
 attempts = []; dates = []; kinds = {}; paths = {};
 for i = 1:numel(files)
     token = regexp(files(i).name, pattern, 'tokens', 'once');
@@ -43,7 +43,9 @@ end
 % An attempt reused on another day is a separate session. Never silently
 % fall back to an older session if the newest one has no checkpoint.
 selected = selected(dates(selected) == max(dates(selected)));
-source = selected(strcmp(kinds(selected), 'fullstate'));
+baseline = selected(strcmp(kinds(selected), 'checkpoint_base'));
+source = baseline;
+if isempty(source), source = selected(strcmp(kinds(selected), 'fullstate')); end
 if isempty(source)
     source = selected(strcmp(kinds(selected), 'checkpoint'));
 end
@@ -54,7 +56,15 @@ if isempty(source)
          'Inspect an earlier attempt explicitly if appropriate.'], attempt);
 end
 source = source(1);
-S = load(paths{source}, 'E');
+if ~isempty(baseline)
+    [~, stem] = fileparts(paths{baseline(1)});
+    stem = extractBefore(stem, '_checkpoint_base');
+    [S.E, recovery] = RecoverCheckpoint_Part2b(dataDir, stem);
+    fprintf('Recovered through batch %d (%d incremental files).\n', ...
+        recovery.lastCommitted, numel(recovery.batchFiles));
+else
+    S = load(paths{source}, 'E');
+end
 if ~isfield(S, 'E') || ~isfield(S.E, 'sbj') || S.E.sbj.n ~= subject || ...
         ~isfield(S.E, 'assignment') || ~isfield(S.E.assignment, 'part2RawNodeRuns') || ...
         ~isfield(S.E, 'part2') || ~isfield(S.E.part2, 'trials') || isempty(S.E.part2.trials)

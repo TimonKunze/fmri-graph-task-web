@@ -45,12 +45,14 @@ try
     E = CleanupPart2b(E);
 
     E = FlushResultsMat_Part2b(E, 'final');
-
     if isfield(E, 'eye') && isfield(E.eye, 'finalizationOk') && ~E.eye.finalizationOk
         warning('EyeLink EDF transfer incomplete. Review E.eye.failedTransferRuns and E.eye.files before closing the session.');
     end
     ThankYou_Part2b(E);
     Screen('CloseAll');
+    if isfield(E, 'part2') && isfield(E.part2, 'checkpoint')
+        CheckpointWorker_Part2b('stop');
+    end
 catch err
     try
         E = CleanupPart2b(E);
@@ -69,9 +71,17 @@ catch err
         warning('Part2b:CrashSaveFailed', 'Emergency save failed: %s', crashSaveErr.message);
     end
     try
+        if isfield(E, 'part2') && isfield(E.part2, 'checkpoint')
+            E = FlushResultsMat_Part2b(E, 'async_drain');
+        end
         E = FlushResultsMat_Part2b(E, 'final');
     catch saveErr
         warning('Part2b:ExportFailed', 'Interrupted-run export failed: %s', saveErr.message);
+    end
+    try
+        CheckpointWorker_Part2b('stop');
+    catch workerErr
+        warning('Part2b:CheckpointCleanupFailed', 'Checkpoint worker cleanup failed: %s', workerErr.message);
     end
     rethrow(err);
 end

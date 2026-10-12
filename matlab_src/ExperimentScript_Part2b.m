@@ -12,12 +12,13 @@ DrawFormattedText(E.screen.theWindow, E.text.part2Start, 'center', 'center', E.s
 Screen('Flip', E.screen.theWindow);
 E.part2.trials = {};
 E.part2.resultsMatNeedsFlush = false;
+E.part2.scannerPulses = [];
+E = FlushResultsMat_Part2b(E, 'async_init'); % Verified baseline before acquisition.
 
 % Start recording before the scanner trigger so the trigger and subsequent
 % scanner-period samples are represented in the EDF. The behavioral log
 % retains its legacy start pulse and records all pulses per run when queued.
 E = StartEyeLinkRecording_Part2b(E);
-E.part2.scannerPulses = [];
 
 startRun = 1;
 startTrial = 1;
@@ -96,6 +97,9 @@ for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
         [~, offsetSecs] = Screen('Flip', E.screen.theWindow);
     end
     E = finishRunDisplay(E, offsetSecs);
+    E = FlushResultsMat_Part2b(E, 'async_drain', runIndex);
+    E = FlushResultsMat_Part2b(E); % Compatible full checkpoint in the break.
+    E.part2.resultsMatNeedsFlush = false;
     % RunBlock includes the full final fixation and ends scanner capture.
     % All EDF I/O is here in the run break, before the next trigger gate.
     E = StopEyeLinkRecording_Part2b(E);
@@ -105,6 +109,11 @@ for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
     end
     % Outside scanner capture and presentation; EDF finalization is already done.
     E = FlushResultsMat_Part2b(E, 'run_snapshot', runIndex);
+    if E.part2.checkpoint.failed
+        error('Part2b:CheckpointFailed', ...
+            'Checkpoint writer failed; complete run data were retained for recovery: %s', ...
+            E.part2.checkpoint.failure.message);
+    end
     if runIndex < numel(E.assignment.part2RawNodeRuns)
         waitForSpecificKey(E.times.continueKey);
         waitForKeyRelease();

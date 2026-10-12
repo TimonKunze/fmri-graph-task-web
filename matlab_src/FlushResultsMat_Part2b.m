@@ -1,8 +1,14 @@
-function E = FlushResultsMat_Part2b(E, mode, runIndex)
-% Default checkpoint cadence is unchanged. Final exports happen after cleanup.
+function E = FlushResultsMat_Part2b(E, mode, runIndex, deadlineSecs)
+% Full snapshots are untimed only. ITIs use async_request/async_service.
 % Keep collection separate from saving: assign E = ...('collect') first.
 % A failed save must not unwind the only copy of newly drained timestamps.
 if nargin < 2, mode = 'checkpoint'; end
+if startsWith(mode, 'async_')
+    if nargin < 3, runIndex = []; end
+    if nargin < 4, deadlineSecs = Inf; end
+    E = AsyncCheckpoint_Part2b(E, mode(7:end), runIndex, deadlineSecs);
+    return;
+end
 if strcmp(mode, 'collect')
     E = collectScannerPulses(E);
     return;
@@ -24,6 +30,10 @@ if strcmp(mode, 'stop')
         end
     end
     return;
+end
+if isfield(E, 'part2') && isfield(E.part2, 'checkpointTimingActive') && ...
+        E.part2.checkpointTimingActive
+    error('Part2b:SynchronousSaveDuringRun', 'Full-state saving is forbidden during timed presentation.');
 end
 if strcmp(mode, 'run_snapshot')
     if nargin < 3, runIndex = NaN; end
