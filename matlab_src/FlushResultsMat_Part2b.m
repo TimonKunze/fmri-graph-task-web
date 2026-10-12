@@ -1,4 +1,4 @@
-function E = FlushResultsMat_Part2b(E, mode)
+function E = FlushResultsMat_Part2b(E, mode, runIndex)
 % Default checkpoint cadence is unchanged. Final exports happen after cleanup.
 % Keep collection separate from saving: assign E = ...('collect') first.
 % A failed save must not unwind the only copy of newly drained timestamps.
@@ -25,7 +25,39 @@ if strcmp(mode, 'stop')
     end
     return;
 end
+if strcmp(mode, 'run_snapshot')
+    if nargin < 3, runIndex = NaN; end
+    snapshotPath = '';
+    try
+        validateattributes(runIndex, {'numeric'}, {'scalar', 'integer', 'positive'});
+        if isfield(E.part2, 'scannerQueueActive') && E.part2.scannerQueueActive
+            error('Part2b:SnapshotDuringCapture', 'Scanner capture must stop before a run snapshot.');
+        end
+        if ~any(strcmp(E.part2.run(runIndex).status, {'completed', 'skipped', 'timed_out'}))
+            error('Part2b:UnfinishedRunSnapshot', 'Run %d has not finished.', runIndex);
+        end
+        snapshotPath = fullfile(E.paths.dataDir, ...
+            sprintf('%s_run%02d_checkpoint.mat', E.fileStem, runIndex));
+        E.part2.resultsTable = BuildResultsTable_Part2b(E);
+        writeCheckpoint(E, snapshotPath, true);
+    catch snapshotError
+        failure = struct('runIndex', runIndex, 'path', snapshotPath, ...
+            'identifier', snapshotError.identifier, 'message', snapshotError.message);
+        if ~isfield(E.part2, 'runSnapshotFailures'), E.part2.runSnapshotFailures = {}; end
+        E.part2.runSnapshotFailures{end+1} = failure;
+        warning('Part2b:RunSnapshotFailed', ...
+            'Run %g checkpoint snapshot failed: %s', runIndex, snapshotError.message);
+    end
+    return;
+end
 if strcmp(mode, 'final')
+    fullPath = fullfile(E.paths.dataDir, E.filenameFullStateMat);
+    resultsPath = fullfile(E.paths.dataDir, E.filenameResultsMat);
+    [~, stem] = fileparts(E.filenameResultsMat);
+    csvPath = fullfile(E.paths.dataDir, [stem '.csv']);
+    % Check the entire set before writing any export.
+    AssertOutputAbsent_Part2b({fullPath, resultsPath, csvPath, ...
+        [fullPath '.tmp'], [resultsPath '.tmp'], [csvPath '.tmp']});
     if ~isfield(E, 'part2'), E.part2 = struct(); end
     if ~isfield(E.part2, 'trials'), E.part2.trials = {}; end
     E.part2.resultsTable = BuildResultsTable_Part2b(E);
@@ -35,24 +67,54 @@ if strcmp(mode, 'final')
     results.subject = E.sbj;
     if isfield(E, 'eye') && isfield(E.eye, 'files'), results.eyeFiles = E.eye.files; end
     if isfield(E, 'times'), results.timingParameters = E.times; end
-    save(fullfile(E.paths.dataDir, E.filenameFullStateMat), 'E');
-    save(fullfile(E.paths.dataDir, E.filenameResultsMat), 'resultsTable', 'results');
-    [~, stem] = fileparts(E.filenameResultsMat);
-    writetable(resultsTable, fullfile(E.paths.dataDir, [stem '.csv']));
+    save([fullPath '.tmp'], 'E');
+    commitPermanent([fullPath '.tmp'], fullPath);
+    save([resultsPath '.tmp'], 'resultsTable', 'results');
+    commitPermanent([resultsPath '.tmp'], resultsPath);
+    writetable(resultsTable, [csvPath '.tmp'], 'FileType', 'text', 'Delimiter', ',');
+    commitPermanent([csvPath '.tmp'], csvPath);
     return;
 end
 if ~isfield(E, 'part2') || ~isfield(E.part2, 'trials') || isempty(E.part2.trials)
     return;
 end
 checkpointMatPath = fullfile(E.paths.dataDir, E.filenameResultsCheckpointMat);
-tmpCheckpointMatPath = [checkpointMatPath '.tmp'];
+isPermanent = ~isempty(regexp(E.filenameResultsCheckpointMat, ...
+    '_run\d+_checkpoint\.mat$', 'once'));
 E.part2.resultsTable = BuildResultsTable_Part2b(E);
+writeCheckpoint(E, checkpointMatPath, isPermanent);
+end
+
+function writeCheckpoint(E, checkpointMatPath, isPermanent)
+tmpCheckpointMatPath = [checkpointMatPath '.tmp'];
+if isPermanent
+    AssertOutputAbsent_Part2b({checkpointMatPath, tmpCheckpointMatPath});
+end
 resultsTable = E.part2.resultsTable;
 save(tmpCheckpointMatPath, 'E', 'resultsTable');
-if ~movefile(tmpCheckpointMatPath, checkpointMatPath, 'f')
-    error('FlushResultsMat_Part2b:CommitFailed', ...
-        'Could not replace checkpoint file %s.', checkpointMatPath);
+if ~isfile(tmpCheckpointMatPath)
+    error('FlushResultsMat_Part2b:MissingTemporary', ...
+        'Temporary checkpoint was not created: %s.', tmpCheckpointMatPath);
 end
+if isPermanent
+    AssertOutputAbsent_Part2b(checkpointMatPath);
+    [ok, message] = movefile(tmpCheckpointMatPath, checkpointMatPath);
+else
+    [ok, message] = movefile(tmpCheckpointMatPath, checkpointMatPath, 'f');
+end
+if ~ok
+    error('FlushResultsMat_Part2b:CommitFailed', ...
+        'Could not commit checkpoint %s: %s', checkpointMatPath, message);
+end
+end
+
+function commitPermanent(source, destination)
+AssertOutputAbsent_Part2b(destination);
+% No REPLACE_EXISTING: never request replacement at commit time either.
+sourceFile = java.io.File(source);
+destinationFile = java.io.File(destination);
+javaMethod('move', 'java.nio.file.Files', sourceFile.toPath(), ...
+    destinationFile.toPath(), javaArray('java.nio.file.CopyOption', 0));
 end
 
 function E = collectScannerPulses(E)

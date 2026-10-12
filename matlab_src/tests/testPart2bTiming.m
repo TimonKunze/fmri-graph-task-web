@@ -29,6 +29,7 @@ E.eye.enabled = false;
 E.sbj.n = 1;
 E.paths.dataDir = folder.Folder;
 E.filenameResultsCheckpointMat = 'checkpoint.mat';
+E.fileStem = 'part2b_subj1_A01_20261010';
 E.begintime = 0;
 E.part2.trials = {};
 E.part2.resultsMatNeedsFlush = false;
@@ -648,6 +649,16 @@ receives = find(strcmp(names, 'ReceiveFile'));
 verifyEqual(testCase, [numel(opens) numel(starts) numel(stops) numel(closes) numel(receives)], [3 3 3 3 3]);
 T = BuildResultsTable_Part2b(E);
 for r = 1:3
+    snapshot = load(fullfile(E.paths.dataDir, ...
+        sprintf('%s_run%02d_checkpoint.mat', E.fileStem, r)));
+    verifyFalse(testCase, snapshot.E.part2.scannerQueueActive);
+    verifyEqual(testCase, snapshot.E.part2.run(r), E.part2.run(r));
+    verifyTrue(testCase, snapshot.E.eye.files{r}.fileTransferred);
+    verifyLessThanOrEqual(testCase, max(snapshot.resultsTable.Run), r);
+    finalDisplay = snapshot.E.part2.trials{end};
+    verifyTrue(testCase, isfinite(finalDisplay.offset_sec));
+    verifyEqual(testCase, finalDisplay.actual_duration_ms, ...
+        E.times.postRunFixationSec * 1000, 'AbsTol', 1e-6);
     file = E.eye.files{r};
     verifyEqual(testCase, file.hostEdfFile, sprintf('P00101R%d.edf', r));
     verifyTrue(testCase, file.fileTransferred);

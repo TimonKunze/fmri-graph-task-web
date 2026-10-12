@@ -211,3 +211,145 @@ E = FlushResultsMat_Part2b(E, 'collect');
 verifyEqual(testCase, E.part2.run.scannerTriggerSecs, [10 11 12]);
 clear global PART2B_TEST_SCANNER_EVENTS
 end
+
+function testPermanentCheckpointCannotBeReplaced(testCase)
+E = testCase.TestData.E;
+E.filenameResultsCheckpointMat = 'part2b_subj7_A01_20261010_run01_checkpoint.mat';
+E.part2.trials = {choiceTrial(2, 0, 0.75, false)};
+FlushResultsMat_Part2b(E);
+file = fullfile(E.paths.dataDir, E.filenameResultsCheckpointMat);
+original = load(file);
+E.part2.trials{1}.response = 1;
+verifyError(testCase, @() FlushResultsMat_Part2b(E), 'Part2b:OutputExists');
+verifyEqual(testCase, load(file), original);
+verifyFalse(testCase, isfile([file '.tmp']));
+end
+
+function testEachFinalDestinationAndTemporaryBlocksEntireExport(testCase)
+E = testCase.TestData.E;
+E.filenameFullStateMat = 'fullstate.mat';
+E.filenameResultsMat = 'results.mat';
+E.part2.trials = {choiceTrial(2, 0, 0.75, false)};
+names = {'fullstate.mat', 'results.mat', 'results.csv', ...
+    'fullstate.mat.tmp', 'results.mat.tmp', 'results.csv.tmp'};
+for k = 1:numel(names)
+    file = fullfile(E.paths.dataDir, names{k});
+    fid = fopen(file, 'w');
+    fprintf(fid, 'original data');
+    fclose(fid);
+    before = dir(E.paths.dataDir);
+    verifyError(testCase, @() FlushResultsMat_Part2b(E, 'final'), 'Part2b:OutputExists');
+    verifyEqual(testCase, fileread(file), 'original data');
+    verifyEqual(testCase, dir(E.paths.dataDir), before);
+    delete(file); % Test fixture only.
+end
+end
+
+function testThreeRunSnapshotsAreCumulativeAndIndependent(testCase)
+E = snapshotState(testCase);
+statuses = {'completed', 'skipped', 'timed_out'};
+for r = 1:3
+    trial = choiceTrial(r, mod(r, 2), r / 10, r == 3);
+    trial.run_index = r;
+    E.part2.trials{end+1} = trial;
+    E.part2.run(r).status = statuses{r};
+    E.part2.run(r).scannerTriggerSecs = [r*10 r*10+1];
+    E.part2.run(r).scannerCaptureEndSecs = r*10+2;
+    E = FlushResultsMat_Part2b(E);
+    E = FlushResultsMat_Part2b(E, 'run_snapshot', r);
+    verifyFalse(testCase, isfield(E.part2, 'runSnapshotFailures'));
+    file = snapshotFile(E, r);
+    saved = load(file);
+    verifyEqual(testCase, saved.E, E);
+    verifyEqual(testCase, height(saved.resultsTable), r);
+    verifyEqual(testCase, saved.E.part2.run(r).status, statuses{r});
+    verifyFalse(testCase, isfile([file '.tmp']));
+    originals{r} = readBytes(file); %#ok<AGROW>
+    for previous = 1:r
+        verifyEqual(testCase, readBytes(snapshotFile(E, previous)), originals{previous});
+    end
+end
+rolling = load(fullfile(E.paths.dataDir, E.filenameResultsCheckpointMat));
+verifyEqual(testCase, rolling.E.part2.trials, E.part2.trials);
+E.filenameFullStateMat = [E.fileStem '_fullstate.mat'];
+E.filenameResultsMat = [E.fileStem '_results.mat'];
+E = FlushResultsMat_Part2b(E, 'final');
+full = load(fullfile(E.paths.dataDir, E.filenameFullStateMat));
+results = load(fullfile(E.paths.dataDir, E.filenameResultsMat));
+csv = readtable(fullfile(E.paths.dataDir, [E.fileStem '_results.csv']));
+verifyEqual(testCase, full.E, E);
+verifyEqual(testCase, results.resultsTable, E.part2.resultsTable);
+verifyEqual(testCase, csv.Response, results.resultsTable.Response);
+end
+
+function testSnapshotCollisionWarnsAndRetainsFailure(testCase)
+E = snapshotState(testCase);
+E.part2.trials = {choiceTrial(1, 0, 0.5, false)};
+E = FlushResultsMat_Part2b(E);
+E = FlushResultsMat_Part2b(E, 'run_snapshot', 1);
+original = readBytes(snapshotFile(E, 1));
+rollingPath = fullfile(E.paths.dataDir, E.filenameResultsCheckpointMat);
+rolling = readBytes(rollingPath);
+verifyWarning(testCase, @() FlushResultsMat_Part2b(E, 'run_snapshot', 1), ...
+    'Part2b:RunSnapshotFailed');
+E = FlushResultsMat_Part2b(E, 'run_snapshot', 1);
+verifyEqual(testCase, E.part2.runSnapshotFailures{end}.identifier, 'Part2b:OutputExists');
+verifyEqual(testCase, readBytes(snapshotFile(E, 1)), original);
+verifyEqual(testCase, readBytes(rollingPath), rolling);
+end
+
+function testFailedSnapshotLeavesRollingAndTemporaryUntouched(testCase)
+E = snapshotState(testCase);
+E.part2.trials = {choiceTrial(1, 0, 0.5, false)};
+E = FlushResultsMat_Part2b(E);
+rollingPath = fullfile(E.paths.dataDir, E.filenameResultsCheckpointMat);
+original = readBytes(rollingPath);
+% An unfinished save must be preserved rather than replaced on retry.
+temporary = [snapshotFile(E, 1) '.tmp'];
+marker = 42;
+save(temporary, 'marker');
+bytes = readBytes(temporary);
+E = FlushResultsMat_Part2b(E, 'run_snapshot', 1);
+verifyEqual(testCase, E.part2.runSnapshotFailures{end}.identifier, 'Part2b:OutputExists');
+verifyEqual(testCase, readBytes(temporary), bytes);
+verifyEqual(testCase, readBytes(rollingPath), original);
+verifyFalse(testCase, isfile(snapshotFile(E, 1)));
+% A file used as the parent directory forces an actual save failure.
+E.paths.dataDir = rollingPath;
+E = FlushResultsMat_Part2b(E, 'run_snapshot', 1);
+verifyEqual(testCase, numel(E.part2.runSnapshotFailures), 2);
+verifyEqual(testCase, readBytes(rollingPath), original);
+end
+
+function testInterruptedOrActiveRunCannotSnapshot(testCase)
+E = snapshotState(testCase);
+E.part2.run(1).status = 'interrupted';
+E = FlushResultsMat_Part2b(E, 'run_snapshot', 1);
+verifyEqual(testCase, E.part2.runSnapshotFailures{end}.identifier, 'Part2b:UnfinishedRunSnapshot');
+verifyEqual(testCase, E.part2.run(1).status, 'interrupted');
+E.part2.run(1).status = 'completed';
+E.part2.scannerQueueActive = true;
+E = FlushResultsMat_Part2b(E, 'run_snapshot', 1);
+verifyEqual(testCase, E.part2.runSnapshotFailures{end}.identifier, 'Part2b:SnapshotDuringCapture');
+verifyFalse(testCase, isfile(snapshotFile(E, 1)));
+end
+
+function E = snapshotState(testCase)
+E = testCase.TestData.E;
+E.fileStem = 'part2b_subj7_A01_20261010';
+E.part2.scannerQueueActive = false;
+E.part2.run = struct('status', 'completed', 'scannerTriggerSecs', [10 11], ...
+    'scannerCaptureEndSecs', 12);
+E.part2.trials = {};
+end
+
+function file = snapshotFile(E, r)
+file = fullfile(E.paths.dataDir, sprintf('%s_run%02d_checkpoint.mat', E.fileStem, r));
+end
+
+function bytes = readBytes(file)
+fid = fopen(file, 'rb');
+assert(fid >= 0, 'Cannot read test output.');
+cleanup = onCleanup(@() fclose(fid));
+bytes = fread(fid, Inf, '*uint8');
+end

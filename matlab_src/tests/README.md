@@ -158,3 +158,19 @@ Run the helper's synthetic-file tests with:
 results = runtests('matlab_src/tests/testFindRestartPoint_Part2b.m');
 assertSuccess(results);
 ```
+
+Attempt overwrite protection tests:
+
+```matlab
+results = runtests({'matlab_src/tests/testAttemptProtection_Part2b.m', ...
+    'matlab_src/tests/testFlushResultsMat_Part2b.m'});
+assertSuccess(results);
+```
+
+These cover read-only startup rejection for saved data, checkpoints, crash and
+temporary files, EDFs and reservations; acceptance of fresh attempts; repeated
+rolling updates; and rejection of permanent checkpoint/final-export replacement.
+
+The checkpoint suite also checks three cumulative run snapshots, byte-for-byte
+preservation of prior snapshots, rolling and final exports, rejected repeat saves,
+retained temporary files, write failures, and interrupted/active-run rejection.

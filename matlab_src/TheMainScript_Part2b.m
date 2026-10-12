@@ -21,6 +21,9 @@ E.filenameResultsMat = [E.fileStem '_results.mat'];
 E.filenameResultsCheckpointMat = [E.fileStem '_checkpoint.mat'];
 E.filenameCrashMat = [E.fileStem '_crash.mat'];
 
+% Outside the crash handler: rejecting an old attempt must write nothing.
+AssertNewAttempt_Part2b(E, attempt);
+
 if ~exist(E.paths.dataDir, 'dir')
     mkdir(E.paths.dataDir);
 end

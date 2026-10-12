@@ -129,3 +129,39 @@ assertSuccess(results);
 The editing environment does not have MATLAB or Octave. A scanner/PTB hardware
 smoke test is still needed to verify pulse delivery and display timing on the
 acquisition machine.
+
+### Attempt overwrite protection
+
+The entry point runs `AssertNewAttempt_Part2b` immediately after assigning
+filenames, before directory creation and outside the crash handler. It checks
+configured data, crash, and EyeLink directories (including nested recovery
+files) for the exact dated attempt stem and participant/attempt EDF names or
+reservations. EDF names have no date, so their existing cross-date protection
+remains in effect. A collision lists paths and requires a new attempt number;
+the check writes nothing. `FindRestartPoint_Part2b` and explicit EDF transfer
+recovery remain separate operations.
+
+Rolling checkpoints retain their existing replacement behavior. Destinations
+ending in `_runXX_checkpoint.mat` are permanent. Permanent checkpoints and
+final MAT/CSV exports reject existing destinations or temporary files, stage
+writes beside the destination, and commit without requesting replacement. Final exports use Java NIO
+(requiring the standard MATLAB JVM) and preflight
+all three destinations before writing. Failed staged saves remain available
+for inspection and block a fresh execution of the same attempt.
+
+### Permanent run checkpoints
+
+`FlushResultsMat_Part2b(E, 'run_snapshot', runIndex)` writes
+`<fileStem>_run01_checkpoint.mat` (and run02/run03) containing cumulative `E`
+and `resultsTable`. The run sequence calls this once after capture has stopped,
+final display offsets have been recorded, and EDF finalization has returned,
+before the next run gate. Completed, skipped and timed-out statuses are retained;
+interrupted runs use the existing crash recovery path.
+
+Both checkpoint modes use the same temporary-save/verification/`movefile` helper.
+Permanent destinations and temporary leftovers are checked before saving and the
+destination is checked again before committing without the force flag. Rolling
+checkpoint cadence is unchanged. Snapshot errors warn with
+`Part2b:RunSnapshotFailed` and append details to `E.part2.runSnapshotFailures`,
+which subsequent checkpoints/final exports retain. No automatic retry or deletion
+occurs. Final exports continue using their existing protected commit path.

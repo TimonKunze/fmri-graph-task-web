@@ -103,6 +103,8 @@ for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
         error('ExperimentScript_Part2b:EdfCloseFailed', ...
             'Cannot start another run while the previous Host EDF is still open.');
     end
+    % Outside scanner capture and presentation; EDF finalization is already done.
+    E = FlushResultsMat_Part2b(E, 'run_snapshot', runIndex);
     if runIndex < numel(E.assignment.part2RawNodeRuns)
         waitForSpecificKey(E.times.continueKey);
         waitForKeyRelease();
