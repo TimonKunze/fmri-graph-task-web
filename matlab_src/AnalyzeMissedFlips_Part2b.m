@@ -93,7 +93,11 @@ for k = 1:numel(trials)
                 r.DuplicateOfRow = j; break;
             end
         end
-        rows(end+1) = r; %#ok<AGROW>
+        if isempty(rows)
+            rows = r;
+        else
+            rows(end+1) = r; %#ok<AGROW>
+        end
     end
 end
 assert(~isempty(rows), 'Part2b:AnalysisInput', 'No raw flip records found.');
@@ -113,7 +117,11 @@ for run = unique(F.Run(isfinite(F.Run))).'
         a.P95ErrorMs = 1000*errors(max(1,ceil(0.95*numel(errors))));
         a.MaxErrorMs = 1000*max(errors);
     end
-    stats(end+1) = a; %#ok<AGROW>
+    if isempty(stats)
+        stats = a;
+    else
+        stats(end+1) = a; %#ok<AGROW>
+    end
 end
 S = table(); if ~isempty(stats), S = struct2table(stats); end
 C = table();

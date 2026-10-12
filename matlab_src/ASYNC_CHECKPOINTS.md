@@ -4,6 +4,8 @@ The timed path keeps the existing post-choice checkpoint opportunities. It packa
 
 A verified baseline is written before acquisition. Startup requires MATLAB R2017b or newer, Parallel Computing Toolbox, and a process pool. Thread workers are rejected. Failure stops before the run rather than falling back to synchronous saving.
 
+**Startup note:** After pressing Space on the instruction screen, MATLAB initializes the background checkpoint worker before it starts listening for scanner triggers. This can take a few seconds on the first run. Once the scanner-wait screen appears, press and release **5** to start; Space does not trigger the run.
+
 Files use the existing attempt stem:
 
 - `*_checkpoint_base.mat`: static/full baseline, assignment, timing configuration, and RNG state.
@@ -31,3 +33,14 @@ Recovery chooses the most advanced readable full snapshot or baseline and applie
 Run deterministic tests with `runtests('matlab_src/tests')`. On the experiment PC, add `matlab_src/tests` to the path and run `report = testAsyncCheckpointTiming`. It uses real Psychtoolbox flips and the real run loop under baseline, one delayed write, and every-write-delayed conditions.
 
 MATLAB is unavailable in this development workspace. Static MATLAB parsing passes; process-pool, disk, display, and scanner-PC timing must be measured on the experiment PC.
+
+## Post-run missed-flip analysis
+
+Run `AnalyzeMissedFlips_Part2b` from the `matlab_src` directory and select the attempt's full-state MAT file (preferred), checkpoint snapshot, or results MAT file. It writes a new temporary report directory and prints its location. To choose a permanent destination, use:
+
+```matlab
+report = AnalyzeMissedFlips_Part2b('Data/your_attempt_fullstate.mat', ...
+    'Data/your_attempt_flip_analysis');
+```
+
+The output directory must not already exist. Outputs include `summary.txt`, `flips.csv`, `picture_timing_by_run.csv`, and `checkpoints.csv` when asynchronous diagnostics are available. Reports include run/trial identifiers, raw timestamps, onset errors, PTB flags, preceding ITI/save evidence, and recorded background activity. Shared offset/onset references are marked as duplicates. An active background writer alone does not establish causation. Missing fields are left unknown. For crash recovery, pass the reconstructed `E` returned by `RecoverCheckpoint_Part2b`; individual incremental batch files are not full snapshots. The optional third argument sets the evidence-matching tolerance in seconds (default 0.015); it is not a pass/fail timing threshold.
