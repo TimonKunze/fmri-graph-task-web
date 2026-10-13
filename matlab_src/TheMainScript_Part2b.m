@@ -38,6 +38,7 @@ try
     E = IniHardware_Part2b(E);
     E = PreLoadText_Part2b(E);
     E = PreLoadStim_Part2b(E);
+    WaitForSpaceScreen_Part2b(E, E.text.part2Intro);
     E = SetupEyeLink_Part2b(E);
 
     E = ExperimentScript_Part2b(E);
