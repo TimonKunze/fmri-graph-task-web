@@ -117,6 +117,13 @@ for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
         waitForKeyRelease();
         E = OpenEyeLinkFile_Part2b(E, runIndex + 1);
         E = RecalibrateAndValidateEyeLink_Part2b(E, runIndex);
+        Screen('FillRect', E.screen.theWindow, E.screen.bckgrnd);
+        DrawFormattedText(E.screen.theWindow, E.text.part2PostCalibration, ...
+            'center', 'center', E.screen.textcolor);
+        Screen('Flip', E.screen.theWindow);
+        waitForKeyRelease(); % Require a fresh Space press after calibration.
+        waitForSpecificKey(E.times.continueKey);
+        waitForKeyRelease();
     end
 end
 

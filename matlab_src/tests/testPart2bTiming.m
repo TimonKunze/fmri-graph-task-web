@@ -263,7 +263,8 @@ E.times.continueKey = 8;
 E.times.scannerOffsetSec = 0;
 E.keys.trigger = 7;
 E.text = struct('part2Intro', 'Intro', 'part2Start', 'Start', ...
-    'part2Final', 'Finished', 'part2RunBreak', 'Run %d of %d');
+    'part2Final', 'Finished', 'part2RunBreak', 'Run %d of %d', ...
+    'part2PostCalibration', 'Calibration complete. Press SPACE.');
 PART2B_TEST_CLOCK.autoContinue = true;
 PART2B_TEST_CLOCK.keyPolls = 0;
 E = ExperimentScript_Part2b(E);
@@ -502,7 +503,8 @@ E.times.scannerOffsetSec = 0;
 E.times.postRunFixationSec = 2;
 E.keys.trigger = 7;
 E.text = struct('part2Intro', 'Intro', 'part2Start', 'Start', ...
-    'part2Final', 'Finished', 'part2RunBreak', 'Run %d of %d');
+    'part2Final', 'Finished', 'part2RunBreak', 'Run %d of %d', ...
+    'part2PostCalibration', 'Calibration complete. Press SPACE.');
 PART2B_TEST_CLOCK.autoContinue = true;
 PART2B_TEST_CLOCK.keyPolls = 0;
 end
