@@ -100,7 +100,7 @@ elseif any(strcmp(names, 'part2_fmri_post_run_fixation')) || ...
     info.status = 'READY';
 elseif isfinite(info.lastSavedTrial)
     info.startRun = run;
-    info.startTrial = info.lastSavedTrial + 1;
+    info.startTrial = info.lastSavedTrial;
     info.status = 'READY';
 else
     fprintf('REVIEW REQUIRED: no saved stimulus record in the latest run.\n');
