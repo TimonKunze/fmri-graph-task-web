@@ -3,21 +3,17 @@ import { mkdirSync } from "node:fs";
 
 const deploymentDate = new Date().toISOString();
 const deploymentComment = process.argv.slice(2).join(" ").trim();
-const basePrefix = process.env.DEPLOY_BASE_PREFIX || "/";
-const saveDataUrl = process.env.DEPLOY_SAVE_DATA_URL || "/fmri_exp/exp_data/save_data.php";
+const deploymentPrefix = process.env.DEPLOY_BASE_PREFIX || "";
+const assetBase = process.env.DEPLOY_ASSET_BASE || "./";
+const saveDataUrl = process.env.DEPLOY_SAVE_DATA_URL || "https://brainsci.uber.space/fmri_exp/exp_data/save_data.php";
 const experimentFolder =
   process.env.DEPLOY_EXPERIMENT_FOLDER ||
-  basePrefix.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean).at(-1) ||
+  deploymentPrefix.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean).at(-1) ||
   "experiment";
 const experimentVersion =
   process.env.VITE_EXPERIMENT_VERSION ||
   process.env.DEPLOY_EXPERIMENT_VERSION ||
   experimentFolder;
-
-function normalizeBasePath(prefix, part) {
-  const trimmed = prefix.replace(/^\/+|\/+$/g, "");
-  return trimmed ? `/${trimmed}/part${part}/` : `/part${part}/`;
-}
 
 const builds = [
   { part: "1", outDir: "dist/part1" },
@@ -26,7 +22,7 @@ const builds = [
   { part: "3", outDir: "dist/part3" },
 ].map((build) => ({
   ...build,
-  base: normalizeBasePath(basePrefix, build.part),
+  base: assetBase,
 }));
 
 mkdirSync("dist", { recursive: true });

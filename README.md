@@ -64,21 +64,51 @@ The experiment saves a combination of global metadata and trial-specific fields 
 
 
 ## To Deploy the experiment use
+### With lftp
+```bash
+# First deploy with:
+DEPLOY_EXPERIMENT_FOLDER=experiment_2026-10-20 npm run build:parts -- "deployment 2026-10-20"
 
-First deploy with:
+# Upload the same build to Uberspace:
+rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-10-20/
 
-TODO: deploy in, then upload with sftp:
-/home/tk/02_AREAS/websites/sissa_personal/fmri_exp
+# Copy to the SISSA staging folder:
+rsync -av ~/01_PROJECTS/fmri_graph_task_web/dist/ ~/02_AREAS/websites/sissa_personal/fmri_exp/experiment_2026-10-20/
 
-DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-10-20 npm run build:parts -- "deployment 2026-10-20"
-DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-03 npm run build:parts -- "deployment 2026-06-03"
-DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-10 npm run build:parts -- "deployment 2026-06-10"
-DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-10_2 npm run build:parts -- "deployment 2026-06-10_2"
-DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-17 npm run build:parts -- "deployment 2026-06-17"
-DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-19 npm run build:parts -- "deployment 2026-06-19"
+# Go to local fmri_exp
+z fmri_exp
 
-Then copy to local folder with:
-rsync -av dist/ ~/02_AREAS/websites/sissa_personal/fmri_exp/experiment_2026-10-20/
+# Connect with lftp
+lftp -u tkunze sftp://sftp.sissa.it
+
+# Set the local source directory
+lcd /home/tk/02_AREAS/websites/sissa_personal/fmri_exp/experiment_2026-10-20
+
+# Create the remote directory if needed, then enter it
+mkdir -p public_html/fmri_exp/experiment_2026-10-20
+cd public_html/fmri_exp/experiment_2026-10-20
+
+# Upload local contents to the remote directory
+mirror --reverse --verbose --parallel=4 ./ ./
+
+bye
+```
+
+The build uses relative frontend asset URLs, so the same uploaded files work
+through both public addresses:
+
+- `https://brainsci.uber.space/fmri_exp/experiment_2026-10-20/part3/`
+- `https://people.sissa.it/~tkunze/fmri_exp/experiment_2026-10-20/part3/`
+
+Do not include either server's URL prefix in the build command.
+
+Both frontend copies submit participant data to the shared Uberspace
+`/fmri_exp/exp_data/save_data.php` endpoint. Upload `exp_data/` there whenever
+`save_data.php` changes.
+
+
+### With sftp
+1. avoid!
 
 Connect via sftp:
 sftp tkunze@sftp.sissa.it
@@ -115,6 +145,21 @@ rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/e
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10_2/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot_2/
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-17/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot_3/
 rsync -e "ssh" -avz brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-19/data/ ~/01_PROJECTS/exp_cogn_gaphs_fmri/data/behavioral/raw/pilot/
+
+## To get participant data
+
+```bash
+lftp -u tkunze sftp://sftp.sissa.it
+
+cd public_html/fmri_exp/experiment_2026-10-20
+
+lcd /home/tk/01_PROJECTS/fmri_graph_task_web
+
+mirror --verbose --parallel=4 data/ downloaded_data/
+
+bye
+```
+
 
 ### Optional EyeLink in MATLAB Part 2b
 

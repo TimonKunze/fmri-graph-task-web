@@ -6,6 +6,7 @@
 $allowed_origins = [
     'https://brainsci.uber.space',
     'https://brainsci.uberspace.de',
+    'https://people.sissa.it',
 ];
 
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins, true)) {
