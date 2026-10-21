@@ -70,18 +70,42 @@ First deploy with:
 TODO: deploy in, then upload with sftp:
 /home/tk/02_AREAS/websites/sissa_personal/fmri_exp
 
+DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-10-20 npm run build:parts -- "deployment 2026-10-20"
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-03 npm run build:parts -- "deployment 2026-06-03"
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-10 npm run build:parts -- "deployment 2026-06-10"
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-10_2 npm run build:parts -- "deployment 2026-06-10_2"
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-17 npm run build:parts -- "deployment 2026-06-17"
 DEPLOY_BASE_PREFIX=/fmri_exp/experiment_2026-06-19 npm run build:parts -- "deployment 2026-06-19"
 
-Then copy to the server with:
-rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-03/
-rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10/
-rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10_2/
-rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-17/
-rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-19/
+Then copy to local folder with:
+rsync -av dist/ ~/02_AREAS/websites/sissa_personal/fmri_exp/experiment_2026-10-20/
+
+Connect via sftp:
+sftp tkunze@sftp.sissa.it
+
+Go to folder:
+cd public_html
+
+Upload full directory via:
+put -r *
+
+Exit with:
+bye
+
+Set permission with
+chmod a+r $HOME/public_html/*.html
+
+Get data with 
+sftp tkunze@sftp.sissa.it
+cd public_html
+get -r directory
+
+<!-- Then copy to the server with: -->
+<!-- rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-03/ -->
+<!-- rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10/ -->
+<!-- rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-10_2/ -->
+<!-- rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-17/ -->
+<!-- rsync -e "ssh" -avz dist/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/experiment_2026-06-19/ -->
 
 Check the save_data.php is shipped:
 rsync -e "ssh" -avz exp_data/ brainsci@regulus.uberspace.de:/home/brainsci/html/fmri_exp/exp_data/

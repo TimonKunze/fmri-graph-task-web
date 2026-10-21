@@ -36,7 +36,7 @@ const configProfiles = {
   },
   prod: {
     debug: false,
-    telegram: true,
+    telegram: false,
     quick_run: false,
     randomize: true,
     nbLearnBlocks: [5, 5],
