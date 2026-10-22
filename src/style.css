@@ -87,6 +87,50 @@ button:focus-visible {
   margin: 0 auto;
 }
 
+.payment-form-callout {
+  margin: 28px 0;
+  padding: 22px 24px;
+  text-align: center;
+  color: #242424;
+  background: #e0e0e0;
+  border: 1px solid #c4c4c4;
+  border-radius: 14px;
+}
+
+.payment-form-callout p {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.payment-form-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  color: #ffffff;
+  background: #43265f;
+  border-radius: 9px;
+  box-shadow: 0 4px 12px rgba(48, 25, 70, 0.3);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.payment-form-button:hover {
+  color: #ffffff;
+  background: #321b49;
+  box-shadow: 0 6px 16px rgba(48, 25, 70, 0.4);
+  transform: translateY(-1px);
+}
+
+.payment-form-button:focus-visible {
+  color: #ffffff;
+  outline: 3px solid rgba(100, 108, 255, 0.45);
+  outline-offset: 3px;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

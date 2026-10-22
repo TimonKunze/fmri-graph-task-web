@@ -4,6 +4,8 @@ import { PATHS } from "../config/paths.js";
 import { sendMessage } from "../utils/telegram";
 import { jsPsych } from "../main";
 import { t } from "../state/participant.js";
+const PAYMENT_FORM_URL =
+  "https://forms.cloud.microsoft/pages/responsepage.aspx?id=NjPd5B_qLEOx4Wlm6FhPG6GEV4zuShNIkByexE-9ZJxUMFlSRldUQlJSS0FVVkJGNlQ3TUJMUk1KNi4u&route=shorturl";
 
 export const finalPart3Trial = {
   type: jsPsychHtmlButtonResponse,
@@ -22,6 +24,26 @@ export const finalPart3Trial = {
           en: "Thank you for participating. We wish you a wonderful rest of the day!",
           de: "Vielen Dank fur deine Teilnahme. Wir wunschen dir noch einen wunderbaren Tag!",
         })}</h3>
+        <div class="payment-form-callout">
+          <p>${t({
+            it: "Prima di concludere, compila il modulo di pagamento.",
+            en: "Before finishing, please fill out the payment form.",
+            de: "Bevor du abschließt, fülle bitte das Zahlungsformular aus.",
+          })}</p>
+          <a
+            class="payment-form-button"
+            href="${PAYMENT_FORM_URL}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ${t({
+              it: "Compila il modulo di pagamento",
+              en: "Fill out the payment form",
+              de: "Zahlungsformular ausfüllen",
+            })}
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
         <p><strong>${t({ it: "Curiosita:", en: "Fun fact:", de: "Schon gewusst?" })}</strong>
         ${t({
           it: " Alcuni pipistrelli della famiglia dei Pteropodidi (Pteropodidae) amano cosi tanto la frutta da essere chiamati pipistrelli frugivori, o anche pipistrelli della frutta. Aiutano le foreste a crescere mangiando i frutti e disperdendone i semi mentre volano. Alcune specie trasportano i semi per molti chilometri, lontano dall'albero da cui hanno mangiato.",
@@ -37,7 +59,8 @@ export const finalPart3Trial = {
       </div>
     `;
   },
-  // Keep the final screen finite so jsPsych.run() reaches the save barrier.
+  // Finish the trial so jsPsych reaches its save barrier. on_finish restores
+  // the same content as a persistent completion screen.
   choices: [],
   trial_duration: 1000,
   data: {
@@ -55,5 +78,11 @@ export const finalPart3Trial = {
   },
   on_finish: (data) => {
     data.timestamp = Date.now();
+    window.setTimeout(() => {
+      const displayElement = jsPsych.getDisplayElement();
+      if (displayElement) {
+        displayElement.innerHTML = finalPart3Trial.stimulus();
+      }
+    }, 0);
   },
 };

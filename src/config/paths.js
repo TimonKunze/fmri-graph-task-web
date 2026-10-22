@@ -24,7 +24,7 @@ export const PATHS = {
     dotPath: withBase("/stimuli/other/dot.png"),
     undoPath: withBase("/stimuli/other/undo_arrow.png"),
     participantInfo: (language = "en") =>
-        language === "it" ? withBase("/participant_info_ital.pdf") : withBase("/participant_info_engl.pdf"),
+        language === "it" ? withBase("/consent_form_fmri_ital.pdf") : withBase("/consent_form_fmri_ital.pdf"),
 
     testExample: withBase("/stimuli/other/test_example.png"),
     part2DemoVideo1: withBase("/practice_trials/videos/link_2_1.mp4"),
