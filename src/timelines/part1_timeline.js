@@ -92,9 +92,9 @@ export function makeCoreTimeline() {
 
   tl.push(preload_trial);
   tl.push(welcome_trial);
-  if (CONFIG.part1) {
-    tl.push(consent_trial);
-  }
+  // if (CONFIG.part1) {
+  //   tl.push(consent_trial);
+  // }
 
   return tl;
 }
