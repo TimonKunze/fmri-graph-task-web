@@ -13,7 +13,8 @@ function testChoiceCheckpointIgnoresItiAndOtherParticipants(testCase)
 writeState(testCase, 7, 2, 2, 3, 'part2_fmri_iti');
 writeState(testCase, 70, 9, 1, 1, 'part2_fmri_iti');
 info = FindRestartPoint_Part2b(7, [], testCase.TestData.folder);
-verifyEqual(testCase, [info.startRun info.startTrial info.nextAttempt], [2 4 3]);
+% Restart at the last saved trial so it is safely repeated.
+verifyEqual(testCase, [info.startRun info.startTrial info.nextAttempt], [2 3 3]);
 verifyEqual(testCase, info.status, 'READY');
 end
 
@@ -63,7 +64,7 @@ mkdir(crashed);
 E = struct();
 save(fullfile(crashed, 'part2b_subj7_A01_20261008_crash.mat'), 'E');
 info = FindRestartPoint_Part2b(7, [], testCase.TestData.folder);
-verifyEqual(testCase, info.startTrial, 4);
+verifyEqual(testCase, info.startTrial, 3);
 % A later attempt without a checkpoint must not silently reuse attempt 1.
 save(fullfile(crashed, 'part2b_subj7_A02_20261008_crash.mat'), 'E');
 verifyError(testCase, @() FindRestartPoint_Part2b(7, [], testCase.TestData.folder), ...

@@ -180,7 +180,8 @@ function testRestartFinderUsesIncrementalProgress(t)
 E = append(t.TestData.E, 1, 6, 1);
 E = AsyncCheckpoint_Part2b(E, 'drain', 1);
 info = FindRestartPoint_Part2b(7, 1, E.paths.dataDir);
-t.verifyEqual([info.startRun info.startTrial info.nextAttempt], [1 7 2]);
+% Restart at the last saved trial so it is safely repeated.
+t.verifyEqual([info.startRun info.startTrial info.nextAttempt], [1 6 2]);
 end
 
 function testBoundaryTimeoutPreservesFullStateAndLaterCompletion(t)

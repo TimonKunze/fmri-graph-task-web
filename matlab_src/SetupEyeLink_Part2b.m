@@ -64,6 +64,9 @@ try
     E.eye.trackerVersion = NaN;
     E.eye.trackerVersionString = '';
     E.eye.defaults = EyelinkInitDefaults(E.screen.theWindow);
+    E.eye.defaults.msgfont = 'Arial';
+    E.eye.defaults.imgtitlefont = 'Arial';
+    EyelinkUpdateDefaults(E.eye.defaults);
 
     if E.eye.dummy
         E.eye.setupComplete = false;
