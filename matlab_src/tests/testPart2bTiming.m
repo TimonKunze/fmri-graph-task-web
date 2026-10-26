@@ -706,7 +706,7 @@ verifyTrue(testCase, recovered.fileTransferred);
 verifyTrue(testCase, isfile(recovered.localEdfPath));
 end
 
-function testInterruptedRunTransfersPartialEdfWithoutHidingExperimentError(testCase)
+function testInterruptedRunTransfersPartialEdfPreservesOriginalError(testCase)
 global PART2B_TEST_CLOCK PART2B_TEST_EYELINK PART2B_TEST_SCANNER
 E = threeRunEyeLinkFixture(testCase);
 PART2B_TEST_CLOCK.failOnDraw = 4;
