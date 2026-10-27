@@ -66,6 +66,9 @@ try
     E.eye.defaults = EyelinkInitDefaults(E.screen.theWindow);
     E.eye.defaults.msgfont = 'Arial';
     E.eye.defaults.imgtitlefont = 'Arial';
+    % Keep calibration and drift correction silent in the scanner.
+    E.eye.defaults.targetbeep = 0;
+    E.eye.defaults.feedbackbeep = 0;
     EyelinkUpdateDefaults(E.eye.defaults);
 
     if E.eye.dummy

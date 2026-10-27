@@ -47,6 +47,8 @@ verifyTrue(testCase, any(strcmp(PART2B_TEST_EYELINK.messages, 'EXPERIMENT_START 
 verifyEqual(testCase, E.eye.requestedSampleRateHz, 1000);
 verifyEqual(testCase, E.eye.trackerVersion, 5);
 verifyEqual(testCase, E.eye.trackerVersionString, '1000 Plus');
+verifyEqual(testCase, E.eye.defaults.targetbeep, 0);
+verifyEqual(testCase, E.eye.defaults.feedbackbeep, 0);
 commands = callNames();
 commandIndex = find(strcmp(commands, 'Command'), 1, 'last');
 verifyEqual(testCase, PART2B_TEST_EYELINK.calls{commandIndex}{2}, 'sample_rate = %d');
