@@ -45,6 +45,7 @@ function addExperimentProperties() {
     session_timestamp: Date.now(),
     mode: CONFIG.mode,
     activePart: CONFIG.activePart,
+    ...(CONFIG.part1 ? { start_block: getParticipantSetup().startBlock } : {}),
     defaultLanguage: CONFIG.defaultLanguage,
     graphHex: G.hex,
     includeEvalTrials: CONFIG.includeEvalTrials,

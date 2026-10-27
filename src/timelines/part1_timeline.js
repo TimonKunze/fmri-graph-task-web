@@ -21,6 +21,8 @@ import { finalPart1Trial } from "../trials/final_part1_trial.js";
 import { jsPsych } from "../main.js";
 import { getLearnLayoutOrder } from "../state/subjectAssignment.js";
 import { getPart2LearningStimulusOrder } from "../utils/part.js";
+import { createLearningBlockPlan } from "../utils/learningBlocks.js";
+import { createLearnResumeTrial } from "../trials/learn_resume_trial.js";
 
 // ------------------------------------
 // Learn Intro Timeline
@@ -103,15 +105,17 @@ export function makeCoreTimeline() {
 // Part 1 Time line (learn and probe)
 // ------------------------------------
  
-export function makeLearnTimeline() {
+export function makeLearnTimeline(startBlock = 1) {
   const tl = [];
   const orderedLayouts = getLearnLayoutOrder();
   if (!Array.isArray(orderedLayouts) || orderedLayouts.length === 0) {
     throw new Error("[makeLearnTimeline] Missing randomized Part I layout order.");
   }
 
-  let globalBlockCounter = 0;
-  const localBlockCounters = new Map();
+  const blocks = createLearningBlockPlan(orderedLayouts, startBlock);
+  if (startBlock > 1) {
+    tl.push(createLearnResumeTrial(startBlock, orderedLayouts.length));
+  }
   let relQueryInstrShown = false;
 
   const annotateBlock = (trials, layoutType, localBlockIndex, globalBlockIndex) => {
@@ -126,20 +130,16 @@ export function makeLearnTimeline() {
     return trials;
   };
 
-  const pushBlock = (layoutType, nodePositions) => {
-    globalBlockCounter += 1;
-    const localBlockIndex = (localBlockCounters.get(layoutType) ?? 0) + 1;
-    localBlockCounters.set(layoutType, localBlockIndex);
-    const block = `${layoutType}_${localBlockIndex}`;
+  const pushBlock = ({ layoutType, localBlockIndex, globalBlockIndex, block }, nodePositions) => {
 
-    tl.push(...annotateBlock(createLearnTrials(nodePositions, block, layoutType), layoutType, localBlockIndex, globalBlockCounter));
+    tl.push(...annotateBlock(createLearnTrials(nodePositions, block, layoutType), layoutType, localBlockIndex, globalBlockIndex));
 
     if (!relQueryInstrShown) {
       tl.push(learnTrialRelQueryInstr);
       relQueryInstrShown = true;
     }
 
-    tl.push(...annotateBlock(createRelQueryTrials(1, block), layoutType, localBlockIndex, globalBlockCounter));
+    tl.push(...annotateBlock(createRelQueryTrials(1, block), layoutType, localBlockIndex, globalBlockIndex));
     if (CONFIG.feedback) {
       tl.push(createRelQueryTrialFeedback(1));
     }
@@ -147,12 +147,13 @@ export function makeLearnTimeline() {
 
   let previousLayout = null;
 
-  for (const layoutType of orderedLayouts) {
+  for (const block of blocks) {
+    const { layoutType } = block;
     if (previousLayout !== null && layoutType !== previousLayout) {
       tl.push(learnSetTransitionTrial);
     }
     previousLayout = layoutType;
-    pushBlock(layoutType, layoutType === "rotational" ? DESIGN.rotationPos : DESIGN.randomPoss);
+    pushBlock(block, layoutType === "rotational" ? DESIGN.rotationPos : DESIGN.randomPoss);
   }
 
   if (CONFIG.includeEvalTrials) {

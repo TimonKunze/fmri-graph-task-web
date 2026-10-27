@@ -7,6 +7,7 @@ import {
 import { makePart2aTimeline } from "../timelines/part2a_timeline.js";
 import { makePart2bTimeline } from "../timelines/part2b_timeline.js";
 import { makePart3Timeline } from "../timelines/part3_timeline.js";
+import { getParticipantSetup } from "../state/participant.js";
 
 export function buildTimeline() {
   const tl = [];
@@ -14,10 +15,11 @@ export function buildTimeline() {
   tl.push(...makeCoreTimeline());
 
   if (CONFIG.part1) {
-    tl.push(
-        ...makeLearnIntroTimeline(CONFIG),
-        ...makeLearnTimeline()
-    );
+    const { startBlock } = getParticipantSetup();
+    if (startBlock === 1) {
+      tl.push(...makeLearnIntroTimeline(CONFIG));
+    }
+    tl.push(...makeLearnTimeline(startBlock));
   } else if (CONFIG.part2a) {
       tl.push(...makePart2aTimeline());
   } else if (CONFIG.part2b) {

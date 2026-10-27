@@ -6,6 +6,7 @@ const participantSetup = {
   subjectCode: null,
   experimenterNote: "",
   language: DEFAULT_LANGUAGE,
+  startBlock: 1,
 };
 
 export const LANGUAGE_OPTIONS = [
@@ -29,6 +30,10 @@ export function setParticipantSetup(nextSetup = {}) {
 
   if (nextSetup.language) {
     participantSetup.language = nextSetup.language;
+  }
+
+  if (nextSetup.startBlock !== undefined) {
+    participantSetup.startBlock = nextSetup.startBlock;
   }
 }
 

@@ -7,6 +7,25 @@ This project uses vite, start a start a server with `npm run dev`.
 
 Local Vite builds default to development mode. `npm run build:parts` explicitly builds all deployed parts in production mode.
 
+## Starting Part I from a later block
+
+In Part I’s opening **Participant setup** dialog, enter the usual subject code and
+choose **Starting block (experimenter)**. It defaults to **1** on every page load.
+Block 1 runs the normal introduction, practice and complete learning sequence.
+Selecting a later block skips the introduction (including age/gender questions),
+practice and earlier learning blocks, then runs the selected block and all remaining
+blocks. Preloading, the welcome screen and relation-query instructions are retained.
+A short confirmation screen identifies the selected starting block.
+
+Blocks are numbered across both stimulus sets in the participant’s assigned order:
+with the production setting `[4, 4]`, blocks 1–4 belong to the first learned set and
+5–8 to the second. Development mode uses `[1, 1]`, so only blocks 1–2 are available.
+Original block indices, stimulus assignments and the subject’s randomization row
+are preserved. The selected 1-based value is saved as `start_block` in session
+metadata and trial records. This starts a **new session**; it does not restore or
+merge data from an earlier session, and within-block randomization is generated anew.
+Parts IIa, IIb and III are unchanged and do not show this selector.
+
 ## Randomization Info
 
 - The participant-specific randomization is defined in `public/config/randomization_table.csv`.

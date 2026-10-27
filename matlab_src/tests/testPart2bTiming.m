@@ -706,7 +706,7 @@ verifyTrue(testCase, recovered.fileTransferred);
 verifyTrue(testCase, isfile(recovered.localEdfPath));
 end
 
-function testInterruptedRunTransfersPartialEdfPreservesOriginalError(testCase)
+function testInterruptedRunTransfersPartialEdfPreservesOriginalError/home/tk/01_PROJECTS/fmri_graph_task_web(testCase)
 global PART2B_TEST_CLOCK PART2B_TEST_EYELINK PART2B_TEST_SCANNER
 E = threeRunEyeLinkFixture(testCase);
 PART2B_TEST_CLOCK.failOnDraw = 4;
