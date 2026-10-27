@@ -116,7 +116,8 @@ for runIndex = startRun:numel(E.assignment.part2RawNodeRuns)
 end
 
 E.eye.experimentCompleted = true; % Expected EDFs for this completed attempt.
-waitForAnyKey();
+waitForSpecificKey(E.times.continueKey);
+waitForKeyRelease();
 catch err
     E.err = err;
     % Remove any interrupted stimulus before cleanup performs EDF/disk I/O.
@@ -176,23 +177,6 @@ while true
     [~, ~, keyCode] = KbCheck;
     if ~any(keyCode)
         return;
-    end
-    WaitSecs(0.01);
-end
-end
-
-function waitForAnyKey()
-while true
-    [keyIsDown, ~, ~] = KbCheck;
-    if keyIsDown
-        break;
-    end
-    WaitSecs(0.01);
-end
-while true
-    [~, ~, keyCode] = KbCheck;
-    if ~any(keyCode)
-        break;
     end
     WaitSecs(0.01);
 end
