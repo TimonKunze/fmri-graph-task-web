@@ -505,9 +505,6 @@ const INSTRUCTION_COPY = {
     Use the left and right arrow keys to respond.
     </p>
     <p>
-    You have maximally 20s to respond on each choice trial.
-    </p>
-    <p>
     Press the right arrow key now, and we will show you a short demo.
     </p>
     `,

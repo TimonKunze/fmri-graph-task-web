@@ -17,16 +17,18 @@ function createDemoTopHtml() {
       <div style="font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px;">
         ${t({ it: "Solo dimostrazione", en: "Demo only", de: "Nur Demonstration" })}
       </div>
-      <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
-        <img src="${PATHS.part2DemoImage1}" alt="" style="width:220px;max-width:28vw;border-radius:10px;">
-        <img src="${PATHS.part2DemoImage2}" alt="" style="width:220px;max-width:28vw;border-radius:10px;">
-        <img src="${PATHS.part2DemoImage3}" alt="" style="width:220px;max-width:28vw;border-radius:10px;">
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,220px));gap:20px;width:min(700px,84vw);margin:0 auto 20px;">
+        <img src="${PATHS.part2DemoImage1}" alt="" style="width:100%;border-radius:10px;">
+        <img src="${PATHS.part2DemoImage2}" alt="" style="width:100%;border-radius:10px;">
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,220px));gap:20px;width:min(700px,84vw);margin:0 auto;">
+        <img src="${PATHS.part2DemoImage1}" alt="" style="width:100%;border-radius:10px;">
+        <img src="${PATHS.part2DemoImage2}" alt="" style="width:100%;border-radius:10px;">
+        <img src="${PATHS.part2DemoImage3}" alt="" style="width:100%;border-radius:10px;">
       </div>
     </div>
   `;
 }
-
-
 
 export function createPart2DemoTimeline() {
   const topHtml = createDemoTopHtml();

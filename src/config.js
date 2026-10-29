@@ -11,7 +11,7 @@ if (!["dev", "prod"].includes(configuredMode)) {
 const baseConfig = {
   mode: configuredMode, // "dev" | "prod"
 
-  activePart: "1", // 1 | 2a | 2b | 3
+  activePart: "2a", // 1 | 2a | 2b | 3
 
   defaultLanguage: "en", // "en" | "it" | "de"
 
