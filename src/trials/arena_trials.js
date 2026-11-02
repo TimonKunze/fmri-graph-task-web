@@ -485,6 +485,8 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
       };
 
       p.mousePressed = function () {
+        nodeStarted = -1;
+
         for (let i = 0; i < p.TLD.nodes.length; i++) {
           const over =
             p.dist(p.TLD.nodes[i].x, p.TLD.nodes[i].y, p.mouseX, p.mouseY) <=
