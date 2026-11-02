@@ -8,7 +8,7 @@ import { G } from "../config/graphState.js";
 import { PATHS } from "../config/paths.js";
 import { getStimSet, useSecondStimSet } from "../config/stimulus_assignment.js";
 import { getSubjectAssignment } from "../state/subjectAssignment.js";
-import { getCurrentLanguage, t } from "../state/participant.js";
+import { t } from "../state/participant.js";
 
 import { jsPsych } from "../main.js";
 import { rotatePoint } from "../utils/geometry.js";
@@ -505,7 +505,10 @@ export function createPosDrawTrial(c_type = "first", layoutType) {
         // itself is always defined, so checking p.mouseReleased in draw_func
         // would clear edges merely while hovering over the button.
         p.TLD.undoMsOver = p.TLD.isMsOver(...p.TLD.undoPos, 3);
-        if (p.TLD.undoMsOver) connectedPos = [];
+        if (p.TLD.undoMsOver) {
+          connectedPos = [];
+          connectedEdgeKeys.clear();
+        }
       };
 
       p.TLD.isMsOver = function (posX, posY, widthX, widthY, padding = 0) {
